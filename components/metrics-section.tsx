@@ -1,9 +1,8 @@
 "use client"
 
 import React from "react"
-
 import { TrendingUp, TrendingDown, Users, Eye, MousePointer, DollarSign, Globe, Target } from "lucide-react"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useRef } from "react"
 
 const kpiCards = [
   { label: "Visitantes Mensuales", value: 245000, suffix: "", prefix: "", format: "compact", icon: Eye, trend: 12.5, color: "primary" as const },
@@ -26,7 +25,7 @@ const channelPerformance = [
   { channel: "Publicidad PPC", sessions: 12, color: "bg-chart-3" },
 ]
 
-function formatValue(value: number, format: string, prefix: string, suffix: string) {
+function formatValue(value: number, format: string, prefix: string, suffix: string): string {
   if (format === "compact") {
     if (value >= 1000) return `${prefix}${(value / 1000).toFixed(1)}K${suffix}`
     return `${prefix}${value}${suffix}`
@@ -35,55 +34,72 @@ function formatValue(value: number, format: string, prefix: string, suffix: stri
   return `${prefix}${value.toLocaleString()}${suffix}`
 }
 
-function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
-  const [count, setCount] = useState(0)
-  const ref = useRef<HTMLDivElement>(null)
+function animateCountUp(
+  el: HTMLElement,
+  end: number,
+  format: string,
+  prefix: string,
+  suffix: string,
+  duration: number = 2000
+): void {
+  const startTime = Date.now()
+  const timer = setInterval(() => {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 3)
+    const current = Math.floor(eased * end)
+    const displayValue =
+      format === "decimal"
+        ? formatValue(current / 10, format, prefix, suffix)
+        : formatValue(current, format, prefix, suffix)
+    el.textContent = displayValue
+    if (progress >= 1) clearInterval(timer)
+  }, 16)
+}
+
+export function MetricsSection() {
+  const sectionRef = useRef<HTMLDivElement>(null)
   const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!startOnView) return
+    const section = sectionRef.current
+    if (!section) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated.current) {
           hasAnimated.current = true
-          const startTime = Date.now()
-          const timer = setInterval(() => {
-            const elapsed = Date.now() - startTime
-            const progress = Math.min(elapsed / duration, 1)
-            const eased = 1 - Math.pow(1 - progress, 3)
-            setCount(Math.floor(eased * end))
-            if (progress >= 1) clearInterval(timer)
-          }, 16)
+          kpiCards.forEach((kpi) => {
+            const el = section.querySelector(`[data-kpi="${kpi.label}"]`)
+            if (!el) return
+            const endValue =
+              kpi.format === "decimal" ? Math.floor(kpi.value * 10) : kpi.value
+            animateCountUp(
+              el as HTMLElement,
+              endValue,
+              kpi.format,
+              kpi.prefix,
+              kpi.suffix
+            )
+          })
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     )
-    if (ref.current) observer.observe(ref.current)
+    observer.observe(section)
     return () => observer.disconnect()
-  }, [end, duration, startOnView])
-
-  return { count, ref }
-}
-
-export function MetricsSection() {
-  const [counts, setCounts] = useState<{ [key: string]: number }>({})
-  const kpiRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
-
-  useEffect(() => {
-    kpiCards.forEach((kpi) => {
-      const endValue = kpi.format === "decimal" ? Math.floor(kpi.value * 10) : kpi.value
-      kpiRefs.current[kpi.label] = kpiRefs.current[kpi.label] || null
-      const { count } = useCountUp(endValue)
-      setCounts((prevCounts) => ({ ...prevCounts, [kpi.label]: count }))
-    })
   }, [])
 
   return (
-    <section id="metrics" className="flex flex-col gap-4">
+    <section id="metrics" ref={sectionRef} className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-bold text-foreground">Rendimiento Global</h2>
-          <p className="text-sm text-muted-foreground mt-1">Vista general de metricas en tiempo real</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">
+            Rendimiento Global
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Vista general de metricas en tiempo real
+          </p>
         </div>
         <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
           <div className="w-2 h-2 rounded-full bg-chart-3 animate-pulse" />
@@ -96,28 +112,36 @@ export function MetricsSection() {
         {kpiCards.map((kpi) => {
           const Icon = kpi.icon
           const isPositive = kpi.trend > 0
-          const count = counts[kpi.label] || 0
-          const displayValue = kpi.format === "decimal"
-            ? formatValue(count / 10, kpi.format, kpi.prefix, kpi.suffix)
-            : formatValue(count, kpi.format, kpi.prefix, kpi.suffix)
+          const initialValue = formatValue(0, kpi.format, kpi.prefix, kpi.suffix)
 
           return (
             <div
               key={kpi.label}
-              ref={(el) => { kpiRefs.current[kpi.label] = el }}
               className="glass-card rounded-xl p-5 flex flex-col gap-3 hover:border-primary/30 transition-all duration-300 group"
             >
               <div className="flex items-center justify-between">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-lg bg-${kpi.color}/10`}>
-                  <Icon className={`w-5 h-5 text-${kpi.color}`} style={{ color: `hsl(var(--${kpi.color}))` }} />
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg" style={{ backgroundColor: `hsl(var(--${kpi.color}) / 0.1)` }}>
+                  <Icon className="w-5 h-5" style={{ color: `hsl(var(--${kpi.color}))` }} />
                 </div>
-                <div className={`flex items-center gap-1 text-xs font-medium ${isPositive ? "text-chart-3" : "text-destructive"}`}>
-                  {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {isPositive ? "+" : ""}{kpi.trend}%
+                <div
+                  className={`flex items-center gap-1 text-xs font-medium ${isPositive ? "text-chart-3" : "text-destructive"}`}
+                >
+                  {isPositive ? (
+                    <TrendingUp className="w-3 h-3" />
+                  ) : (
+                    <TrendingDown className="w-3 h-3" />
+                  )}
+                  {isPositive ? "+" : ""}
+                  {kpi.trend}%
                 </div>
               </div>
               <div>
-                <span className="font-display text-2xl font-bold text-foreground">{displayValue}</span>
+                <span
+                  className="font-display text-2xl font-bold text-foreground"
+                  data-kpi={kpi.label}
+                >
+                  {initialValue}
+                </span>
                 <p className="text-xs text-muted-foreground mt-1">{kpi.label}</p>
               </div>
             </div>
@@ -137,13 +161,22 @@ export function MetricsSection() {
           </div>
           <div className="flex flex-col gap-3">
             {regionData.map((r) => (
-              <div key={r.region} className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
+              <div
+                key={r.region}
+                className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
+              >
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{r.region}</p>
-                  <p className="text-xs text-muted-foreground">{r.clients} clientes activos</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {r.region}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {r.clients} clientes activos
+                  </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold font-display text-foreground">${r.revenue}</p>
+                  <p className="text-sm font-bold font-display text-foreground">
+                    ${r.revenue}
+                  </p>
                   <p className="text-xs text-chart-3">+{r.growth}%</p>
                 </div>
                 <div className="hidden sm:block w-24 h-2 rounded-full bg-secondary overflow-hidden">
@@ -169,8 +202,15 @@ export function MetricsSection() {
           {/* Donut-like circle */}
           <div className="flex items-center justify-center mb-6">
             <div className="relative w-36 h-36">
-              <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90" aria-hidden="true">
-                {channelPerformance.reduce<{ offset: number; elements: React.ReactNode[] }>(
+              <svg
+                viewBox="0 0 100 100"
+                className="w-full h-full -rotate-90"
+                aria-hidden="true"
+              >
+                {channelPerformance.reduce<{
+                  offset: number
+                  elements: React.ReactNode[]
+                }>(
                   (acc, ch, i) => {
                     const circumference = 2 * Math.PI * 40
                     const strokeLen = (ch.sessions / 100) * circumference
@@ -183,10 +223,13 @@ export function MetricsSection() {
                         r="40"
                         fill="none"
                         stroke={
-                          i === 0 ? "hsl(var(--primary))" :
-                          i === 1 ? "hsl(var(--chart-2))" :
-                          i === 2 ? "hsl(var(--chart-4))" :
-                          "hsl(var(--chart-3))"
+                          i === 0
+                            ? "hsl(var(--primary))"
+                            : i === 1
+                              ? "hsl(var(--chart-2))"
+                              : i === 2
+                                ? "hsl(var(--chart-4))"
+                                : "hsl(var(--chart-3))"
                         }
                         strokeWidth="10"
                         strokeDasharray={`${strokeLen - gap} ${circumference - strokeLen + gap}`}
@@ -202,8 +245,12 @@ export function MetricsSection() {
                 ).elements}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-display text-xl font-bold text-foreground">100%</span>
-                <span className="text-[10px] text-muted-foreground">Sesiones</span>
+                <span className="font-display text-xl font-bold text-foreground">
+                  100%
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  Sesiones
+                </span>
               </div>
             </div>
           </div>
@@ -212,8 +259,12 @@ export function MetricsSection() {
             {channelPerformance.map((ch) => (
               <div key={ch.channel} className="flex items-center gap-3">
                 <div className={`w-2.5 h-2.5 rounded-full ${ch.color}`} />
-                <span className="flex-1 text-xs text-muted-foreground">{ch.channel}</span>
-                <span className="text-xs font-semibold text-foreground">{ch.sessions}%</span>
+                <span className="flex-1 text-xs text-muted-foreground">
+                  {ch.channel}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
+                  {ch.sessions}%
+                </span>
               </div>
             ))}
           </div>
