@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 import {
   LayoutDashboard,
   Briefcase,
@@ -13,16 +15,25 @@ import {
   ChevronRight,
   Menu,
   X,
+  Users,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { id: "hero", label: "Dashboard", icon: LayoutDashboard },
-  { id: "metrics", label: "Rendimiento", icon: BarChart3 },
-  { id: "services", label: "Servicios", icon: Briefcase },
-  { id: "portfolio", label: "Portafolio", icon: FolderOpen },
-  { id: "testimonials", label: "Testimonios", icon: MessageSquareQuote },
-  { id: "contact", label: "Contacto", icon: Mail },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/servicios", label: "Servicios", icon: Briefcase },
+  { href: "/portafolio", label: "Portafolio", icon: FolderOpen },
+  { href: "/nosotros", label: "Nosotros", icon: Users },
+  { href: "/contacto", label: "Contacto", icon: Mail },
+]
+
+const dashboardScrollItems = [
+  { id: "hero", label: "Inicio" },
+  { id: "metrics", label: "Rendimiento" },
+  { id: "services", label: "Servicios" },
+  { id: "portfolio", label: "Portafolio" },
+  { id: "testimonials", label: "Testimonios" },
+  { id: "contact", label: "Contacto" },
 ]
 
 const regions = [
@@ -35,10 +46,10 @@ const regions = [
 export function SidebarNav() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("hero")
+  const pathname = usePathname()
+  const isHome = pathname === "/"
 
-  const handleNavClick = (id: string) => {
-    setActiveSection(id)
+  const handleScrollTo = (id: string) => {
     setMobileOpen(false)
     const el = document.getElementById(id)
     if (el) {
@@ -80,27 +91,33 @@ export function SidebarNav() {
       >
         {/* Logo */}
         <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-border/50", collapsed && "justify-center")}>
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground font-bold font-display text-sm shrink-0">
-            SG
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-sm text-foreground leading-tight">Start By Global</span>
-              <span className="text-[10px] text-muted-foreground leading-tight">Marketing Digital</span>
+          <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground font-bold font-display text-sm shrink-0">
+              SG
             </div>
-          )}
+            {!collapsed && (
+              <div className="flex flex-col">
+                <span className="font-display font-bold text-sm text-foreground leading-tight">Start By Global</span>
+                <span className="text-[10px] text-muted-foreground leading-tight">Marketing Digital</span>
+              </div>
+            )}
+          </Link>
         </div>
 
-        {/* Nav Items */}
+        {/* Main Navigation */}
         <nav className="flex-1 py-4 px-2 flex flex-col gap-1 overflow-y-auto">
+          <div className={cn("px-1 mb-2", collapsed && "hidden")}>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Navegacion</p>
+          </div>
+
           {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeSection === item.id
+            const isActive = pathname === item.href
             return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleNavClick(item.id)}
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 group",
                   collapsed && "justify-center px-0",
@@ -112,9 +129,36 @@ export function SidebarNav() {
               >
                 <Icon className={cn("w-5 h-5 shrink-0", isActive && "text-primary")} />
                 {!collapsed && <span className="truncate">{item.label}</span>}
-              </button>
+                {isActive && !collapsed && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
+                )}
+              </Link>
             )
           })}
+
+          {/* Dashboard scroll links - only on home */}
+          {isHome && (
+            <>
+              <div className={cn("px-1 mt-4 mb-2", collapsed && "hidden")}>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Secciones</p>
+              </div>
+              {dashboardScrollItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleScrollTo(item.id)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-xs transition-all duration-200 text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    collapsed && "justify-center px-0"
+                  )}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <BarChart3 className="w-3.5 h-3.5 shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </button>
+              ))}
+            </>
+          )}
         </nav>
 
         {/* Regions */}
@@ -126,7 +170,7 @@ export function SidebarNav() {
             {regions.map((r) => (
               <div
                 key={r.flag}
-                className="flex items-center justify-center rounded-md bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                className="flex items-center justify-center rounded-md bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
                 title={r.label}
               >
                 <Globe className={cn("w-4 h-4", collapsed ? "m-2" : "m-1.5")} />
