@@ -5,6 +5,7 @@ import { ServicesSection } from "@/components/services-section"
 import { PortfolioSection } from "@/components/portfolio-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { ContactSection } from "@/components/contact-section"
+import { CtaBanner } from "@/components/cta-banner"
 import { Footer } from "@/components/footer"
 
 export default function Page() {
@@ -38,6 +39,7 @@ export default function Page() {
           <PortfolioSection />
           <TestimonialsSection />
           <ContactSection />
+          <CtaBanner />
           <Footer />
         </div>
       </main>

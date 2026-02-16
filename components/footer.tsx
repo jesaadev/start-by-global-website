@@ -52,7 +52,10 @@ export function Footer() {
             ))}
           </nav>
 
-          <div className="sm:ml-auto flex items-center gap-4 text-[10px] text-muted-foreground">
+          <div className="sm:ml-auto flex items-center gap-4 text-[10px] text-muted-foreground flex-wrap">
+            <a href="mailto:info@startbyglobal.com" className="hover:text-primary transition-colors">
+              info@startbyglobal.com
+            </a>
             <span className="flex items-center gap-1">
               <Globe className="w-3 h-3" />
               RD / ES / LATAM / US

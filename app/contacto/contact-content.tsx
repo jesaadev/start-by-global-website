@@ -19,10 +19,10 @@ import {
 import { useState } from "react"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (809) 555-0100", email: "rd@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
-  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "+34 91 555 0100", email: "es@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
-  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "+52 55 5555 0100", email: "mx@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
-  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "+1 (305) 555-0100", email: "us@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (809) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
+  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "+34 91 555 0100", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
+  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "+52 55 5555 0100", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
+  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "+1 (305) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
 ]
 
 const contactMethods = [
@@ -41,12 +41,36 @@ export function ContactPageContent() {
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 5000)
-    setFormData({ name: "", email: "", company: "", service: "", budget: "", message: "" })
+    setSending(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Error al enviar. Intenta de nuevo.")
+        setSending(false)
+        return
+      }
+
+      setSubmitted(true)
+      setFormData({ name: "", email: "", company: "", service: "", budget: "", message: "" })
+      setTimeout(() => setSubmitted(false), 6000)
+    } catch {
+      setError("Error de conexion. Verifica tu internet e intenta de nuevo.")
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -179,12 +203,28 @@ export function ContactPageContent() {
                   />
                 </div>
 
+                {error && (
+                  <div className="px-4 py-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]"
+                  disabled={sending}
+                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none"
                 >
-                  <Send className="w-4 h-4" />
-                  Enviar Mensaje
+                  {sending ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Enviar Mensaje
+                    </>
+                  )}
                 </button>
               </form>
             )}

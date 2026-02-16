@@ -21,12 +21,36 @@ export function ContactSection() {
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 4000)
-    setFormData({ name: "", email: "", company: "", service: "", message: "" })
+    setSending(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Error al enviar. Intenta de nuevo.")
+        setSending(false)
+        return
+      }
+
+      setSubmitted(true)
+      setFormData({ name: "", email: "", company: "", service: "", message: "" })
+      setTimeout(() => setSubmitted(false), 5000)
+    } catch {
+      setError("Error de conexion. Verifica tu internet e intenta de nuevo.")
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -135,12 +159,28 @@ export function ContactSection() {
                   />
                 </div>
 
+                {error && (
+                  <div className="px-4 py-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+                    {error}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] mt-2"
+                  disabled={sending}
+                  className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] mt-2 disabled:opacity-60 disabled:pointer-events-none"
                 >
-                  <Send className="w-4 h-4" />
-                  Enviar Mensaje
+                  {sending ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Enviar Mensaje
+                    </>
+                  )}
                 </button>
               </form>
             )}
@@ -187,11 +227,11 @@ export function ContactSection() {
               </p>
               <div className="flex flex-col gap-2">
                 <a
-                  href="mailto:hola@startbyglobal.com"
+                  href="mailto:info@startbyglobal.com"
                   className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  hola@startbyglobal.com
+                  info@startbyglobal.com
                   <ArrowUpRight className="w-3 h-3 ml-auto" />
                 </a>
               </div>
