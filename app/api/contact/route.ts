@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { Resend } from "resend"
 
 interface ContactFormData {
   name: string
@@ -131,32 +132,34 @@ export async function POST(request: Request) {
     const resendApiKey = process.env.RESEND_API_KEY
 
     if (resendApiKey) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${resendApiKey}`,
-        },
-        body: JSON.stringify({
-          from: "Start By Global <noreply@startbyglobal.com>",
+      try {
+        const resend = new Resend(resendApiKey)
+        
+        const { error } = await resend.emails.send({
+          from: "Start By Global <onboarding@resend.dev>",
           to: ["info@startbyglobal.com"],
-          reply_to: formData.email,
+          replyTo: formData.email,
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
-        }),
-      })
+        })
 
-      if (!res.ok) {
-        const errorBody = await res.text()
-        console.error("[Contact API] Resend error:", errorBody)
+        if (error) {
+          console.error("[Contact API] Resend error:", error)
+          return NextResponse.json(
+            { error: "Error al enviar el email. Por favor intenta de nuevo." },
+            { status: 500 }
+          )
+        }
+
+        return NextResponse.json({ success: true, method: "resend" })
+      } catch (err) {
+        console.error("[Contact API] Resend exception:", err)
         return NextResponse.json(
           { error: "Error al enviar el email. Por favor intenta de nuevo." },
           { status: 500 }
         )
       }
-
-      return NextResponse.json({ success: true, method: "resend" })
     }
 
     // Fallback: Log the contact submission and return success
