@@ -93,9 +93,9 @@ export function SidebarNav() {
         <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-border/50", collapsed && "justify-center px-2")}>
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <img 
-              src="/logo-blue.svg" 
+              src="/logo-black.svg" 
               alt="Start By Global" 
-              className={cn("shrink-0 transition-all", collapsed ? "h-8" : "h-10")}
+              className={cn("shrink-0 transition-all invert", collapsed ? "h-8" : "h-10")}
             />
           </Link>
         </div>
