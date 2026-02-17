@@ -138,11 +138,15 @@ export async function POST(request: Request) {
         const { error } = await resend.emails.send({
           from: "Start By Global <onboarding@startbyglobal.com>",
           to: ["info@startbyglobal.com"],
-          replyTo: formData.email,
+          headers: {
+            'In-Reply-To': formData.email,
+          },
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
         })
+
+
 
         if (error) {
           console.error("[Contact API] Resend error:", error)
