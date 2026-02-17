@@ -158,7 +158,7 @@ export async function POST(request: Request) {
           from: "Start By Global <onboarding@resend.dev>",
           to: ["jhonesaa23@gmail.com"],
           cc: ["startbyglobal@gmail.com"],
-          replyTo: formData.email,
+          replyTo: [],
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
