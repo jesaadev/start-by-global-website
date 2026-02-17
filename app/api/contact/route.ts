@@ -138,9 +138,15 @@ export async function POST(request: Request) {
         const { error } = await resend.emails.send({
           from: "Start By Global <onboarding@startbyglobal.com>",
           to: ["info@startbyglobal.com"],
-          headers: {
-            'In-Reply-To': formData.email,
-          },
+          subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
+          html: htmlContent,
+          text: textContent,
+        })
+
+        const { error } = await resend.emails.send({
+          from: "Start By Global <onboarding@startbyglobal.com>",
+          cc: ["startbyglobal@gmail.com"],
+          to: ["jhonesaa23@gmail.com"],
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
