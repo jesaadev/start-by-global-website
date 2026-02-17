@@ -134,9 +134,9 @@ export async function POST(request: Request) {
     if (resendApiKey) {
       try {
         const resend = new Resend(resendApiKey)
-        
+
         const { error } = await resend.emails.send({
-          from: "Start By Global <onboarding@resend.dev>",
+          from: "Start By Global <onboarding@startbyglobal.com>",
           to: ["info@startbyglobal.com"],
           replyTo: formData.email,
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
