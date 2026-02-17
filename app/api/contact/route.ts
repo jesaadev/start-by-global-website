@@ -137,7 +137,7 @@ export async function POST(request: Request) {
 
         // Send to info@startbyglobal.com
         const { error: error1 } = await resend.emails.send({
-          from: "Start By Global <onboarding@resend.dev>",
+          from: "Start By Global <onboarding@startbyglobal.com>",
           to: ["info@startbyglobal.com"],
           replyTo: formData.email,
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
 
         // Send copy to additional recipients
         const { error: error2 } = await resend.emails.send({
-          from: "Start By Global <onboarding@resend.dev>",
+          from: "Start By Global <onboarding@startbyglobal.com>",
           to: ["jhonesaa23@gmail.com"],
           cc: ["startbyglobal@gmail.com"],
           replyTo: [],
