@@ -90,17 +90,13 @@ export function SidebarNav() {
         )}
       >
         {/* Logo */}
-        <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-border/50", collapsed && "justify-center")}>
+        <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-border/50", collapsed && "justify-center px-2")}>
           <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary text-primary-foreground font-bold font-display text-sm shrink-0">
-              SG
-            </div>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="font-display font-bold text-sm text-foreground leading-tight">Start By Global</span>
-                <span className="text-[10px] text-muted-foreground leading-tight">Marketing Digital</span>
-              </div>
-            )}
+            <img 
+              src="/logo-blue.svg" 
+              alt="Start By Global" 
+              className={cn("shrink-0 transition-all", collapsed ? "h-8" : "h-10")}
+            />
           </Link>
         </div>
 

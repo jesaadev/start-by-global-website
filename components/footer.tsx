@@ -9,13 +9,11 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground font-bold font-display text-xs">
-                SG
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-foreground">Start By Global</p>
-                <p className="text-[10px] text-muted-foreground">Soluciones Web & Marketing Digital</p>
-              </div>
+              <img 
+                src="/logo-blue.svg" 
+                alt="Start By Global" 
+                className="h-10"
+              />
             </Link>
           </div>
 
