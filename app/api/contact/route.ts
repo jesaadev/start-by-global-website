@@ -135,31 +135,38 @@ export async function POST(request: Request) {
       try {
         const resend = new Resend(resendApiKey)
 
-        const { error } = await resend.emails.send({
-          from: "Start By Global <onboarding@startbyglobal.com>",
+        // Send to info@startbyglobal.com
+        const { error: error1 } = await resend.emails.send({
+          from: "Start By Global <onboarding@resend.dev>",
           to: ["info@startbyglobal.com"],
+          replyTo: formData.email,
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
         })
 
-        const { error } = await resend.emails.send({
-          from: "Start By Global <onboarding@startbyglobal.com>",
-          cc: ["startbyglobal@gmail.com"],
-          to: ["jhonesaa23@gmail.com"],
-          subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
-          html: htmlContent,
-          text: textContent,
-        })
-
-
-
-        if (error) {
-          console.error("[Contact API] Resend error:", error)
+        if (error1) {
+          console.error("[Contact API] Resend error (info):", error1)
           return NextResponse.json(
             { error: "Error al enviar el email. Por favor intenta de nuevo." },
             { status: 500 }
           )
+        }
+
+        // Send copy to additional recipients
+        const { error: error2 } = await resend.emails.send({
+          from: "Start By Global <onboarding@resend.dev>",
+          to: ["jhonesaa23@gmail.com"],
+          cc: ["startbyglobal@gmail.com"],
+          replyTo: formData.email,
+          subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
+          html: htmlContent,
+          text: textContent,
+        })
+
+        if (error2) {
+          console.error("[Contact API] Resend error (copy):", error2)
+          // Don't fail the request if the copy fails, main email was sent
         }
 
         return NextResponse.json({ success: true, method: "resend" })
