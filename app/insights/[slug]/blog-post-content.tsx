@@ -21,7 +21,7 @@ const blogPostsData: Record<string, any> = {
     title: "IA en Marketing Digital: 5 Tendencias que Dominarán 2026",
     excerpt: "La inteligencia artificial está redefiniendo cómo las marcas se conectan con sus audiencias.",
     author: "María González",
-    date: "2026-02-15",
+    date: "15 de febrero de 2026",
     readTime: "8 min",
     category: "Marketing Digital",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
@@ -106,11 +106,7 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              {new Date(post.date).toLocaleDateString("es", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              {post.date}
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="w-4 h-4" />
