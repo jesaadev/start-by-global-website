@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Users,
+  BookOpen,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/servicios", label: "Servicios", icon: Briefcase },
   { href: "/portafolio", label: "Portafolio", icon: FolderOpen },
   { href: "/nosotros", label: "Nosotros", icon: Users },
+  { href: "/insights", label: "Insights", icon: BookOpen },
   { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
