@@ -31,7 +31,8 @@ const blogPosts = [
     excerpt: "La inteligencia artificial está redefiniendo cómo las marcas se conectan con sus audiencias. Descubre las estrategias que liderarán el próximo año.",
     category: "marketing",
     author: "María González",
-    date: "2026-02-15",
+    date: "15 de febrero de 2026",
+    dateShort: "15 feb",
     readTime: "8 min",
     image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
     featured: true,
@@ -42,7 +43,8 @@ const blogPosts = [
     excerpt: "Exploramos las últimas actualizaciones del framework más popular de React y cómo pueden mejorar tu flujo de desarrollo.",
     category: "desarrollo",
     author: "Carlos Méndez",
-    date: "2026-02-12",
+    date: "12 de febrero de 2026",
+    dateShort: "12 feb",
     readTime: "6 min",
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
     featured: false,
@@ -53,7 +55,8 @@ const blogPosts = [
     excerpt: "Posiciona tu negocio en las búsquedas locales con estas tácticas probadas específicas para el mercado dominicano.",
     category: "marketing",
     author: "Ana Rodríguez",
-    date: "2026-02-10",
+    date: "10 de febrero de 2026",
+    dateShort: "10 feb",
     readTime: "7 min",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
     featured: false,
@@ -64,7 +67,8 @@ const blogPosts = [
     excerpt: "Mejora la calidad de tu código con estas técnicas avanzadas de TypeScript que todo desarrollador debería conocer.",
     category: "desarrollo",
     author: "Luis Pérez",
-    date: "2026-02-08",
+    date: "8 de febrero de 2026",
+    dateShort: "8 feb",
     readTime: "10 min",
     image: "https://images.unsplash.com/photo-1619410283995-43d9134e7656?w=800&q=80",
     featured: false,
@@ -75,7 +79,8 @@ const blogPosts = [
     excerpt: "Analizamos cómo la descentralización puede impactar tu modelo de negocio y qué oportunidades presenta.",
     category: "tendencias",
     author: "Roberto Santos",
-    date: "2026-02-05",
+    date: "5 de febrero de 2026",
+    dateShort: "5 feb",
     readTime: "9 min",
     image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
     featured: false,
@@ -86,7 +91,8 @@ const blogPosts = [
     excerpt: "El email sigue siendo uno de los canales más rentables. Descubre las estrategias que generan resultados reales.",
     category: "marketing",
     author: "Patricia Núñez",
-    date: "2026-02-03",
+    date: "3 de febrero de 2026",
+    dateShort: "3 feb",
     readTime: "5 min",
     image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80",
     featured: false,
@@ -186,11 +192,7 @@ export function InsightsContent() {
                   <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="w-3 h-3" />
-                      {new Date(featuredPost.date).toLocaleDateString("es", { 
-                        day: "numeric", 
-                        month: "long", 
-                        year: "numeric" 
-                      })}
+                      {featuredPost.date}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1.5">
@@ -246,10 +248,7 @@ export function InsightsContent() {
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {new Date(post.date).toLocaleDateString("es", { 
-                        day: "numeric", 
-                        month: "short" 
-                      })}
+                      {post.dateShort}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
