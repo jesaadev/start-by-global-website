@@ -17,6 +17,7 @@ import {
   X,
   Users,
   BookOpen,
+  Layers,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/portafolio", label: "Portafolio", icon: FolderOpen },
   { href: "/nosotros", label: "Nosotros", icon: Users },
   { href: "/insights", label: "Insights", icon: BookOpen },
+  { href: "/outsourcing", label: "Outsourcing", icon: Layers, highlight: true },
   { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
@@ -111,6 +113,7 @@ export function SidebarNav() {
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
+            const isHighlight = (item as any).highlight
             return (
               <Link
                 key={item.href}
@@ -121,12 +124,19 @@ export function SidebarNav() {
                   collapsed && "justify-center px-0",
                   isActive
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    : isHighlight
+                      ? "text-[#0074D9] bg-[#0074D9]/8 hover:bg-[#0074D9]/15 border border-[#0074D9]/20"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 )}
                 title={collapsed ? item.label : undefined}
               >
-                <Icon className={cn("w-5 h-5 shrink-0", isActive && "text-primary")} />
-                {!collapsed && <span className="truncate">{item.label}</span>}
+                <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-primary" : isHighlight ? "text-[#0074D9]" : "")} />
+                {!collapsed && <span className="truncate font-medium">{item.label}</span>}
+                {!collapsed && isHighlight && !isActive && (
+                  <div className="ml-auto px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#0074D9]/20 text-[#0074D9] uppercase tracking-wide">
+                    New
+                  </div>
+                )}
                 {isActive && !collapsed && (
                   <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />
                 )}
