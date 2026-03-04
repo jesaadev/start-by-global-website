@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
   Briefcase,
