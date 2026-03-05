@@ -19,10 +19,10 @@ import {
 import { useState } from "react"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (809) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
-  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "+34 91 555 0100", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
-  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "+52 55 5555 0100", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
-  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "+1 (305) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (849) 356-2247", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
+  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
+  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
+  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "", email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
 ]
 
 const contactMethods = [
@@ -252,10 +252,14 @@ export function ContactPageContent() {
                         {office.address}
                       </p>
                       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {office.phone}
-                        </span>
+                        <div>
+                          {office.phone && (
+                            <a href={`tel:${office.phone.replace(/\s+/g, '')}`} className="text-[11px] text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+                              <Phone className="w-3 h-3" />
+                              {office.phone}
+                            </a>
+                          )}
+                        </div>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {office.timezone}
