@@ -25,6 +25,150 @@ interface BlogPostContentProps {
   slug: string
 }
 
+// ---------------------------------------------------------------------------
+// Minimal HTML → React renderer
+// Converts the HTML strings in blog-data into JSX with explicit Tailwind
+// classes so typography renders correctly without @tailwindcss/typography.
+// ---------------------------------------------------------------------------
+function ArticleBody({ html }: { html: string }) {
+  // Split on block-level tags we care about
+  const segments: React.ReactNode[] = []
+
+  // We process the raw HTML string into logical blocks line-by-line.
+  // Supported tags: h2, h3, p, ul, ol, blockquote, (li handled inside ul/ol)
+  const blockRegex =
+    /<(h2|h3|p|ul|ol|blockquote)([^>]*)>([\s\S]*?)<\/\1>/g
+
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+  let key = 0
+
+  // biome-ignore lint/suspicious/noAssignInExpressions: intentional pattern
+  while ((match = blockRegex.exec(html)) !== null) {
+    const [fullMatch, tag, , inner] = match
+
+    // Any raw text between blocks (shouldn't exist but just in case)
+    if (match.index > lastIndex) {
+      const between = html.slice(lastIndex, match.index).trim()
+      if (between) {
+        segments.push(
+          <p key={key++} className="text-muted-foreground leading-[1.9] text-[1.0625rem]">
+            <InlineHtml html={between} />
+          </p>
+        )
+      }
+    }
+    lastIndex = match.index + fullMatch.length
+
+    if (tag === "h2") {
+      segments.push(
+        <h2
+          key={key++}
+          className="font-display text-2xl sm:text-[1.75rem] font-bold text-foreground mt-12 mb-5 pb-3 border-b border-border/40 leading-snug tracking-tight"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: safe – controlled content
+          dangerouslySetInnerHTML={{ __html: inner }}
+        />
+      )
+    } else if (tag === "h3") {
+      segments.push(
+        <h3
+          key={key++}
+          className="font-display text-lg sm:text-xl font-semibold text-foreground mt-8 mb-3 leading-snug"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: safe – controlled content
+          dangerouslySetInnerHTML={{ __html: inner }}
+        />
+      )
+    } else if (tag === "p") {
+      segments.push(
+        <p key={key++} className="text-muted-foreground leading-[1.9] text-[1.0625rem] mb-1">
+          <InlineHtml html={inner} />
+        </p>
+      )
+    } else if (tag === "blockquote") {
+      const text = inner.replace(/<[^>]+>/g, "").trim()
+      segments.push(
+        <blockquote
+          key={key++}
+          className="my-8 pl-5 pr-4 py-4 border-l-4 border-primary/70 bg-primary/5 rounded-r-xl text-foreground font-medium text-lg sm:text-xl leading-relaxed italic"
+        >
+          {text}
+        </blockquote>
+      )
+    } else if (tag === "ul") {
+      const items = extractListItems(inner)
+      segments.push(
+        <ul key={key++} className="mt-4 mb-6 space-y-2.5 pl-1">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-3 text-muted-foreground leading-relaxed text-[1.0625rem]">
+              <span className="mt-[0.35rem] w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              <span><InlineHtml html={item} /></span>
+            </li>
+          ))}
+        </ul>
+      )
+    } else if (tag === "ol") {
+      const items = extractListItems(inner)
+      segments.push(
+        <ol key={key++} className="mt-4 mb-6 space-y-3 pl-1">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-3 text-muted-foreground leading-relaxed text-[1.0625rem]">
+              <span className="mt-0.5 flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 font-display">
+                {i + 1}
+              </span>
+              <span><InlineHtml html={item} /></span>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  }
+
+  return <div className="space-y-2">{segments}</div>
+}
+
+/** Extracts <li> inner HTML strings from a list block */
+function extractListItems(html: string): string[] {
+  const items: string[] = []
+  const liRegex = /<li[^>]*>([\s\S]*?)<\/li>/g
+  let m: RegExpExecArray | null
+  // biome-ignore lint/suspicious/noAssignInExpressions: intentional pattern
+  while ((m = liRegex.exec(html)) !== null) {
+    items.push(m[1].trim())
+  }
+  return items
+}
+
+/** Renders inline HTML (strong, em, a, code) safely */
+function InlineHtml({ html }: { html: string }) {
+  // Replace inline tags with spans carrying explicit classes
+  const processed = html
+    .replace(
+      /<strong>([\s\S]*?)<\/strong>/g,
+      '<strong class="font-semibold text-foreground">$1</strong>'
+    )
+    .replace(
+      /<em>([\s\S]*?)<\/em>/g,
+      '<em class="italic">$1</em>'
+    )
+    .replace(
+      /<code>([\s\S]*?)<\/code>/g,
+      '<code class="font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded-md text-sm">$1</code>'
+    )
+    .replace(
+      /<a href="([^"]*)">([\s\S]*?)<\/a>/g,
+      '<a href="$1" class="text-primary font-medium underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors">$2</a>'
+    )
+
+  return (
+    <span
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: safe – controlled inline content
+      dangerouslySetInnerHTML={{ __html: processed }}
+    />
+  )
+}
+
+// ---------------------------------------------------------------------------
+
 export function BlogPostContent({ slug }: BlogPostContentProps) {
   const post = blogPostsData[slug]
 
@@ -50,7 +194,8 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
     )
   }
 
-  const colorClass = categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
+  const colorClass =
+    categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -68,48 +213,53 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
       {/* Header */}
       <AnimateIn delay={0.1}>
-        <div className="space-y-5">
-          {/* Category + meta row */}
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold ${colorClass}`}>
+        <div className="space-y-6">
+          {/* Category + meta */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold ${colorClass}`}
+            >
               <Tag className="w-3 h-3" />
               {post.category}
             </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Calendar className="w-3.5 h-3.5" />
               {post.date}
             </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />
               {post.readTime} de lectura
             </span>
-            <span className="flex items-center gap-1.5 text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <User className="w-3.5 h-3.5" />
               {post.author}
             </span>
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-balance leading-tight">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-balance leading-[1.15] tracking-tight">
             {post.title}
           </h1>
 
-          {/* Excerpt / Lead */}
-          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed text-balance border-l-4 border-primary/40 pl-5">
+          {/* Lead */}
+          <p className="text-lg sm:text-xl text-muted-foreground leading-[1.75] border-l-4 border-primary/50 pl-5 text-balance">
             {post.excerpt}
           </p>
 
           {/* Share */}
-          <div className="flex items-center gap-3 pt-2 border-t border-border/50">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Compartir</span>
+          <div className="flex items-center gap-3 pt-1 border-t border-border/50">
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
+              Compartir
+            </span>
             <div className="flex items-center gap-2">
               {[
-                { icon: Twitter,   label: "Twitter"  },
-                { icon: Linkedin,  label: "LinkedIn" },
-                { icon: LinkIcon,  label: "Copiar enlace" },
+                { icon: Twitter,  label: "Twitter"  },
+                { icon: Linkedin, label: "LinkedIn" },
+                { icon: LinkIcon, label: "Copiar enlace" },
               ].map(({ icon: Icon, label }) => (
                 <button
                   key={label}
+                  type="button"
                   aria-label={label}
                   className="p-2 rounded-lg bg-card hover:bg-secondary border border-border/50 text-muted-foreground hover:text-foreground transition-all"
                 >
@@ -123,7 +273,7 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
       {/* Hero Image */}
       <AnimateIn delay={0.2}>
-        <div className="relative h-[280px] sm:h-[420px] rounded-2xl overflow-hidden">
+        <div className="relative h-[260px] sm:h-[420px] rounded-2xl overflow-hidden">
           <img
             src={post.image}
             alt={post.title}
@@ -135,53 +285,17 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
       {/* Article Body */}
       <AnimateIn delay={0.3}>
-        <article className="glass-card rounded-2xl p-6 sm:p-10">
-          {/*
-            Prose-style rendering.
-            The HTML strings use semantic tags: h2, h3, p, ul, ol, li, blockquote, strong, a, code.
-            We apply explicit Tailwind classes via the prose-* variant set.
-          */}
-          <div
-            className="
-              prose prose-invert max-w-none
-
-              /* paragraphs */
-              prose-p:text-muted-foreground prose-p:leading-[1.85] prose-p:mb-5 prose-p:text-base
-
-              /* headings */
-              prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground prose-headings:text-balance
-              prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border/40
-              prose-h3:text-lg prose-h3:sm:text-xl prose-h3:mt-7 prose-h3:mb-3
-
-              /* links */
-              prose-a:text-primary prose-a:font-medium prose-a:underline prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
-
-              /* blockquote */
-              prose-blockquote:not-italic prose-blockquote:border-l-4 prose-blockquote:border-primary/60
-              prose-blockquote:pl-5 prose-blockquote:py-1
-              prose-blockquote:text-foreground prose-blockquote:font-medium prose-blockquote:text-lg
-              prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-xl prose-blockquote:my-8
-
-              /* lists */
-              prose-ul:text-muted-foreground prose-ul:my-4 prose-ul:pl-5
-              prose-ol:text-muted-foreground prose-ol:my-4 prose-ol:pl-5
-              prose-li:my-2 prose-li:leading-relaxed
-
-              /* inline code */
-              prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-
-              /* strong */
-              prose-strong:text-foreground prose-strong:font-semibold
-            "
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+        <article className="glass-card rounded-2xl p-7 sm:p-12">
+          <ArticleBody html={post.content} />
         </article>
       </AnimateIn>
 
-      {/* Author Card */}
+      {/* Author */}
       <AnimateIn delay={0.4}>
         <div className="glass-card rounded-2xl p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Sobre el autor</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+            Sobre el autor
+          </p>
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center text-xl font-bold text-white shrink-0 font-display">
               {post.author.charAt(0)}
@@ -200,19 +314,25 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
       {/* CTA */}
       <AnimateIn delay={0.5}>
-        <div className="rounded-2xl p-8 sm:p-10 text-center relative overflow-hidden border border-primary/20"
-          style={{ background: "linear-gradient(135deg, hsl(16 85% 55% / 0.08) 0%, hsl(190 70% 50% / 0.05) 100%)" }}
+        <div
+          className="rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden border border-primary/20"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(16 85% 55% / 0.07) 0%, hsl(190 70% 50% / 0.04) 100%)",
+          }}
         >
-          <div className="relative z-10 space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Start By Global</p>
+          <div className="relative z-10 space-y-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+              Start By Global
+            </p>
             <h3 className="font-display text-2xl sm:text-3xl font-bold text-balance">
               ¿Listo para Aplicar Estas Estrategias?
             </h3>
             <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado a tu negocio
-              y mercado específico.
+              Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado
+              a tu negocio y mercado específico.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
               <Link
                 href="/contacto"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
