@@ -172,11 +172,11 @@ export function TestimonialsSection() {
                 }`}>
                   {item.name.split(" ").map((n) => n[0]).join("")}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 overflow-hidden">
                   <p className="text-xs font-medium text-foreground truncate">{item.name}</p>
                   <p className="text-[10px] text-muted-foreground truncate">{item.region}</p>
                 </div>
-                <span className="text-[10px] font-bold text-chart-3 whitespace-nowrap">{item.metric}</span>
+                <span className="text-[10px] font-bold text-chart-3 shrink-0">{item.metric}</span>
               </button>
             ))}
           </div>

@@ -163,23 +163,23 @@ export function MetricsSection() {
             {regionData.map((r) => (
               <div
                 key={r.region}
-                className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
               >
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {r.region}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {r.clients} clientes activos
+                    {r.clients} clientes
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <p className="text-sm font-bold font-display text-foreground">
                     ${r.revenue}
                   </p>
                   <p className="text-xs text-chart-3">+{r.growth}%</p>
                 </div>
-                <div className="hidden sm:block w-24 h-2 rounded-full bg-secondary overflow-hidden">
+                <div className="hidden sm:block w-20 h-2 rounded-full bg-secondary overflow-hidden shrink-0">
                   <div
                     className="h-full rounded-full bg-primary transition-all duration-1000"
                     style={{ width: `${(r.growth / 40) * 100}%` }}

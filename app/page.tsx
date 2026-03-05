@@ -10,12 +10,12 @@ import { Footer } from "@/components/footer"
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background overflow-x-hidden">
       <SidebarNav />
 
       {/* Main content area */}
-      <main className="flex-1 lg:ml-[240px] transition-all duration-300">
-        <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto">
+      <main className="flex-1 min-w-0 lg:ml-[240px] transition-all duration-300 overflow-x-hidden">
+        <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
           {/* Top bar */}
           <header className="flex items-center justify-between pl-12 lg:pl-0">
             <div>

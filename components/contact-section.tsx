@@ -199,15 +199,11 @@ export function ContactSection() {
                 {offices.map((office, i) => (
                   <AnimateIn key={office.city} delay={i * 80}>
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors group">
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">{office.city}</p>
                         <p className="text-[10px] text-muted-foreground">{office.country}</p>
                       </div>
-                      <div className="text-right flex flex-col items-end gap-0.5">
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                          <Phone className="w-2.5 h-2.5" />
-                          {office.phone}
-                        </span>
+                      <div className="text-right flex flex-col items-end gap-0.5 shrink-0">
                         <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                           <Clock className="w-2.5 h-2.5" />
                           {office.timezone}

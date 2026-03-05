@@ -45,9 +45,9 @@ export function HeroSection() {
         }}
       />
 
-      <div className="relative flex flex-col lg:flex-row items-center gap-8 lg:gap-12 p-6 sm:p-8 lg:p-12">
+      <div className="relative flex flex-col lg:flex-row items-center gap-8 lg:gap-12 p-5 sm:p-8 lg:p-12 w-full min-w-0">
         {/* Left content */}
-        <div className="flex-1 flex flex-col gap-6">
+        <div className="flex-1 min-w-0 flex flex-col gap-6 w-full">
           <AnimateIn delay={0}>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium">
@@ -97,7 +97,7 @@ export function HeroSection() {
 
           {/* Quick stats row */}
           <AnimateIn delay={400}>
-            <div className="flex items-center gap-6 pt-4 mt-2 border-t border-border/50">
+            <div className="grid grid-cols-4 gap-3 pt-4 mt-2 border-t border-border/50">
               {[
                 { value: "150+", label: "Proyectos" },
                 { value: "12", label: "Paises" },
@@ -105,8 +105,8 @@ export function HeroSection() {
                 { value: "5", label: "Anos" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col">
-                  <span className="font-display text-xl font-bold text-foreground">{stat.value}</span>
-                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                  <span className="font-display text-lg sm:text-xl font-bold text-foreground">{stat.value}</span>
+                  <span className="text-[11px] sm:text-xs text-muted-foreground">{stat.label}</span>
                 </div>
               ))}
             </div>
@@ -114,16 +114,16 @@ export function HeroSection() {
         </div>
 
         {/* Right visual - dashboard preview card */}
-        <AnimateIn direction="right" delay={200} className="flex-shrink-0 w-full lg:w-[400px] xl:w-[460px]">
+        <AnimateIn direction="right" delay={200} className="w-full lg:w-[400px] xl:w-[460px] lg:shrink-0">
           <div className="relative rounded-2xl bg-card border border-border/50 overflow-hidden animate-pulse-glow">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between mb-4 gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-destructive/80" />
                   <div className="w-2.5 h-2.5 rounded-full bg-chart-4/80" />
                   <div className="w-2.5 h-2.5 rounded-full bg-chart-3/80" />
                 </div>
-                <span className="text-[10px] text-muted-foreground font-mono">dashboard.startbyglobal.com</span>
+                <span className="text-[10px] text-muted-foreground font-mono truncate">dashboard.sbg.com</span>
               </div>
 
               {/* Animated analytics bars */}
