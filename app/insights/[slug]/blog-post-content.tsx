@@ -2,56 +2,23 @@
 
 import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Clock, 
-  User, 
-  Share2,
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
   Twitter,
   Linkedin,
-  Facebook,
   Link as LinkIcon,
-  ChevronRight
+  ChevronRight,
+  Tag,
 } from "lucide-react"
+import { blogPostsData } from "./blog-data"
 
-// Sample blog post data - in production this would come from a CMS or API
-const blogPostsData: Record<string, any> = {
-  "ia-marketing-digital-2026": {
-    title: "IA en Marketing Digital: 5 Tendencias que Dominarán 2026",
-    excerpt: "La inteligencia artificial está redefiniendo cómo las marcas se conectan con sus audiencias.",
-    author: "María González",
-    date: "15 de febrero de 2026",
-    readTime: "8 min",
-    category: "Marketing Digital",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80",
-    content: `
-      <h2>El Futuro del Marketing es Ahora</h2>
-      <p>La inteligencia artificial ha dejado de ser una promesa futurista para convertirse en una herramienta esencial en el arsenal de cualquier estratega de marketing digital. En 2026, veremos cómo estas tecnologías transforman completamente la forma en que las marcas interactúan con sus audiencias.</p>
-
-      <h3>1. Personalización Hipersegmentada en Tiempo Real</h3>
-      <p>Los algoritmos de IA ahora pueden analizar miles de puntos de datos en milisegundos para ofrecer experiencias completamente personalizadas a cada usuario. Desde el contenido que ven hasta los productos que se les recomiendan, todo se adapta dinámicamente.</p>
-
-      <blockquote>
-        "La personalización ya no es una ventaja competitiva, es una expectativa básica del consumidor moderno."
-      </blockquote>
-
-      <h3>2. Generación de Contenido Asistida por IA</h3>
-      <p>Las herramientas de IA generativa están permitiendo a los equipos de marketing producir contenido de alta calidad a escala. Desde copy publicitario hasta imágenes personalizadas, la IA acelera el proceso creativo sin sacrificar calidad.</p>
-
-      <h3>3. Análisis Predictivo Avanzado</h3>
-      <p>Los modelos de machine learning pueden predecir con precisión el comportamiento del consumidor, permitiendo a las marcas anticiparse a las necesidades y optimizar sus estrategias antes de que sea demasiado tarde.</p>
-
-      <h3>4. Chatbots y Asistentes Virtuales Mejorados</h3>
-      <p>La nueva generación de chatbots powered by IA ofrece conversaciones naturales que son prácticamente indistinguibles de las humanas, mejorando dramáticamente la experiencia del cliente.</p>
-
-      <h3>5. Optimización Automática de Campañas</h3>
-      <p>Las plataformas de IA pueden ahora optimizar campañas publicitarias en tiempo real, ajustando presupuestos, audiencias y creatividades basándose en el rendimiento instantáneo.</p>
-
-      <h2>Conclusión</h2>
-      <p>La integración de IA en el marketing digital no es opcional: es imperativa. Las empresas que adopten estas tecnologías ahora estarán mejor posicionadas para liderar en sus industrias. En Start By Global, ayudamos a nuestros clientes a navegar esta transformación con estrategias personalizadas y tecnología de punta.</p>
-    `,
-  },
+const categoryColors: Record<string, string> = {
+  "Marketing Digital": "bg-chart-1/10 text-chart-1 border-chart-1/20",
+  "Desarrollo Web":    "bg-chart-2/10 text-chart-2 border-chart-2/20",
+  "Tendencias Tech":   "bg-chart-4/10 text-chart-4 border-chart-4/20",
 }
 
 interface BlogPostContentProps {
@@ -75,7 +42,7 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
-              Volver al Blog
+              Volver a Insights
             </Link>
           </div>
         </AnimateIn>
@@ -83,124 +50,149 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
     )
   }
 
+  const colorClass = categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
+
   return (
-    <div className="space-y-8">
-      {/* Back Button */}
+    <div className="max-w-4xl mx-auto space-y-8">
+
+      {/* Back */}
       <AnimateIn>
         <Link
           href="/insights"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Volver al Blog
+          Volver a Insights
         </Link>
       </AnimateIn>
 
-      {/* Article Header */}
+      {/* Header */}
       <AnimateIn delay={0.1}>
-        <div className="space-y-6">
-          {/* Meta */}
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary font-medium border border-primary/20">
+        <div className="space-y-5">
+          {/* Category + meta row */}
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-semibold ${colorClass}`}>
+              <Tag className="w-3 h-3" />
               {post.category}
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-3.5 h-3.5" />
               {post.date}
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              {post.readTime}
+              <Clock className="w-3.5 h-3.5" />
+              {post.readTime} de lectura
             </span>
             <span className="flex items-center gap-1.5 text-muted-foreground">
-              <User className="w-4 h-4" />
+              <User className="w-3.5 h-3.5" />
               {post.author}
             </span>
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-balance leading-tight">
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-balance leading-tight">
             {post.title}
           </h1>
 
-          {/* Excerpt */}
-          <p className="text-xl text-muted-foreground text-balance">
+          {/* Excerpt / Lead */}
+          <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed text-balance border-l-4 border-primary/40 pl-5">
             {post.excerpt}
           </p>
 
           {/* Share */}
-          <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-            <span className="text-sm text-muted-foreground font-medium">Compartir:</span>
+          <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Compartir</span>
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                <Twitter className="w-4 h-4" />
-              </button>
-              <button className="p-2 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                <Linkedin className="w-4 h-4" />
-              </button>
-              <button className="p-2 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                <Facebook className="w-4 h-4" />
-              </button>
-              <button className="p-2 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                <LinkIcon className="w-4 h-4" />
-              </button>
+              {[
+                { icon: Twitter,   label: "Twitter"  },
+                { icon: Linkedin,  label: "LinkedIn" },
+                { icon: LinkIcon,  label: "Copiar enlace" },
+              ].map(({ icon: Icon, label }) => (
+                <button
+                  key={label}
+                  aria-label={label}
+                  className="p-2 rounded-lg bg-card hover:bg-secondary border border-border/50 text-muted-foreground hover:text-foreground transition-all"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                </button>
+              ))}
             </div>
           </div>
         </div>
       </AnimateIn>
 
-      {/* Featured Image */}
+      {/* Hero Image */}
       <AnimateIn delay={0.2}>
-        <div className="relative h-[400px] sm:h-[500px] rounded-2xl overflow-hidden">
+        <div className="relative h-[280px] sm:h-[420px] rounded-2xl overflow-hidden">
           <img
             src={post.image}
             alt={post.title}
             className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
         </div>
       </AnimateIn>
 
-      {/* Article Content */}
+      {/* Article Body */}
       <AnimateIn delay={0.3}>
-        <div className="glass-card rounded-2xl p-6 sm:p-10">
+        <article className="glass-card rounded-2xl p-6 sm:p-10">
+          {/*
+            Prose-style rendering.
+            The HTML strings use semantic tags: h2, h3, p, ul, ol, li, blockquote, strong, a, code.
+            We apply explicit Tailwind classes via the prose-* variant set.
+          */}
           <div
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
-              prose-h2:text-3xl prose-h2:mt-8 prose-h2:mb-4
-              prose-h3:text-2xl prose-h3:mt-6 prose-h3:mb-3
-              prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4
-              prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-              prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-foreground
+            className="
+              prose prose-invert max-w-none
+
+              /* paragraphs */
+              prose-p:text-muted-foreground prose-p:leading-[1.85] prose-p:mb-5 prose-p:text-base
+
+              /* headings */
+              prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground prose-headings:text-balance
+              prose-h2:text-2xl prose-h2:sm:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-border/40
+              prose-h3:text-lg prose-h3:sm:text-xl prose-h3:mt-7 prose-h3:mb-3
+
+              /* links */
+              prose-a:text-primary prose-a:font-medium prose-a:underline prose-a:underline-offset-2 prose-a:decoration-primary/40 hover:prose-a:decoration-primary
+
+              /* blockquote */
+              prose-blockquote:not-italic prose-blockquote:border-l-4 prose-blockquote:border-primary/60
+              prose-blockquote:pl-5 prose-blockquote:py-1
+              prose-blockquote:text-foreground prose-blockquote:font-medium prose-blockquote:text-lg
+              prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-xl prose-blockquote:my-8
+
+              /* lists */
+              prose-ul:text-muted-foreground prose-ul:my-4 prose-ul:pl-5
+              prose-ol:text-muted-foreground prose-ol:my-4 prose-ol:pl-5
+              prose-li:my-2 prose-li:leading-relaxed
+
+              /* inline code */
+              prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+
+              /* strong */
               prose-strong:text-foreground prose-strong:font-semibold
-              prose-ul:text-muted-foreground prose-ol:text-muted-foreground
-              prose-li:my-1"
+            "
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
-        </div>
+        </article>
       </AnimateIn>
 
       {/* Author Card */}
       <AnimateIn delay={0.4}>
         <div className="glass-card rounded-2xl p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Sobre el autor</p>
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center text-2xl font-bold text-white shrink-0">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center text-xl font-bold text-white shrink-0 font-display">
               {post.author.charAt(0)}
             </div>
-            <div className="flex-1">
-              <h3 className="font-display text-xl font-bold mb-1">
-                Escrito por {post.author}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                Especialista en {post.category} con más de 10 años de experiencia ayudando a empresas a transformar su presencia digital.
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display text-lg font-bold">{post.author}</h3>
+              <p className="text-sm text-primary mb-2">{post.authorRole} · Start By Global</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Especialista en {post.category} con amplia experiencia ayudando a empresas en
+                República Dominicana, España y Latinoamérica a crecer en el entorno digital.
               </p>
-              <div className="flex gap-2">
-                <button className="p-1.5 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                  <Twitter className="w-4 h-4" />
-                </button>
-                <button className="p-1.5 rounded-lg bg-card hover:bg-card/80 border border-border/50 transition-colors">
-                  <Linkedin className="w-4 h-4" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -208,22 +200,34 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
       {/* CTA */}
       <AnimateIn delay={0.5}>
-        <div className="glass-card rounded-2xl p-8 sm:p-10 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10 opacity-50" />
-          <div className="relative z-10">
-            <h3 className="font-display text-2xl sm:text-3xl font-bold mb-3">
-              ¿Listo para Transformar tu Negocio?
+        <div className="rounded-2xl p-8 sm:p-10 text-center relative overflow-hidden border border-primary/20"
+          style={{ background: "linear-gradient(135deg, hsl(16 85% 55% / 0.08) 0%, hsl(190 70% 50% / 0.05) 100%)" }}
+        >
+          <div className="relative z-10 space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Start By Global</p>
+            <h3 className="font-display text-2xl sm:text-3xl font-bold text-balance">
+              ¿Listo para Aplicar Estas Estrategias?
             </h3>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Implementa estas estrategias con el apoyo de nuestro equipo de expertos
+            <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado a tu negocio
+              y mercado específico.
             </p>
-            <Link
-              href="/contacto"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:shadow-lg hover:shadow-primary/25 transition-all"
-            >
-              Agenda tu Consultoría Gratuita
-              <ChevronRight className="w-5 h-5" />
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              <Link
+                href="/contacto"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
+              >
+                Agenda una Consultoría Gratuita
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/insights"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-card border border-border/50 text-foreground font-medium hover:border-primary/30 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Más Artículos
+              </Link>
+            </div>
           </div>
         </div>
       </AnimateIn>
