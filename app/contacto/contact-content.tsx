@@ -17,12 +17,13 @@ import {
   Video,
 } from "lucide-react"
 import { useState } from "react"
+import { ScheduleModal } from "@/components/schedule-modal"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (809) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
-  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "+34 91 555 0100", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
-  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "+52 55 5555 0100", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
-  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "+1 (305) 555-0100", email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 849 356-2247", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
+  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: null, email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
+  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: null, email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
+  { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: null, email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
 ]
 
 const contactMethods = [
@@ -43,6 +44,7 @@ export function ContactPageContent() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
+  const [scheduleModal, setScheduleModal] = useState<"call" | "video" | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,14 +76,23 @@ export function ContactPageContent() {
   }
 
   return (
+    <>
+    {scheduleModal && (
+      <ScheduleModal type={scheduleModal} onClose={() => setScheduleModal(null)} />
+    )}
     <DashboardLayout title="Contacto" subtitle="Hablemos sobre como impulsar tu negocio">
       {/* Contact methods */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {contactMethods.map((method, i) => {
           const Icon = method.icon
+          const isCall = method.title === "Agendar Llamada"
+          const isVideo = method.title === "Videollamada"
           return (
             <AnimateIn key={method.title} delay={i * 80}>
-              <div className="glass-card-hover rounded-xl p-5 flex flex-col gap-3 cursor-pointer group h-full">
+              <div
+                onClick={() => isCall ? setScheduleModal("call") : isVideo ? setScheduleModal("video") : undefined}
+                className={`glass-card-hover rounded-xl p-5 flex flex-col gap-3 group h-full ${isCall || isVideo ? "cursor-pointer" : ""}`}
+              >
                 <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
@@ -252,10 +263,14 @@ export function ContactPageContent() {
                         {office.address}
                       </p>
                       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Phone className="w-3 h-3" />
-                          {office.phone}
-                        </span>
+                        {office.phone ? (
+                          <a href={`tel:${office.phone.replace(/\s/g, "")}`} className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors">
+                            <Phone className="w-3 h-3" />
+                            {office.phone}
+                          </a>
+                        ) : (
+                          <span />
+                        )}
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {office.timezone}

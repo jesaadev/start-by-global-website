@@ -1,18 +1,19 @@
 "use client"
 
-import React from "react"
-import { Send, MapPin, Phone, Mail, Clock, ArrowUpRight, CheckCircle } from "lucide-react"
-import { useState } from "react"
+import React, { useState } from "react"
+import { Send, MapPin, Phone, Mail, Clock, ArrowUpRight, CheckCircle, Calendar, Video, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { AnimateIn } from "@/components/animate-in"
+import { ScheduleModal } from "@/components/schedule-modal"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", phone: "+1 (809) 555-0100", timezone: "GMT-4" },
-  { city: "Madrid", country: "Espana", phone: "+34 91 555 0100", timezone: "GMT+1" },
-  { city: "Ciudad de Mexico", country: "Mexico", phone: "+52 55 5555 0100", timezone: "GMT-6" },
-  { city: "Miami", country: "EE.UU.", phone: "+1 (305) 555-0100", timezone: "GMT-5" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", phone: "+1 849 356-2247", timezone: "GMT-4" },
+  { city: "Madrid", country: "Espana", phone: null, timezone: "GMT+1" },
+  { city: "Ciudad de Mexico", country: "Mexico", phone: null, timezone: "GMT-6" },
+  { city: "Miami", country: "EE.UU.", phone: null, timezone: "GMT-5" },
 ]
 
 export function ContactSection() {
+  const [scheduleModal, setScheduleModal] = useState<"call" | "video" | null>(null)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -54,6 +55,10 @@ export function ContactSection() {
   }
 
   return (
+    <>
+    {scheduleModal && (
+      <ScheduleModal type={scheduleModal} onClose={() => setScheduleModal(null)} />
+    )}
     <section id="contact" className="flex flex-col gap-6">
       <AnimateIn>
         <div>
@@ -198,17 +203,21 @@ export function ContactSection() {
               <div className="flex flex-col gap-3">
                 {offices.map((office, i) => (
                   <AnimateIn key={office.city} delay={i * 80}>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors group">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">{office.city}</p>
                         <p className="text-[10px] text-muted-foreground">{office.country}</p>
+                        {office.phone && (
+                          <a href={`tel:${office.phone.replace(/\s/g, "")}`} className="text-[10px] text-primary flex items-center gap-1 mt-0.5 hover:text-primary/80 transition-colors">
+                            <Phone className="w-2.5 h-2.5" />
+                            {office.phone}
+                          </a>
+                        )}
                       </div>
-                      <div className="text-right flex flex-col items-end gap-0.5 shrink-0">
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5" />
-                          {office.timezone}
-                        </span>
-                      </div>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1 shrink-0">
+                        <Clock className="w-2.5 h-2.5" />
+                        {office.timezone}
+                      </span>
                     </div>
                   </AnimateIn>
                 ))}
@@ -230,11 +239,28 @@ export function ContactSection() {
                   info@startbyglobal.com
                   <ArrowUpRight className="w-3 h-3 ml-auto" />
                 </a>
+                <button
+                  onClick={() => setScheduleModal("call")}
+                  className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors w-full mt-1"
+                >
+                  <Calendar className="w-4 h-4 text-primary" />
+                  Agendar Llamada
+                  <ArrowUpRight className="w-3 h-3 ml-auto" />
+                </button>
+                <button
+                  onClick={() => setScheduleModal("video")}
+                  className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors w-full"
+                >
+                  <Video className="w-4 h-4 text-primary" />
+                  Agendar Videollamada
+                  <ArrowUpRight className="w-3 h-3 ml-auto" />
+                </button>
               </div>
             </div>
           </div>
         </AnimateIn>
       </div>
     </section>
+    </>
   )
 }
