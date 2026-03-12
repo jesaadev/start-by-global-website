@@ -14,28 +14,12 @@ const AnalyticsScripts = () => {
       if (typeof window.fbq !== 'undefined') {
         window.fbq('track', 'PageView')
       }
-      // GA4 lo gestiona automáticamente con next/third-parties, 
-      // pero Clarity también se beneficia del seguimiento de sesión activo.
     }
   }, [pathname, searchParams])
 
   return (
     <>
-      {/* 1. Google Analytics 4 (Vía Script nativo para evitar líos de pnpm) */}
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-XXXXXXXXXX');
-        `}
-      </Script>
-
-      {/* 2. Meta Pixel */}
+      {/* 1. Meta Pixel */}
       <Script id="fb-pixel" strategy="afterInteractive">
         {`
           !function(f,b,e,v,n,t,s)
@@ -59,7 +43,7 @@ const AnalyticsScripts = () => {
         />
       </noscript>
 
-      {/* 3. Microsoft Clarity */}
+      {/* 2. Microsoft Clarity */}
       <Script id="microsoft-clarity" strategy="afterInteractive">
         {`
           (function(c,l,a,r,i,t,y){
