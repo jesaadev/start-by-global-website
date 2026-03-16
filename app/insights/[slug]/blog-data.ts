@@ -13,6 +13,83 @@ export interface BlogPost {
 }
 
 export const blogPostsData: Record<string, BlogPost> = {
+  "estructura-web-estrategica-conversion": {
+    title: "Cómo Crear una Estructura Web Estratégica que Convierte",
+    excerpt:
+      "No es magia, es arquitectura invisible. Aprende a diseñar la ruta que transforma a un visitante curioso en un cliente fiel.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "16 de marzo de 2026",
+    dateISO: "2026-03-16",
+    readTime: "6 min",
+    category: "Desarrollo Web",
+    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-7.avif",
+    keywords: [
+      "Estructura Web",
+      "Arquitectura de Información",
+      "Conversión Web",
+      "UX Design",
+      "Diseño Web Dominicana",
+      "CRO",
+      "Start By Global",
+    ],
+    content: `
+<h2>La Base de Todo: Entender a Quién Hablas</h2>
+
+<p>Antes de definir cuántas páginas tendrá tu sitio, debes conocer a tu <strong>buyer persona</strong>. ¿Qué problemas busca resolver? ¿Qué información valora más? Una estructura estratégica no se basa en adivinanzas, sino en una investigación profunda de las necesidades de tu usuario.</p>
+
+
+
+<h2>Arquitectura de la Información: El Plano de Tu Éxito</h2>
+
+<p>Piensa en la arquitectura de la información como el esqueleto de tu sitio. Es la organización lógica que asegura que todo sea fácil de encontrar. Una buena arquitectura reduce la fricción, algo vital para la conversión.</p>
+
+<h3>Navegación Intuitiva</h3>
+<p>Para que un usuario no se frustre, implementamos elementos clave:</p>
+<ul>
+  <li><strong>Menú Principal Conciso:</strong> Etiquetas descriptivas y sin sobrecarga.</li>
+  <li><strong>Breadcrumbs (Migas de Pan):</strong> Para que el usuario siempre sepa dónde está.</li>
+  <li><strong>Enlaces Internos:</strong> Conectamos páginas relevantes para guiar al usuario y potenciar el SEO.</li>
+</ul>
+
+<h2>Diseño Centrado en la Conversión: De Visitante a Cliente</h2>
+
+<p>Cada elemento debe tener un propósito claro. En Start By Global, nos enfocamos en que ese propósito sea guiar al usuario hacia una acción específica.</p>
+
+<h3>El Poder de las Llamadas a la Acción (CTAs)</h3>
+<p>Las CTAs son el motor de tu web. Para que funcionen, deben ser:</p>
+<ul>
+  <li><strong>Específicas:</strong> "Descarga nuestra guía" es superior a "Haz clic aquí".</li>
+  <li><strong>Persuasivas:</strong> Usamos verbos de acción y generamos urgencia o beneficio claro.</li>
+  <li><strong>Estratégicas:</strong> Ubicadas donde el usuario está listo para decidir.</li>
+</ul>
+
+
+
+<h2>Velocidad y Experiencia Móvil: Los Pilares Modernos</h2>
+
+<p>En el mundo actual, la paciencia es limitada. Un sitio que tarda en cargar o que no es <strong>responsive</strong> es una oportunidad perdida. Google prioriza la experiencia móvil, por lo que adaptamos cada píxel para que funcione perfecto en cualquier dispositivo.</p>
+
+<h2>Contenido que Guía y Convence</h2>
+
+<p>La estructura es el recipiente, pero el contenido es el líquido. Un buen contenido para conversión debe tener:</p>
+<ul>
+  <li><strong>Enfoque en Beneficios:</strong> Explicar cómo resuelves el problema del cliente.</li>
+  <li><strong>Prueba Social:</strong> Testimonios y casos de éxito que generen confianza.</li>
+  <li><strong>Claridad:</strong> Sin jerga innecesaria que confunda al visitante.</li>
+</ul>
+
+<h2>Iteración Constante: El Secreto de la Optimización</h2>
+
+<p>Un sitio web exitoso nunca está "terminado". Es un proceso continuo de medir y mejorar. Analizamos dónde abandonan los usuarios y refinamos la arquitectura para maximizar el ROI de forma constante.</p>
+
+<blockquote>
+  "Un sitio web que convierte es aquel que pone al usuario en primer lugar desde su arquitectura invisible."
+</blockquote>
+
+<p>¿Estás listo para construir una experiencia digital que trabaje para tus objetivos? <a href="/contacto">Solicita un análisis de tu estructura actual</a>.</p>
+    `,
+  },
   "busqueda-generativa-futuro-google-geo": {
     title: "Búsqueda Generativa: El Futuro de Google, ChatGPT y el GEO",
     excerpt:

@@ -26,6 +26,18 @@ const categories = [
 
 const blogPosts = [
   {
+    slug: "estructura-web-estrategica-conversion",
+    title: "Cómo Crear una Estructura Web Estratégica que Convierte",
+    excerpt: "No es magia, es arquitectura invisible. Aprende a diseñar la ruta que transforma a un visitante curioso en un cliente fiel.",
+    category: "desarrollo",
+    author: "Jhon Alejandro Esáa",
+    date: "16 de marzo de 2026",
+    dateShort: "16 mar",
+    readTime: "6 min",
+    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-7.avif",
+    featured: false,
+  },
+  {
     slug: "busqueda-generativa-futuro-google-geo",
     title: "Búsqueda Generativa: El Futuro de Google, ChatGPT y el GEO",
     excerpt: "La IA está redefiniendo qué significa «buscar». Descubre cómo el GEO está desplazando al SEO tradicional y qué hacer para que la IA cite tu marca.",
