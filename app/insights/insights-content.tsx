@@ -3,12 +3,12 @@
 import { useState } from "react"
 import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
-import { 
-  TrendingUp, 
-  Code, 
-  Megaphone, 
-  Sparkles, 
-  Clock, 
+import {
+  TrendingUp,
+  Code,
+  Megaphone,
+  Sparkles,
+  Clock,
   ArrowRight,
   Search,
   Filter,
@@ -25,6 +25,18 @@ const categories = [
 ]
 
 const blogPosts = [
+  {
+    slug: "busqueda-generativa-futuro-google-geo",
+    title: "Búsqueda Generativa: El Futuro de Google, ChatGPT y el GEO",
+    excerpt: "La IA está redefiniendo qué significa «buscar». Descubre cómo el GEO está desplazando al SEO tradicional y qué hacer para que la IA cite tu marca.",
+    category: "tendencias",
+    author: "Jhon Alejandro Esáa",
+    date: "16 de marzo de 2026",
+    dateShort: "16 mar",
+    readTime: "7 min",
+    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-8.avif",
+    featured: false,
+  },
   {
     slug: "ia-marketing-digital-2026",
     title: "IA en Marketing Digital: 5 Tendencias que Dominarán 2026",
@@ -106,7 +118,7 @@ export function InsightsContent() {
   const filteredPosts = blogPosts.filter((post) => {
     const matchesCategory = selectedCategory === "all" || post.category === selectedCategory
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
@@ -151,11 +163,10 @@ export function InsightsContent() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                      : "bg-card/50 text-foreground hover:bg-card hover:border-primary/30 border border-border/50"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "bg-card/50 text-foreground hover:bg-card hover:border-primary/30 border border-border/50"
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   {cat.label}
