@@ -26,6 +26,18 @@ const categories = [
 
 const blogPosts = [
   {
+    slug: "arquetipos-sitio-web-personalidad-negocio",
+    title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
+    excerpt: "¿Por qué algunos sitios web conectan instintivamente y otros se sienten genéricos? Descubre cómo usar los arquetipos para que tu marca sea inolvidable.",
+    category: "tendencias",
+    author: "Jhon Alejandro Esáa",
+    date: "16 de marzo de 2026",
+    dateShort: "16 mar",
+    readTime: "8 min",
+    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-6.avif",
+    featured: false,
+  },
+  {
     slug: "estructura-web-estrategica-conversion",
     title: "Cómo Crear una Estructura Web Estratégica que Convierte",
     excerpt: "No es magia, es arquitectura invisible. Aprende a diseñar la ruta que transforma a un visitante curioso en un cliente fiel.",

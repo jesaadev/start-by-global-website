@@ -13,6 +13,81 @@ export interface BlogPost {
 }
 
 export const blogPostsData: Record<string, BlogPost> = {
+  "arquetipos-sitio-web-personalidad-negocio": {
+    title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
+    excerpt:
+      "¿Por qué algunos sitios web conectan instintivamente y otros se sienten genéricos? Descubre cómo usar los arquetipos para que tu marca sea inolvidable.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "16 de marzo de 2026",
+    dateISO: "2026-03-16",
+    readTime: "8 min",
+    category: "Tendencias Tech",
+    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-6.avif",
+    keywords: [
+      "Arquetipos Web",
+      "Branding Digital",
+      "Psicología del Diseño",
+      "Personalidad de Marca",
+      "Start By Global",
+      "Diseño Web Estratégico",
+    ],
+    content: `
+<p>¿Alguna vez te has preguntado por qué algunos sitios web simplemente «funcionan» y conectan contigo a un nivel casi instintivo, mientras que otros se sienten… bueno, genéricos? No es magia, es estrategia. Y hoy vamos a desgranar uno de los secretos mejor guardados del diseño web efectivo: los arquetipos de sitio web.</p>
+
+<p>Piensa en tu negocio como una persona. ¿Qué quieres que esa persona proyecte al mundo digital? ¿Confianza, audacia, cuidado, conocimiento? Cada uno de estos rasgos puede ser la base de un arquetipo web que guíe toda la experiencia de tu usuario. Si estás pensando en crea tu web o darle un giro a tu presencia online, entender esto es fundamental.</p>
+
+<h2>¿Qué es un Arquetipo Web y Por Qué Debería Importarte?</h2>
+
+<p>En pocas palabras, un arquetipo web es un modelo de comportamiento y personalidad que aplicamos al diseño y la comunicación de tu sitio web. Se basa en los arquetipos universales que todos reconocemos, como el Héroe, el Sabio, el Bufón, el Amante, etc. Al definir el arquetipo de tu marca, le das una voz, un estilo visual y una forma de interactuar que resuena con tu audiencia ideal.</p>
+
+<p>¿Por qué es tan crucial? Porque la coherencia es la reina de la confianza. Cuando tu sitio web transmite un mensaje claro y consistente, los visitantes saben qué esperar. Sin un arquetipo definido, tu web puede sentirse fragmentada, confusa y, lo que es peor, olvidable.</p>
+
+<h2>Los Arquetipos Más Comunes para Negocios Online</h2>
+
+<h3>El Sabio: El Gurú del Conocimiento</h3>
+<p>Si tu negocio se basa en la experiencia, la investigación o la consultoría. 
+<strong>Características:</strong> Autoridad, conocimiento, objetividad. 
+<strong>Diseño:</strong> Limpio, profesional, colores como azules y grises.</p>
+
+<h3>El Héroe: El Conquistador de Desafíos</h3>
+<p>Perfecto para quienes ayudan a superar obstáculos (coaches, gimnasios). 
+<strong>Características:</strong> Valentía, determinación, resultados. 
+<strong>Diseño:</strong> Dinámico, inspirador, colores vibrantes.</p>
+
+<h3>El Gobernante: El Creador de Orden y Control</h3>
+<p>Para marcas de lujo, exclusividad o estabilidad. 
+<strong>Características:</strong> Liderazgo, estatus, calidad premium. 
+<strong>Diseño:</strong> Elegante, minimalista, paleta de negros, dorados y blancos.</p>
+
+<h3>El Amante: El Creador de Conexiones Emocionales</h3>
+<p>Marcas que venden experiencias, placer o belleza. 
+<strong>Características:</strong> Pasión, sensualidad, apreciación de la estética. 
+<strong>Diseño:</strong> Sensorial, atractivo, colores cálidos.</p>
+
+<h3>El Inocente: El Portador de Felicidad y Simplicidad</h3>
+<p>Para negocios que ofrecen soluciones directas y optimismo. 
+<strong>Características:</strong> Pureza, honestidad, felicidad. 
+<strong>Diseño:</strong> Luminoso, alegre, colores pastel.</p>
+
+<h2>Cómo Elegir y Aplicar Tu Arquetipo Web</h2>
+
+<p>Para elegir el correcto, considera:</p>
+<ul>
+  <li><strong>Conoce a tu audiencia:</strong> ¿Con qué se identifican?</li>
+  <li><strong>Sé auténtico:</strong> Debe reflejar la esencia real de tu marca.</li>
+  <li><strong>Tu propuesta de valor:</strong> ¿Qué beneficio principal ofreces?</li>
+</ul>
+
+<p>Una vez definido, aplícalo con consistencia en tu logo, tono de copy, imágenes y navegación. Una vez definida la personalidad de tu marca, el siguiente paso es aterrizarla en una estructura de sitio web que convierte, asegurando que el diseño no solo sea estético, sino funcional.</p>
+
+<blockquote>
+  "Definir tu arquetipo web no es solo una tarea de diseño; es una estrategia de negocio profunda."
+</blockquote>
+
+<p>¿Estás listo para dejar de ser uno más y empezar a ser inolvidable? <a href="/contacto">Descubre el arquetipo que tu negocio necesita con nosotros.</a></p>
+    `,
+  },
   "estructura-web-estrategica-conversion": {
     title: "Cómo Crear una Estructura Web Estratégica que Convierte",
     excerpt:
