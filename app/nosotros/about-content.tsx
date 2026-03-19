@@ -21,7 +21,7 @@ import Link from "next/link"
 
 const team = [
   {
-    name: "Ricardo Mendez",
+    name: "Jhon Esáa",
     role: "CEO & Fundador",
     region: "Santo Domingo",
     specialties: ["Estrategia Digital", "Growth", "Business Development"],
