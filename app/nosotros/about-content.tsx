@@ -98,7 +98,6 @@ export function AboutPageContent() {
               <p className="text-sm font-medium text-foreground italic">
                 &ldquo;Transformamos datos en decisiones, ideas en experiencias y clientes en embajadores de marca.&rdquo;
               </p>
-              <p className="text-xs text-muted-foreground mt-1">- Ricardo Mendez, CEO</p>
             </div>
           </div>
         </AnimateIn>
