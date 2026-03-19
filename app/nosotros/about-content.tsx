@@ -8,61 +8,14 @@ import {
   Target,
   Heart,
   Lightbulb,
-  Users,
   Award,
   MapPin,
   ArrowRight,
-  Linkedin,
   TrendingUp,
   Calendar,
   Rocket,
 } from "lucide-react"
 import Link from "next/link"
-
-const team = [
-  {
-    name: "Jhon Esáa",
-    role: "CEO & Fundador",
-    region: "Santo Domingo",
-    specialties: ["Estrategia Digital", "Growth", "Business Development"],
-    bio: "15 anos de experiencia en marketing digital. Anteriormente VP de marketing en agencia Top 10 LATAM.",
-  },
-  {
-    name: "Laura Gutierrez",
-    role: "Directora Creativa",
-    region: "Madrid",
-    specialties: ["Branding", "UI/UX", "Direccion de Arte"],
-    bio: "Ex-directora creativa en agencia de Madrid galardonada. Mas de 200 marcas creadas.",
-  },
-  {
-    name: "Diego Ramirez",
-    role: "Director de Tecnologia",
-    region: "Ciudad de Mexico",
-    specialties: ["Full Stack", "Cloud", "Arquitectura"],
-    bio: "Ingeniero con experiencia en Silicon Valley. Especialista en plataformas de alto rendimiento.",
-  },
-  {
-    name: "Amanda Roberts",
-    role: "Head of Performance",
-    region: "Miami",
-    specialties: ["PPC", "Analytics", "CRO"],
-    bio: "Certificada en Google Ads y Meta. Ha gestionado presupuestos de mas de $5M en campanas digitales.",
-  },
-  {
-    name: "Sofia Herrera",
-    role: "Directora de SEO",
-    region: "Santo Domingo",
-    specialties: ["SEO Tecnico", "Content Strategy", "Local SEO"],
-    bio: "10 anos posicionando marcas en SERP. Caso de exito: Top 1 para 500+ keywords competitivas.",
-  },
-  {
-    name: "Carlos Rivera",
-    role: "Lead Developer",
-    region: "Ciudad de Mexico",
-    specialties: ["React", "Next.js", "Node.js"],
-    bio: "Full stack con pasion por la performance. Contributor de proyectos open source populares.",
-  },
-]
 
 const values = [
   {
@@ -200,47 +153,6 @@ export function AboutPageContent() {
             </AnimateIn>
           )
         })}
-      </div>
-
-      {/* Team */}
-      <AnimateIn>
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-bold text-foreground">Nuestro Equipo</h2>
-          <span className="text-xs text-muted-foreground">Lideres en cada area</span>
-        </div>
-      </AnimateIn>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {team.map((member, i) => (
-          <AnimateIn key={member.name} delay={i * 80}>
-            <div className="glass-card-hover rounded-xl p-5 flex flex-col gap-4 h-full group">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary font-display font-bold border border-primary/20 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                  {member.name.split(" ").map((n) => n[0]).join("")}
-                </div>
-                <div className="flex-1">
-                  <p className="font-display font-semibold text-foreground text-sm">{member.name}</p>
-                  <p className="text-xs text-primary">{member.role}</p>
-                </div>
-                <Linkedin className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" />
-              </div>
-
-              <p className="text-xs text-muted-foreground leading-relaxed">{member.bio}</p>
-
-              <div className="flex items-center gap-2 mt-auto pt-3 border-t border-border/50">
-                <MapPin className="w-3 h-3 text-muted-foreground" />
-                <span className="text-[10px] text-muted-foreground">{member.region}</span>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {member.specialties.map((s) => (
-                  <span key={s} className="px-2 py-0.5 rounded-md bg-secondary/60 text-[10px] text-muted-foreground font-medium">
-                    {s}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </AnimateIn>
-        ))}
       </div>
 
       {/* Certifications / Partners */}
