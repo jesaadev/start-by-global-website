@@ -3,6 +3,7 @@ import Script from 'next/script'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@/components/analytics'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import './globals.css'
 
@@ -30,6 +31,7 @@ export default function RootLayout({
         strategy="afterInteractive"
       />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
