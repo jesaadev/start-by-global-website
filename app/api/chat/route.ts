@@ -79,8 +79,8 @@ export async function POST(request: Request) {
     const lastText = lastUserMessage?.parts?.[0]?.text ?? ""
     const complexity = assessComplexity(lastText)
 
-    // Selección del modelo según complejidad
-    const model = complexity === "complex" ? "gemini-2.5-flash-preview-05-20" : "gemini-2.0-flash"
+    // Usar siempre el modelo 2.5 para evitar el modelo 2.0 obsoleto
+    const model = "gemini-2.5-flash-preview-05-20"
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
