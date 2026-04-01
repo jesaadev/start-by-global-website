@@ -134,7 +134,8 @@ function ChatWidgetInner() {
     }
   }
 
-  const modelLabel = activeModel ? "Gemini 2.5 Flash" : ""
+  const modelLabel = activeModel ? "Gemini 2.5 Flash Lite" : ""
+  const isAdvanced = true
 
   return (
     <>
