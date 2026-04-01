@@ -26,9 +26,9 @@ const offices = [
 ]
 
 const contactMethods = [
-  { icon: MessageCircle, title: "Chat en Vivo", desc: "Respuesta inmediata en horario laboral", action: "Iniciar chat" },
-  { icon: Calendar, title: "Agendar Llamada", desc: "Reserva 30 min con un experto", action: "Ver calendario" },
-  { icon: Video, title: "Videollamada", desc: "Presentacion gratuita por Zoom/Meet", action: "Solicitar demo" },
+  { icon: MessageCircle, title: "Chat en Vivo", desc: "Respuesta inmediata en horario laboral", action: "Iniciar chat", onClick: () => (window as any).openChatWidget?.() },
+  { icon: Calendar, title: "Agendar Llamada", desc: "Reserva 30 min con un experto", action: "Ver calendario", onClick: () => window.open('https://calendly.com/startbyglobal', '_blank') },
+  { icon: Video, title: "Videollamada", desc: "Presentacion gratuita por Zoom/Meet", action: "Solicitar demo", onClick: () => window.open('mailto:info@startbyglobal.com?subject=Solicitud de Demo por Videollamada', '_blank') },
 ]
 
 export function ContactPageContent() {
@@ -81,7 +81,10 @@ export function ContactPageContent() {
           const Icon = method.icon
           return (
             <AnimateIn key={method.title} delay={i * 80}>
-              <div className="glass-card-hover rounded-xl p-5 flex flex-col gap-3 cursor-pointer group h-full">
+              <div
+                className="glass-card-hover rounded-xl p-5 flex flex-col gap-3 cursor-pointer group h-full"
+                onClick={method.onClick}
+              >
                 <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>

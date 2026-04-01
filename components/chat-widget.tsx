@@ -74,6 +74,17 @@ function ChatWidgetInner() {
     }
   }, [open])
 
+  // Escuchar evento personalizado para abrir el chat
+  useEffect(() => {
+    const handleOpenChat = () => {
+      setOpen(true)
+      setMinimized(false)
+    }
+
+    window.addEventListener('openChatWidget', handleOpenChat)
+    return () => window.removeEventListener('openChatWidget', handleOpenChat)
+  }, [])
+
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim()
@@ -409,4 +420,12 @@ export function ChatWidget() {
   if (!mounted) return null
 
   return <ChatWidgetInner />
+}
+
+// Función global para abrir el chat desde cualquier lugar
+if (typeof window !== 'undefined') {
+  (window as any).openChatWidget = () => {
+    // Disparar un evento personalizado que el ChatWidget pueda escuchar
+    window.dispatchEvent(new CustomEvent('openChatWidget'))
+  }
 }
