@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@/components/analytics'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { ChatWidget } from '@/components/chat-widget'
 
 import './globals.css'
 
@@ -26,10 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>{children}<Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-        strategy="afterInteractive"
-      />
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>{children}
+        <ChatWidget />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+          strategy="afterInteractive"
+        />
         <Analytics />
         <SpeedInsights />
       </body>
