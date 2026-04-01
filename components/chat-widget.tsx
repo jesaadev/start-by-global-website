@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { MessageCircle, X, Send, Minimize2, Bot, User, Loader2, Sparkles, Zap } from "lucide-react"
+import { MessageCircle, X, Send, Minimize2, Bot, User, Loader2, Sparkles, Zap, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Message {
@@ -20,6 +20,9 @@ const SUGGESTED_QUESTIONS = [
 
 const WELCOME_TEXT =
   "¡Hola! 👋 Soy el asistente virtual de **Start By Global**. Estoy aquí para ayudarte con información sobre nuestros servicios, precios y cómo podemos impulsar tu negocio digital.\n\n¿En qué te puedo ayudar hoy?"
+
+// Variable temporal para desactivar el chat mientras se desarrolla
+const CHAT_STOP = true
 
 function formatText(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -223,140 +226,171 @@ function ChatWidgetInner() {
         {/* Body */}
         {!minimized && (
           <>
-            {/* Mensajes */}
-            <div className="overflow-y-auto p-4 space-y-3" style={{ height: "320px" }}>
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={cn(
-                    "flex gap-2.5 items-end",
-                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "flex items-center justify-center w-7 h-7 rounded-full shrink-0 mb-0.5",
-                      msg.role === "user"
-                        ? "bg-primary/15 text-primary border border-primary/20"
-                        : "bg-secondary text-muted-foreground border border-border/50"
-                    )}
-                  >
-                    {msg.role === "user" ? (
-                      <User className="w-3.5 h-3.5" />
-                    ) : (
-                      <Bot className="w-3.5 h-3.5" />
-                    )}
-                  </div>
-
-                  <div
-                    className={cn(
-                      "max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed",
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-secondary/60 text-foreground rounded-bl-sm border border-border/30"
-                    )}
-                  >
-                    {formatText(msg.text)}
-                    {msg.role === "model" && msg.model && (
-                      <div
-                        className={cn(
-                          "flex items-center gap-1 mt-1.5 text-[9px] font-medium opacity-50",
-                          msg.model.includes("2.5") ? "text-chart-4" : "text-chart-2"
-                        )}
-                      >
-                        {msg.model.includes("2.5") ? (
-                          <Sparkles className="w-2 h-2" />
-                        ) : (
-                          <Zap className="w-2 h-2" />
-                        )}
-                        {msg.model.includes("2.5") ? "2.5 Flash" : "2.0 Flash"}
-                      </div>
-                    )}
-                  </div>
+            {CHAT_STOP ? (
+              /* Modo inactivo */
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-secondary/60 border border-border/50">
+                  <Bot className="w-6 h-6 text-muted-foreground" />
                 </div>
-              ))}
-
-              {loading && (
-                <div className="flex gap-2.5 items-end">
-                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-secondary border border-border/50 shrink-0">
-                    <Bot className="w-3.5 h-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="bg-secondary/60 border border-border/30 px-4 py-3 rounded-2xl rounded-bl-sm">
-                    <div className="flex gap-1 items-center h-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "300ms" }} />
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-foreground">Chat temporalmente inactivo</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Estamos trabajando en mejoras para ofrecerte una mejor experiencia.
+                    Mientras tanto, puedes contactarnos directamente.
+                  </p>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Preguntas sugeridas */}
-            {messages.length === 1 && !loading && (
-              <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-                {SUGGESTED_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => sendMessage(q)}
-                    className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors font-medium"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Input */}
-            <div className="p-3 border-t border-border/50 shrink-0">
-              <div className="flex gap-2 items-end">
-                <textarea
-                  ref={inputRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Escribe tu mensaje..."
-                  rows={1}
-                  disabled={loading}
-                  className={cn(
-                    "flex-1 resize-none px-3.5 py-2.5 rounded-xl text-sm",
-                    "bg-secondary/50 border border-border/50 text-foreground",
-                    "placeholder:text-muted-foreground/50",
-                    "focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20",
-                    "disabled:opacity-50 transition-all min-h-[40px] max-h-24"
-                  )}
-                  style={{ height: "40px" }}
-                  onInput={(e) => {
-                    const t = e.currentTarget
-                    t.style.height = "40px"
-                    t.style.height = Math.min(t.scrollHeight, 96) + "px"
-                  }}
-                />
                 <button
                   type="button"
-                  onClick={() => sendMessage(input)}
-                  disabled={!input.trim() || loading}
-                  aria-label="Enviar"
+                  onClick={() => window.open('mailto:info@startbyglobal.com?subject=Consulta desde el sitio web', '_blank')}
                   className={cn(
-                    "flex items-center justify-center w-10 h-10 rounded-xl shrink-0",
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
                     "bg-primary text-primary-foreground transition-all duration-200",
-                    "hover:shadow-lg hover:shadow-primary/25 hover:scale-105 active:scale-95",
-                    "disabled:opacity-40 disabled:pointer-events-none"
+                    "hover:shadow-lg hover:shadow-primary/25 hover:scale-105 active:scale-95"
                   )}
                 >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
+                  <Mail className="w-4 h-4" />
+                  Enviar correo
                 </button>
               </div>
-              <p className="text-[10px] text-muted-foreground/40 text-center mt-2">
-                Powered by Gemini AI · Start By Global
-              </p>
-            </div>
+            ) : (
+              /* Modo activo del chat */
+              <>
+                {/* Mensajes */}
+                <div className="overflow-y-auto p-4 space-y-3" style={{ height: "320px" }}>
+                  {messages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "flex gap-2.5 items-end",
+                        msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center justify-center w-7 h-7 rounded-full shrink-0 mb-0.5",
+                          msg.role === "user"
+                            ? "bg-primary/15 text-primary border border-primary/20"
+                            : "bg-secondary text-muted-foreground border border-border/50"
+                        )}
+                      >
+                        {msg.role === "user" ? (
+                          <User className="w-3.5 h-3.5" />
+                        ) : (
+                          <Bot className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+
+                      <div
+                        className={cn(
+                          "max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed",
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground rounded-br-sm"
+                            : "bg-secondary/60 text-foreground rounded-bl-sm border border-border/30"
+                        )}
+                      >
+                        {formatText(msg.text)}
+                        {msg.role === "model" && msg.model && (
+                          <div
+                            className={cn(
+                              "flex items-center gap-1 mt-1.5 text-[9px] font-medium opacity-50",
+                              msg.model.includes("2.5") ? "text-chart-4" : "text-chart-2"
+                            )}
+                          >
+                            {msg.model.includes("2.5") ? (
+                              <Sparkles className="w-2 h-2" />
+                            ) : (
+                              <Zap className="w-2 h-2" />
+                            )}
+                            {msg.model.includes("2.5") ? "2.5 Flash" : "2.0 Flash"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {loading && (
+                    <div className="flex gap-2.5 items-end">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-secondary border border-border/50 shrink-0">
+                        <Bot className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                      <div className="bg-secondary/60 border border-border/30 px-4 py-3 rounded-2xl rounded-bl-sm">
+                        <div className="flex gap-1 items-center h-4">
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Preguntas sugeridas */}
+                {messages.length === 1 && !loading && (
+                  <div className="px-4 pb-2 flex flex-wrap gap-1.5">
+                    {SUGGESTED_QUESTIONS.map((q) => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => sendMessage(q)}
+                        className="text-[11px] px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors font-medium"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Input */}
+                <div className="p-3 border-t border-border/50 shrink-0">
+                  <div className="flex gap-2 items-end">
+                    <textarea
+                      ref={inputRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Escribe tu mensaje..."
+                      rows={1}
+                      disabled={loading}
+                      className={cn(
+                        "flex-1 resize-none px-3.5 py-2.5 rounded-xl text-sm",
+                        "bg-secondary/50 border border-border/50 text-foreground",
+                        "placeholder:text-muted-foreground/50",
+                        "focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20",
+                        "disabled:opacity-50 transition-all min-h-[40px] max-h-24"
+                      )}
+                      style={{ height: "40px" }}
+                      onInput={(e) => {
+                        const t = e.currentTarget
+                        t.style.height = "40px"
+                        t.style.height = Math.min(t.scrollHeight, 96) + "px"
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => sendMessage(input)}
+                      disabled={!input.trim() || loading}
+                      aria-label="Enviar"
+                      className={cn(
+                        "flex items-center justify-center w-10 h-10 rounded-xl shrink-0",
+                        "bg-primary text-primary-foreground transition-all duration-200",
+                        "hover:shadow-lg hover:shadow-primary/25 hover:scale-105 active:scale-95",
+                        "disabled:opacity-40 disabled:pointer-events-none"
+                      )}
+                    >
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground/40 text-center mt-2">
+                    Powered by Gemini AI · Start By Global
+                  </p>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
