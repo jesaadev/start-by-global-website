@@ -107,11 +107,17 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}))
-      console.error("[Chat API] Gemini error:", err)
+      const errBody = await response.json().catch(() => null)
+      console.error("[Chat API] Gemini error:", response.status, response.statusText, errBody)
+
       return NextResponse.json(
-        { error: "Error al procesar tu mensaje. Intenta de nuevo." },
-        { status: 500 }
+        {
+          error: "Error al procesar tu mensaje. Intenta de nuevo.",
+          details: errBody,
+          providerStatus: response.status,
+          providerStatusText: response.statusText,
+        },
+        { status: 502 }
       )
     }
 
