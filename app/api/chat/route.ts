@@ -10,16 +10,17 @@ Tu objetivo es:
 3. Ser amable, profesional y persuasivo sin ser agresivo
 
 SERVICIOS QUE OFRECEMOS:
-- Desarrollo Web: Next.js, React, WordPress, E-commerce, Landing Pages. Desde $300 o 15,000$RD (En Republica Dominicana) por proyecto.
+- Desarrollo Web: Next.js, React, WordPress, E-commerce, Landing Pages. Desde $300 o RD$15,000 (en República Dominicana) por proyecto.
 - SEO & Posicionamiento: SEO técnico, link building, SEO local. Resultados en 3-6 meses.
 - Marketing Digital: Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads. ROI promedio 380%.
 - Branding & Diseño: Identidad visual, UI/UX, material gráfico.
 - Analítica & Data: Dashboards GA4, Looker Studio, reportes automatizados.
-- Automatización e IA: Chatbots, flujos Make/N8N/Zapier, agentes IA. Desde $600 proyecto, $RD2,400/mes (En República Dominicana) retainer.
+- Automatización e IA: Chatbots, flujos Make/N8N/Zapier, agentes IA. Desde $600 proyecto, RD$2,400/mes (en República Dominicana) retainer.
 - Outsourcing/Marca Blanca: Para agencias, desarrollo web bajo su marca. NDA incluido.
 
 DATOS DE CONTACTO:
 - Email: info@startbyglobal.com
+- WhatsApp: +18493562247
 - Web: startbyglobal.com
 - Oficinas: Santo Domingo (principal), Madrid, Ciudad de México, Miami (Remoto)
 
@@ -31,30 +32,52 @@ REGLAS IMPORTANTES:
 - Si la pregunta no es relevante para Start By Global, redirige amablemente hacia los servicios
 - Usa un tono cálido, profesional y orientado a resultados
 - Nunca menciones que eres un modelo de IA de Google; eres el asistente virtual de Start By Global
-- Manten un enfoque claro en cerrar la venta con un Pitch persuasivo pero cercano al cliente. Ofrecemos soluciones a sus necesidades, no solo servicios.
+- Mantén un enfoque claro en cerrar la venta con un pitch persuasivo pero cercano al cliente. Ofrecemos soluciones a sus necesidades, no solo servicios.
 - Si el cliente muestra interés, guía hacia agendar una consultoría o contactar al equipo.
 - Si el cliente hace una pregunta compleja o técnica, responde con un resumen claro y ofrece agendar una consultoría para discutir detalles.
 - Si el cliente hace una pregunta simple, responde de forma directa y amigable, e invita a conocer más sobre nuestros servicios.
-- Evalua la calidad del lead según su interés y necesidades, y adapta tu respuesta para maximizar la probabilidad de conversión.
-`
+- Evalúa la calidad del lead según su interés y necesidades, y adapta tu respuesta para maximizar la probabilidad de conversión.
 
-// Heurística para determinar complejidad de la pregunta
+DETECCIÓN DE INTENCIÓN DE COMPRA:
+Al final de CADA respuesta tuya, incluye en una línea separada uno de estos marcadores:
+[INTENT:low] — el usuario solo está explorando o haciendo preguntas generales
+[INTENT:medium] — el usuario pregunta por precios, procesos, tiempos o casos de éxito
+[INTENT:high] — el usuario menciona presupuesto, quiere empezar, pide una propuesta, menciona un proyecto concreto, o pregunta cómo contratar
+
+Este marcador es INTERNO. Será eliminado antes de mostrar la respuesta al usuario. No lo menciones ni expliques.`
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function assessComplexity(message: string): "simple" | "complex" {
   const complexIndicators = [
-    // Preguntas técnicas detalladas
     /\b(arquitectura|integrar|api|base de datos|escalab|infraestructura|rendimiento|migrar|customiz)\b/i,
-    // Preguntas de estrategia
     /\b(estrategia|plan|roadmap|presupuesto|roi|comparar|diferencia entre|mejor opción)\b/i,
-    // Preguntas multi-parte
     /[?]{2,}|\b(además|también|y cómo|y qué|y cuánto|asimismo)\b/i,
-    // Longitud significativa
   ]
-
   const isLong = message.trim().split(" ").length > 25
   const hasComplexIndicator = complexIndicators.some((r) => r.test(message))
-
   return isLong || hasComplexIndicator ? "complex" : "simple"
 }
+
+function extractIntent(raw: string): {
+  text: string
+  intent: "low" | "medium" | "high"
+} {
+  const match = raw.match(/\[INTENT:(low|medium|high)\]/i)
+  const intent = (match?.[1] ?? "low") as "low" | "medium" | "high"
+  const text = raw.replace(/\[INTENT:(low|medium|high)\]/gi, "").trim()
+  return { text, intent }
+}
+
+function detectHighIntentFromMessage(message: string): boolean {
+  const patterns = [
+    /\b(presupuesto|cotización|cotizar|cuánto cuesta|precio|propuesta|contratar|empezar|comenzar|quiero|necesito|proyecto)\b/i,
+    /\b(budget|quote|pricing|how much|proposal|hire|start|begin|want|need|project)\b/i,
+  ]
+  return patterns.some((r) => r.test(message))
+}
+
+// ─── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
   try {
@@ -66,28 +89,27 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { messages } = body as {
+    const { messages, messageCount } = body as {
       messages: Array<{ role: "user" | "model"; parts: [{ text: string }] }>
+      messageCount?: number
     }
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: "Mensajes inválidos." }, { status: 400 })
     }
 
-    // Obtener el último mensaje del usuario para evaluar complejidad
     const lastUserMessage = [...messages].reverse().find((m) => m.role === "user")
     const lastText = lastUserMessage?.parts?.[0]?.text ?? ""
     const complexity = assessComplexity(lastText)
+    const clientHighIntent = detectHighIntentFromMessage(lastText)
 
-    // Usar siempre el modelo 2.5 lite según la nueva configuración
+    // Modelo único: gemini-2.5-flash-lite (estable, sin preview)
     const model = "gemini-2.5-flash-lite"
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
     const payload = {
-      system_instruction: {
-        parts: [{ text: SYSTEM_PROMPT }],
-      },
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
       contents: messages,
       generationConfig: {
         temperature: 0.7,
@@ -109,7 +131,6 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const errBody = await response.json().catch(() => null)
       console.error("[Chat API] Gemini error:", response.status, response.statusText, errBody)
-
       return NextResponse.json(
         {
           error: "Error al procesar tu mensaje. Intenta de nuevo.",
@@ -122,16 +143,26 @@ export async function POST(request: Request) {
     }
 
     const data = await response.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
 
-    if (!text) {
+    if (!raw) {
       return NextResponse.json(
         { error: "No se pudo generar una respuesta." },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ text, model })
+    const { text, intent: geminiIntent } = extractIntent(raw)
+    const highIntent = geminiIntent === "high" || clientHighIntent
+    const mediumIntent = geminiIntent === "medium"
+    const shouldAskEmail = (messageCount ?? 0) >= 3
+
+    return NextResponse.json({
+      text,
+      model,
+      intent: highIntent ? "high" : mediumIntent ? "medium" : "low",
+      shouldAskEmail,
+    })
   } catch (error) {
     console.error("[Chat API] Unexpected error:", error)
     return NextResponse.json(
