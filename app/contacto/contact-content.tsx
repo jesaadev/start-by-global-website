@@ -37,12 +37,28 @@ export function ContactPageContent() {
     email: "",
     company: "",
     service: "",
+    currency: "USD",
     budget: "",
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
+
+  // Opciones de presupuesto según moneda
+  const budgetOptions = {
+    RD: [
+      { value: "30k-50k", label: "30,000 - 50,000 $RD" },
+      { value: "50k-100k", label: "50,000 - 100,000 $RD" },
+      { value: ">100k", label: "Mas de 100,000 $RD" },
+    ],
+    USD: [
+      { value: "500-1k", label: "$500 - $1,000" },
+      { value: "1k-2.5k", label: "$1,000 - $2,500" },
+      { value: "2.5k-5k", label: "$2,500 - $5,000" },
+      { value: ">5k", label: "Mas de $5,000" },
+    ]
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,7 +80,7 @@ export function ContactPageContent() {
       }
 
       setSubmitted(true)
-      setFormData({ name: "", email: "", company: "", service: "", budget: "", message: "" })
+      setFormData({ name: "", email: "", company: "", service: "", currency: "USD", budget: "", message: "" })
       setTimeout(() => setSubmitted(false), 6000)
     } catch {
       setError("Error de conexion. Verifica tu internet e intenta de nuevo.")
@@ -176,21 +192,35 @@ export function ContactPageContent() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="c-budget" className="text-xs text-muted-foreground font-medium">Presupuesto estimado</label>
-                  <select
-                    id="c-budget"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all appearance-none"
-                  >
-                    <option value="" className="bg-card text-foreground">Seleccionar rango...</option>
-                    <option value="<5k" className="bg-card text-foreground">Menos de $5,000</option>
-                    <option value="5k-10k" className="bg-card text-foreground">$5,000 - $10,000</option>
-                    <option value="10k-25k" className="bg-card text-foreground">$10,000 - $25,000</option>
-                    <option value="25k-50k" className="bg-card text-foreground">$25,000 - $50,000</option>
-                    <option value=">50k" className="bg-card text-foreground">Mas de $50,000</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="c-currency" className="text-xs text-muted-foreground font-medium">Moneda</label>
+                    <select
+                      id="c-currency"
+                      value={formData.currency}
+                      onChange={(e) => setFormData({ ...formData, currency: e.target.value, budget: "" })}
+                      className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all appearance-none"
+                    >
+                      <option value="USD" className="bg-card text-foreground">$ Americano (USD)</option>
+                      <option value="RD" className="bg-card text-foreground">$ Dominicano (RD)</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label htmlFor="c-budget" className="text-xs text-muted-foreground font-medium">Presupuesto estimado</label>
+                    <select
+                      id="c-budget"
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all appearance-none"
+                    >
+                      <option value="" className="bg-card text-foreground">Seleccionar rango...</option>
+                      {budgetOptions[formData.currency as keyof typeof budgetOptions].map((option) => (
+                        <option key={option.value} value={option.value} className="bg-card text-foreground">
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
