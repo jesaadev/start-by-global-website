@@ -4,6 +4,8 @@ import { ArrowRight, Play, Sparkles } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
+import { SocialProofTicker } from "@/components/social-proof-ticker"
+import { ClientLogos } from "@/components/client-logos"
 
 const words = ["impulsan", "transforman", "escalan", "potencian"]
 
@@ -95,6 +97,9 @@ export function HeroSection() {
             </div>
           </AnimateIn>
 
+          {/* Social Proof Ticker */}
+          <SocialProofTicker />
+
           {/* Quick stats row */}
           <AnimateIn delay={400}>
             <div className="grid grid-cols-4 gap-3 pt-4 mt-2 border-t border-border/50">
@@ -111,6 +116,10 @@ export function HeroSection() {
               ))}
             </div>
           </AnimateIn>
+
+          {/* Client Logos */}
+          <ClientLogos />
+
         </div>
 
         {/* Right visual - dashboard preview card */}
