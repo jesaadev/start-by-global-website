@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react"
 const kpiCards = [
   { label: "Visitantes Mensuales", value: 245000, suffix: "", prefix: "", format: "compact", icon: Eye, trend: 12.5, color: "primary" as const },
   { label: "Leads Generados", value: 1842, suffix: "", prefix: "", format: "standard", icon: Users, trend: 23.1, color: "chart-2" as const },
-  { label: "Tasa de Clics (CTR)", value: 4.8, suffix: "%", prefix: "", format: "decimal", icon: MousePointer, trend: -2.3, color: "chart-4" as const },
+  { label: "Tasa de Clics (CTR)", value: 4.8, suffix: "%", prefix: "", format: "decimal", icon: MousePointer, trend: 8.7, color: "chart-4" as const },
   { label: "Ingresos Generados", value: 892, suffix: "K", prefix: "$", format: "standard", icon: DollarSign, trend: 18.7, color: "chart-3" as const },
 ]
 
