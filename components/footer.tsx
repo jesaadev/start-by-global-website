@@ -10,7 +10,7 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
               <img 
-                src="/logo-blue.svg" 
+                src="/logo-black.svg" 
                 alt="Start By Global" 
                 className="h-10"
               />
