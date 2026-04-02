@@ -4,56 +4,38 @@ import { AnimateIn } from "@/components/animate-in"
 
 const clientLogos = [
   {
-    name: "TechCorp",
-    industry: "Tecnología",
+    name: "Aokipharma",
+    industry: "Farmacológico",
     logo: (
       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
-        <span className="text-primary font-bold text-sm">TC</span>
+        <span className="text-primary font-bold text-sm">AP</span>
       </div>
     )
   },
   {
-    name: "GlobalFinance",
-    industry: "Finanzas",
+    name: "Resulting",
+    industry: "Recursos Humanos",
     logo: (
       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-chart-2/20 to-chart-2/5 border border-chart-2/20 flex items-center justify-center">
-        <span className="text-chart-2 font-bold text-sm">GF</span>
+        <span className="text-chart-2 font-bold text-sm">RS</span>
       </div>
     )
   },
   {
-    name: "HealthPlus",
-    industry: "Salud",
+    name: "Grupo Rodrigo",
+    industry: "Consumo Masivo",
     logo: (
       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-chart-3/20 to-chart-3/5 border border-chart-3/20 flex items-center justify-center">
-        <span className="text-chart-3 font-bold text-sm">HP</span>
+        <span className="text-chart-3 font-bold text-sm">GR</span>
       </div>
     )
   },
   {
-    name: "EduLearn",
-    industry: "Educación",
+    name: "New Era Roofing",
+    industry: "Construcción",
     logo: (
       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-chart-4/20 to-chart-4/5 border border-chart-4/20 flex items-center justify-center">
-        <span className="text-chart-4 font-bold text-sm">EL</span>
-      </div>
-    )
-  },
-  {
-    name: "RetailMax",
-    industry: "Retail",
-    logo: (
-      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/15 to-chart-2/10 border border-primary/15 flex items-center justify-center">
-        <span className="text-primary font-bold text-sm">RM</span>
-      </div>
-    )
-  },
-  {
-    name: "LogiFlow",
-    industry: "Logística",
-    logo: (
-      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-chart-4/15 to-chart-3/10 border border-chart-4/15 flex items-center justify-center">
-        <span className="text-chart-4 font-bold text-sm">LF</span>
+        <span className="text-chart-4 font-bold text-sm">NR</span>
       </div>
     )
   }
@@ -89,7 +71,7 @@ export function ClientLogos() {
         </div>
         <div className="flex items-center gap-2 mt-2">
           <div className="flex -space-x-1">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
                 className="w-6 h-6 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 border-2 border-background flex items-center justify-center"
@@ -98,9 +80,6 @@ export function ClientLogos() {
               </div>
             ))}
           </div>
-          <span className="text-[10px] text-muted-foreground">
-            +150 empresas satisfechas
-          </span>
         </div>
       </div>
     </AnimateIn>

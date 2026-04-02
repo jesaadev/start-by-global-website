@@ -97,9 +97,6 @@ export function HeroSection() {
             </div>
           </AnimateIn>
 
-          {/* Social Proof Ticker */}
-          <SocialProofTicker />
-
           {/* Quick stats row */}
           <AnimateIn delay={400}>
             <div className="grid grid-cols-4 gap-3 pt-4 mt-2 border-t border-border/50">
@@ -124,6 +121,11 @@ export function HeroSection() {
 
         {/* Right visual - dashboard preview card */}
         <AnimateIn direction="right" delay={200} className="w-full lg:w-[400px] xl:w-[460px] lg:shrink-0">
+          {/* Social Proof Ticker */}
+          <div className="mb-4">
+            <SocialProofTicker />
+          </div>
+
           <div className="relative rounded-2xl bg-card border border-border/50 overflow-hidden animate-pulse-glow">
             <div className="p-4">
               <div className="flex items-center justify-between mb-4 gap-2">
