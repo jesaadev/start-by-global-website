@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import {
   MessageSquare, Lightbulb, Settings, BarChart3, LogOut,
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Eye,
@@ -83,23 +83,25 @@ const TYPE_COLORS = {
 // ─── API helper ───────────────────────────────────────────────────────────────
 
 function useAdminAPI(password: string) {
-  const headers = { "Content-Type": "application/json", "x-admin-password": password }
+  return useMemo(() => {
+    const headers = { "Content-Type": "application/json", "x-admin-password": password }
 
-  const get = (params: Record<string, string>) => {
-    const qs = new URLSearchParams(params).toString()
-    return fetch(`/api/admin?${qs}`, { headers }).then((r) => r.json())
-  }
+    const get = (params: Record<string, string>) => {
+      const qs = new URLSearchParams(params).toString()
+      return fetch(`/api/admin?${qs}`, { headers }).then((r) => r.json())
+    }
 
-  const patch = (body: Record<string, unknown>) =>
-    fetch("/api/admin", { method: "PATCH", headers, body: JSON.stringify(body) }).then((r) => r.json())
+    const patch = (body: Record<string, unknown>) =>
+      fetch("/api/admin", { method: "PATCH", headers, body: JSON.stringify(body) }).then((r) => r.json())
 
-  const post = (body: Record<string, unknown>) =>
-    fetch("/api/admin", { method: "POST", headers, body: JSON.stringify(body) }).then((r) => r.json())
+    const post = (body: Record<string, unknown>) =>
+      fetch("/api/admin", { method: "POST", headers, body: JSON.stringify(body) }).then((r) => r.json())
 
-  const del = (body: Record<string, unknown>) =>
-    fetch("/api/admin", { method: "DELETE", headers, body: JSON.stringify(body) }).then((r) => r.json())
+    const del = (body: Record<string, unknown>) =>
+      fetch("/api/admin", { method: "DELETE", headers, body: JSON.stringify(body) }).then((r) => r.json())
 
-  return { get, patch, post, del }
+    return { get, patch, post, del }
+  }, [password])
 }
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
