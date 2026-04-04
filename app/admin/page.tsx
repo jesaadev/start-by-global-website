@@ -189,19 +189,28 @@ function ConversationsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [data, setData] = useState<Conversation[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
+  const [loadedPage, setLoadedPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<ConversationDetail | null>(null)
   const [loadingDetail, setLoadingDetail] = useState(false)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    const res = await api.get({ resource: "conversations", page: String(page) })
-    setData(res.data ?? [])
-    setTotal(res.total ?? 0)
-    setLoading(false)
-  }, [api, page])
+  useEffect(() => {
+    if (loadedPage === page && data.length > 0) return
 
-  useEffect(() => { load() }, [load])
+    let active = true
+    const fetchConversations = async () => {
+      setLoading(true)
+      const res = await api.get({ resource: "conversations", page: String(page) })
+      if (!active) return
+      setData(res.data ?? [])
+      setTotal(res.total ?? 0)
+      setLoadedPage(page)
+      setLoading(false)
+    }
+
+    fetchConversations()
+    return () => { active = false }
+  }, [api, page, data.length])
 
   const openDetail = async (id: string) => {
     setLoadingDetail(true)
@@ -392,14 +401,21 @@ function InsightsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [form, setForm] = useState({ type: "objection", trigger_phrase: "", best_response: "", context: "", success_rate: 50 })
   const [saving, setSaving] = useState(false)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    const res = await api.get({ resource: "insights" })
-    setData(res.data ?? [])
-    setLoading(false)
-  }, [api])
+  useEffect(() => {
+    if (data.length > 0) return
 
-  useEffect(() => { load() }, [load])
+    let active = true
+    const fetchInsights = async () => {
+      setLoading(true)
+      const res = await api.get({ resource: "insights" })
+      if (!active) return
+      setData(res.data ?? [])
+      setLoading(false)
+    }
+
+    fetchInsights()
+    return () => { active = false }
+  }, [api, data.length])
 
   const toggleActive = async (insight: SalesInsight) => {
     await api.patch({ resource: "insight", id: insight.id, active: !insight.active })
@@ -557,14 +573,21 @@ function OverridesTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [form, setForm] = useState({ key: "", content: "", priority: 0 })
   const [saving, setSaving] = useState(false)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    const res = await api.get({ resource: "overrides" })
-    setData(res.data ?? [])
-    setLoading(false)
-  }, [api])
+  useEffect(() => {
+    if (data.length > 0) return
 
-  useEffect(() => { load() }, [load])
+    let active = true
+    const fetchOverrides = async () => {
+      setLoading(true)
+      const res = await api.get({ resource: "overrides" })
+      if (!active) return
+      setData(res.data ?? [])
+      setLoading(false)
+    }
+
+    fetchOverrides()
+    return () => { active = false }
+  }, [api, data.length])
 
   const toggleActive = async (o: PromptOverride) => {
     await api.patch({ resource: "override", id: o.id, active: !o.active })
