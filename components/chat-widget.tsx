@@ -280,6 +280,40 @@ function ChatWidgetInner() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const chatHistory = useRef<Array<{ role: "user" | "model"; parts: [{ text: string }] }>>([])
+  const sessionId = useRef(`session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const savedRef = useRef(false)
+  const latestIntent = useRef<"low" | "medium" | "high">("low")
+  const capturedEmailRef = useRef<string | null>(null)
+  const capturedNameRef = useRef<string | null>(null)
+
+
+  const saveConversationToSupabase = useCallback(async (converted = false) => {
+    if (savedRef.current || chatHistory.current.length < 2) return
+    savedRef.current = true
+    try {
+      await fetch("/api/chat/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: sessionId.current,
+          messages: chatHistory.current,
+          email: capturedEmailRef.current,
+          name: capturedNameRef.current,
+          intent_final: latestIntent.current,
+          converted,
+          summary: conversationSummary || null,
+          page_url: window.location.href,
+        }),
+      })
+    } catch { savedRef.current = false }
+  }, [conversationSummary])
+
+  // Auto-save tras 3 min de inactividad
+  const resetSaveTimer = useCallback(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => saveConversationToSupabase(false), 3 * 60 * 1000)
+  }, [saveConversationToSupabase])
 
   // Scroll al fondo
   useEffect(() => {
@@ -298,6 +332,20 @@ function ChatWidgetInner() {
       setTimeout(() => inputRef.current?.focus(), 300)
     }
   }, [open])
+
+  // Guardar al cerrar el chat
+  useEffect(() => {
+    if (!open && chatHistory.current.length >= 2) {
+      saveConversationToSupabase(false)
+    }
+  }, [open, saveConversationToSupabase])
+
+  // Guardar al cerrar la pestaña
+  useEffect(() => {
+    const handler = () => saveConversationToSupabase(false)
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
+  }, [saveConversationToSupabase])
 
   // Escuchar evento global para abrir el chat desde otras partes del sitio
   useEffect(() => {
@@ -395,6 +443,9 @@ function ChatWidgetInner() {
   const handleEmailSubmit = useCallback(
     (email: string, name: string) => {
       setCapturedEmail(email)
+      capturedEmailRef.current = email
+      capturedNameRef.current = name
+      savedRef.current = false // allow re-save with email
       setPhase("email-captured")
 
       const confirmMsg: Message = {

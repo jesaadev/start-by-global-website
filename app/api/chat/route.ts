@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
+import { getActiveInsights, getActiveOverrides, buildDynamicPromptBlock } from "@/lib/supabase"
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-const SYSTEM_PROMPT = `Eres un agente de ventas y soporte de Start By Global, una agencia de marketing digital de clase mundial con presencia en República Dominicana, España, Latinoamérica y EE.UU.
+const BASE_SYSTEM_PROMPT = `Eres un agente de ventas y soporte de Start By Global, una agencia de marketing digital de clase mundial con presencia en República Dominicana, España, Latinoamérica y EE.UU.
 
 Tu objetivo es:
 1. Responder preguntas sobre los servicios, precios y procesos de Start By Global
@@ -15,7 +16,7 @@ SERVICIOS QUE OFRECEMOS:
 - Marketing Digital: Google Ads, Meta Ads, TikTok Ads, LinkedIn Ads. ROI promedio 380%.
 - Branding & Diseño: Identidad visual, UI/UX, material gráfico.
 - Analítica & Data: Dashboards GA4, Looker Studio, reportes automatizados.
-- Automatización e IA: Chatbots, flujos Make/N8N/Zapier, agentes IA. Desde $600 proyecto, RD$2,400/mes (en República Dominicana) retainer.
+- Automatización e IA: Chatbots, flujos Make/N8N/Zapier, agentes IA. Desde $600 proyecto, RD$2,400/mes retainer.
 - Outsourcing/Marca Blanca: Para agencias, desarrollo web bajo su marca. NDA incluido.
 
 DATOS DE CONTACTO:
@@ -32,60 +33,44 @@ REGLAS IMPORTANTES:
 - Si la pregunta no es relevante para Start By Global, redirige amablemente hacia los servicios
 - Usa un tono cálido, profesional y orientado a resultados
 - Nunca menciones que eres un modelo de IA de Google; eres el asistente virtual de Start By Global
-- Mantén un enfoque claro en cerrar la venta con un pitch persuasivo pero cercano al cliente. Ofrecemos soluciones a sus necesidades, no solo servicios.
-- Si el cliente muestra interés, guía hacia agendar una consultoría o contactar al equipo.
-- Si el cliente hace una pregunta compleja o técnica, responde con un resumen claro y ofrece agendar una consultoría para discutir detalles.
-- Si el cliente hace una pregunta simple, responde de forma directa y amigable, e invita a conocer más sobre nuestros servicios.
-- Evalúa la calidad del lead según su interés y necesidades, y adapta tu respuesta para maximizar la probabilidad de conversión.
+- Mantén un enfoque claro en cerrar la venta con un pitch persuasivo pero cercano al cliente
+- Si el cliente muestra interés, guía hacia agendar una consultoría o contactar al equipo
+- Evalúa la calidad del lead según su interés y necesidades, adapta tu respuesta para maximizar conversión
 
 DETECCIÓN DE INTENCIÓN DE COMPRA:
-Al final de CADA respuesta tuya, incluye en una línea separada uno de estos marcadores:
-[INTENT:low] — el usuario solo está explorando o haciendo preguntas generales
-[INTENT:medium] — el usuario pregunta por precios, procesos, tiempos o casos de éxito
-[INTENT:high] — el usuario menciona presupuesto, quiere empezar, pide una propuesta, menciona un proyecto concreto, o pregunta cómo contratar
-
-Este marcador es INTERNO. Será eliminado antes de mostrar la respuesta al usuario. No lo menciones ni expliques.`
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+Al final de CADA respuesta tuya incluye en una línea separada:
+[INTENT:low] si solo explora o hace preguntas generales
+[INTENT:medium] si pregunta por precios, procesos, tiempos o casos de éxito
+[INTENT:high] si menciona presupuesto, quiere empezar, pide propuesta o proyecto concreto
+Este marcador es INTERNO, se elimina antes de mostrarlo. No lo menciones.`
 
 function assessComplexity(message: string): "simple" | "complex" {
-  const complexIndicators = [
+  const indicators = [
     /\b(arquitectura|integrar|api|base de datos|escalab|infraestructura|rendimiento|migrar|customiz)\b/i,
     /\b(estrategia|plan|roadmap|presupuesto|roi|comparar|diferencia entre|mejor opción)\b/i,
     /[?]{2,}|\b(además|también|y cómo|y qué|y cuánto|asimismo)\b/i,
   ]
-  const isLong = message.trim().split(" ").length > 25
-  const hasComplexIndicator = complexIndicators.some((r) => r.test(message))
-  return isLong || hasComplexIndicator ? "complex" : "simple"
+  return message.trim().split(" ").length > 25 || indicators.some((r) => r.test(message))
+    ? "complex" : "simple"
 }
 
-function extractIntent(raw: string): {
-  text: string
-  intent: "low" | "medium" | "high"
-} {
+function extractIntent(raw: string): { text: string; intent: "low" | "medium" | "high" } {
   const match = raw.match(/\[INTENT:(low|medium|high)\]/i)
   const intent = (match?.[1] ?? "low") as "low" | "medium" | "high"
-  const text = raw.replace(/\[INTENT:(low|medium|high)\]/gi, "").trim()
-  return { text, intent }
+  return { text: raw.replace(/\[INTENT:(low|medium|high)\]/gi, "").trim(), intent }
 }
 
-function detectHighIntentFromMessage(message: string): boolean {
-  const patterns = [
+function detectHighIntent(message: string): boolean {
+  return [
     /\b(presupuesto|cotización|cotizar|cuánto cuesta|precio|propuesta|contratar|empezar|comenzar|quiero|necesito|proyecto)\b/i,
     /\b(budget|quote|pricing|how much|proposal|hire|start|begin|want|need|project)\b/i,
-  ]
-  return patterns.some((r) => r.test(message))
+  ].some((r) => r.test(message))
 }
-
-// ─── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
   try {
     if (!GEMINI_API_KEY) {
-      return NextResponse.json(
-        { error: "Servicio de chat no configurado." },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: "Servicio de chat no configurado." }, { status: 500 })
     }
 
     const body = await request.json()
@@ -94,80 +79,69 @@ export async function POST(request: Request) {
       messageCount?: number
     }
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    if (!messages?.length) {
       return NextResponse.json({ error: "Mensajes inválidos." }, { status: 400 })
     }
 
-    const lastUserMessage = [...messages].reverse().find((m) => m.role === "user")
-    const lastText = lastUserMessage?.parts?.[0]?.text ?? ""
+    const lastText = [...messages].reverse().find((m) => m.role === "user")?.parts?.[0]?.text ?? ""
     const complexity = assessComplexity(lastText)
-    const clientHighIntent = detectHighIntentFromMessage(lastText)
+    const clientHighIntent = detectHighIntent(lastText)
 
-    // Modelo único: gemini-2.5-flash-lite (estable, sin preview)
-    const model = "gemini-2.5-flash-lite"
-
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
-
-    const payload = {
-      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: messages,
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: complexity === "complex" ? 800 : 400,
-        topP: 0.9,
-      },
-      safetySettings: [
-        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-      ],
+    // Prompt dinámico desde Supabase
+    let systemPrompt = BASE_SYSTEM_PROMPT
+    try {
+      const [insights, overrides] = await Promise.all([getActiveInsights(), getActiveOverrides()])
+      const block = buildDynamicPromptBlock(insights, overrides)
+      if (block) systemPrompt += block
+    } catch (e) {
+      console.warn("[Chat] Dynamic prompt failed, using base:", e)
     }
+
+    const model = "gemini-2.5-flash-lite"
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: messages,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: complexity === "complex" ? 800 : 400,
+          topP: 0.9,
+        },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        ],
+      }),
     })
 
     if (!response.ok) {
       const errBody = await response.json().catch(() => null)
-      console.error("[Chat API] Gemini error:", response.status, response.statusText, errBody)
+      console.error("[Chat] Gemini error:", response.status, errBody)
       return NextResponse.json(
-        {
-          error: "Error al procesar tu mensaje. Intenta de nuevo.",
-          details: errBody,
-          providerStatus: response.status,
-          providerStatusText: response.statusText,
-        },
+        { error: "Error al procesar tu mensaje.", details: errBody },
         { status: 502 }
       )
     }
 
     const data = await response.json()
     const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
-
-    if (!raw) {
-      return NextResponse.json(
-        { error: "No se pudo generar una respuesta." },
-        { status: 500 }
-      )
-    }
+    if (!raw) return NextResponse.json({ error: "Sin respuesta del modelo." }, { status: 500 })
 
     const { text, intent: geminiIntent } = extractIntent(raw)
     const highIntent = geminiIntent === "high" || clientHighIntent
-    const mediumIntent = geminiIntent === "medium"
-    const shouldAskEmail = (messageCount ?? 0) >= 3
 
     return NextResponse.json({
       text,
       model,
-      intent: highIntent ? "high" : mediumIntent ? "medium" : "low",
-      shouldAskEmail,
+      intent: highIntent ? "high" : geminiIntent === "medium" ? "medium" : "low",
+      shouldAskEmail: (messageCount ?? 0) >= 3,
     })
   } catch (error) {
-    console.error("[Chat API] Unexpected error:", error)
-    return NextResponse.json(
-      { error: "Error interno del servidor." },
-      { status: 500 }
-    )
+    console.error("[Chat] Unexpected error:", error)
+    return NextResponse.json({ error: "Error interno del servidor." }, { status: 500 })
   }
 }
