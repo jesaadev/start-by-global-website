@@ -29,7 +29,7 @@ const navItems = [
   { href: "/nosotros", label: "Nosotros", icon: Users },
   { href: "/insights", label: "Insights", icon: BookOpen },
   { href: "/outsourcing", label: "Outsourcing", icon: Layers, highlight: true, highlightColor: "#0074D9" },
-  { href: "/ia-automatizacion", label: "IA & Automatizacion", icon: Cpu, highlight: true, highlightColor: "#7B61FF" },
+  { href: "/ia-automatizacion", label: "IA & Automatización", icon: Cpu, highlight: true, highlightColor: "#7B61FF" },
   { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
@@ -44,8 +44,8 @@ const dashboardScrollItems = [
 
 const regions = [
   { flag: "DO", label: "Rep. Dominicana" },
-  { flag: "ES", label: "Espana" },
-  { flag: "MX", label: "Latinoamerica" },
+  { flag: "ES", label: "España" },
+  { flag: "MX", label: "Latinoamérica" },
   { flag: "US", label: "EE.UU." },
 ]
 

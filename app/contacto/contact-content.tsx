@@ -20,8 +20,8 @@ import { useState } from "react"
 
 const offices = [
   { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (849) 356-2247", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
-  { city: "Madrid", country: "Espana", address: "Paseo de la Castellana 95", phone: "", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
-  { city: "Ciudad de Mexico", country: "Mexico", address: "Av. Reforma 222, Col. Juarez", phone: "", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
+  { city: "Madrid", country: "España", address: "Paseo de la Castellana 95", phone: "", email: "info@startbyglobal.com", timezone: "GMT+1", hours: "9:00 AM - 7:00 PM" },
+  { city: "Ciudad de México", country: "México", address: "Av. Reforma 222, Col. Juarez", phone: "", email: "info@startbyglobal.com", timezone: "GMT-6", hours: "8:00 AM - 6:00 PM" },
   { city: "Miami", country: "EE.UU.", address: "1001 Brickell Bay Dr, Suite 2700", phone: "", email: "info@startbyglobal.com", timezone: "GMT-5", hours: "9:00 AM - 6:00 PM" },
 ]
 
@@ -50,13 +50,13 @@ export function ContactPageContent() {
     RD: [
       { value: "30k-50k", label: "30,000 - 50,000 $RD" },
       { value: "50k-100k", label: "50,000 - 100,000 $RD" },
-      { value: ">100k", label: "Mas de 100,000 $RD" },
+      { value: ">100k", label: "Más de 100,000 $RD" },
     ],
     USD: [
       { value: "500-1k", label: "$500 - $1,000" },
       { value: "1k-2.5k", label: "$1,000 - $2,500" },
       { value: "2.5k-5k", label: "$2,500 - $5,000" },
-      { value: ">5k", label: "Mas de $5,000" },
+      { value: ">5k", label: "Más de $5,000" },
     ]
   }
 
@@ -83,7 +83,7 @@ export function ContactPageContent() {
       setFormData({ name: "", email: "", company: "", service: "", currency: "USD", budget: "", message: "" })
       setTimeout(() => setSubmitted(false), 6000)
     } catch {
-      setError("Error de conexion. Verifica tu internet e intenta de nuevo.")
+      setError("Error de conexión. Verifica tu internet e intenta de nuevo.")
     } finally {
       setSending(false)
     }
@@ -124,7 +124,7 @@ export function ContactPageContent() {
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground">Mensaje Enviado</h3>
                 <p className="text-sm text-muted-foreground text-center max-w-sm">
-                  Gracias por contactarnos. Un miembro de nuestro equipo se pondra en contacto contigo en las proximas 24 horas.
+                  Gracias por contactarnos. Un miembro de nuestro equipo se pondra en contacto contigo en las próximas 24 horas.
                 </p>
               </div>
             ) : (
@@ -174,7 +174,7 @@ export function ContactPageContent() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor="c-service" className="text-xs text-muted-foreground font-medium">Servicio de interes</label>
+                    <label htmlFor="c-service" className="text-xs text-muted-foreground font-medium">Servicio de interés</label>
                     <select
                       id="c-service"
                       value={formData.service}
@@ -185,9 +185,9 @@ export function ContactPageContent() {
                       <option value="web" className="bg-card text-foreground">Desarrollo Web</option>
                       <option value="seo" className="bg-card text-foreground">SEO & Posicionamiento</option>
                       <option value="marketing" className="bg-card text-foreground">Marketing Digital</option>
-                      <option value="branding" className="bg-card text-foreground">Branding & Diseno</option>
-                      <option value="analytics" className="bg-card text-foreground">Analitica & Data</option>
-                      <option value="automation" className="bg-card text-foreground">Automatizacion</option>
+                      <option value="branding" className="bg-card text-foreground">Branding & Diseño</option>
+                      <option value="analytics" className="bg-card text-foreground">Analítica & Data</option>
+                      <option value="automation" className="bg-card text-foreground">Automatización</option>
                     </select>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export function ContactPageContent() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-                    placeholder="Cuentanos sobre tu proyecto, objetivos y timeline..."
+                    placeholder="Cuéntanos sobre tu proyecto, objetivos y timeline..."
                   />
                 </div>
 
@@ -321,7 +321,7 @@ export function ContactPageContent() {
                   <span className="text-foreground font-medium">{"< 2 horas"}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Cotizacion</span>
+                  <span className="text-muted-foreground">Cotización</span>
                   <span className="text-foreground font-medium">48 horas</span>
                 </div>
               </div>

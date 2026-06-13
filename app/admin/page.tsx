@@ -6,8 +6,10 @@ import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Eye,
   ChevronLeft, ChevronRight, Loader2, CheckCircle2,
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
+  Search, Building2, Activity,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { SiteSettings } from "@/lib/site-settings"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -709,11 +711,259 @@ function OverridesTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   )
 }
 
+// ─── SEO & Métricas Tab ───────────────────────────────────────────────────────
+
+const fieldInputCls =
+  "w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">{children}</label>
+}
+
+function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [settings, setSettings] = useState<SiteSettings | null>(null)
+  const [keywordsStr, setKeywordsStr] = useState("")
+  const [sameAsStr, setSameAsStr] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    let active = true
+    const fetchSeo = async () => {
+      setLoading(true)
+      const res = await api.get({ resource: "seo" })
+      if (!active) return
+      if (res.data) {
+        setSettings(res.data)
+        setKeywordsStr((res.data.seo.keywords ?? []).join(", "))
+        setSameAsStr((res.data.organization.sameAs ?? []).join("\n"))
+      }
+      setLoading(false)
+    }
+    fetchSeo()
+    return () => { active = false }
+  }, [api])
+
+  const setSeo = <K extends keyof SiteSettings["seo"]>(key: K, value: SiteSettings["seo"][K]) =>
+    setSettings((s) => (s ? { ...s, seo: { ...s.seo, [key]: value } } : s))
+  const setOrg = <K extends keyof SiteSettings["organization"]>(key: K, value: SiteSettings["organization"][K]) =>
+    setSettings((s) => (s ? { ...s, organization: { ...s.organization, [key]: value } } : s))
+  const setPixel = <K extends keyof SiteSettings["pixels"]>(key: K, value: SiteSettings["pixels"][K]) =>
+    setSettings((s) => (s ? { ...s, pixels: { ...s.pixels, [key]: value } } : s))
+
+  const save = async () => {
+    if (!settings) return
+    setSaving(true)
+    setError("")
+    const payload: SiteSettings = {
+      ...settings,
+      seo: {
+        ...settings.seo,
+        keywords: keywordsStr.split(",").map((k) => k.trim()).filter(Boolean),
+      },
+      organization: {
+        ...settings.organization,
+        sameAs: sameAsStr.split("\n").map((u) => u.trim()).filter(Boolean),
+      },
+    }
+    const res = await api.patch({ resource: "seo", data: payload })
+    if (res.data) {
+      setSettings(res.data)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } else {
+      setError(res.error || "No se pudo guardar.")
+    }
+    setSaving(false)
+  }
+
+  if (loading || !settings) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  const { seo, organization: org, pixels } = settings
+
+  return (
+    <div className="space-y-4">
+      <div className="glass-card rounded-xl p-4 text-sm text-muted-foreground leading-relaxed">
+        <p className="font-semibold text-foreground text-xs mb-1">Configuración global del sitio</p>
+        Cambios en SEO, datos de la organización (rich snippets) y pixels de medición. Se aplican a
+        todo el sitio al guardar — la metadata, el sitemap y los scripts de analítica se regeneran automáticamente.
+      </div>
+
+      {/* ── SEO general ── */}
+      <div className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="flex items-center gap-2 font-semibold text-sm text-foreground">
+          <Search className="w-4 h-4 text-primary" /> SEO general
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Nombre del sitio</FieldLabel>
+            <input className={fieldInputCls} value={seo.siteName} onChange={(e) => setSeo("siteName", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>URL canónica base</FieldLabel>
+            <input className={fieldInputCls} value={seo.canonicalBase} onChange={(e) => setSeo("canonicalBase", e.target.value)} placeholder="https://startbyglobal.com" />
+          </div>
+        </div>
+        <div>
+          <FieldLabel>Título por defecto</FieldLabel>
+          <input className={fieldInputCls} value={seo.titleDefault} onChange={(e) => setSeo("titleDefault", e.target.value)} />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Plantilla de título (%s = título de página)</FieldLabel>
+            <input className={fieldInputCls} value={seo.titleTemplate} onChange={(e) => setSeo("titleTemplate", e.target.value)} placeholder="%s | Start By Global" />
+          </div>
+          <div>
+            <FieldLabel>Idioma (locale)</FieldLabel>
+            <input className={fieldInputCls} value={seo.locale} onChange={(e) => setSeo("locale", e.target.value)} placeholder="es_DO" />
+          </div>
+        </div>
+        <div>
+          <FieldLabel>Meta descripción</FieldLabel>
+          <textarea rows={2} className={cn(fieldInputCls, "resize-none")} value={seo.description} onChange={(e) => setSeo("description", e.target.value)} />
+        </div>
+        <div>
+          <FieldLabel>Palabras clave (separadas por coma)</FieldLabel>
+          <input className={fieldInputCls} value={keywordsStr} onChange={(e) => setKeywordsStr(e.target.value)} placeholder="marketing digital, desarrollo web, SEO" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Imagen Open Graph por defecto</FieldLabel>
+            <input className={fieldInputCls} value={seo.defaultOgImage} onChange={(e) => setSeo("defaultOgImage", e.target.value)} placeholder="/og-image.jpg" />
+          </div>
+          <div>
+            <FieldLabel>Handle de Twitter/X</FieldLabel>
+            <input className={fieldInputCls} value={seo.twitterHandle} onChange={(e) => setSeo("twitterHandle", e.target.value)} placeholder="@startbyglobal" />
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setSeo("indexable", !seo.indexable)}
+          className="flex items-center gap-2 text-sm text-foreground"
+        >
+          {seo.indexable ? <ToggleRight className="w-5 h-5 text-chart-3" /> : <ToggleLeft className="w-5 h-5 text-muted-foreground" />}
+          <span>Permitir indexación por buscadores {seo.indexable ? "(activado)" : "(bloqueado: noindex + robots disallow)"}</span>
+        </button>
+      </div>
+
+      {/* ── Organización / JSON-LD ── */}
+      <div className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="flex items-center gap-2 font-semibold text-sm text-foreground">
+          <Building2 className="w-4 h-4 text-primary" /> Organización (datos estructurados)
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Nombre</FieldLabel>
+            <input className={fieldInputCls} value={org.name} onChange={(e) => setOrg("name", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Razón social (legal)</FieldLabel>
+            <input className={fieldInputCls} value={org.legalName} onChange={(e) => setOrg("legalName", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Email</FieldLabel>
+            <input className={fieldInputCls} value={org.email} onChange={(e) => setOrg("email", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Teléfono</FieldLabel>
+            <input className={fieldInputCls} value={org.telephone} onChange={(e) => setOrg("telephone", e.target.value)} placeholder="+18493562247" />
+          </div>
+          <div>
+            <FieldLabel>Logo (URL o ruta)</FieldLabel>
+            <input className={fieldInputCls} value={org.logo} onChange={(e) => setOrg("logo", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Ciudad</FieldLabel>
+            <input className={fieldInputCls} value={org.city} onChange={(e) => setOrg("city", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Calle / dirección</FieldLabel>
+            <input className={fieldInputCls} value={org.streetAddress} onChange={(e) => setOrg("streetAddress", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Región / provincia</FieldLabel>
+            <input className={fieldInputCls} value={org.region} onChange={(e) => setOrg("region", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Código postal</FieldLabel>
+            <input className={fieldInputCls} value={org.postalCode} onChange={(e) => setOrg("postalCode", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>País (código ISO)</FieldLabel>
+            <input className={fieldInputCls} value={org.country} onChange={(e) => setOrg("country", e.target.value)} placeholder="DO" />
+          </div>
+        </div>
+        <div>
+          <FieldLabel>Perfiles sociales (sameAs — una URL por línea)</FieldLabel>
+          <textarea rows={3} className={cn(fieldInputCls, "resize-none")} value={sameAsStr} onChange={(e) => setSameAsStr(e.target.value)} placeholder={"https://www.instagram.com/startbyglobal/\nhttps://www.linkedin.com/company/..."} />
+        </div>
+      </div>
+
+      {/* ── Pixels & Métricas ── */}
+      <div className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="flex items-center gap-2 font-semibold text-sm text-foreground">
+          <Activity className="w-4 h-4 text-primary" /> Pixels & Métricas
+        </h3>
+        <p className="text-xs text-muted-foreground -mt-2">Deja un campo vacío para no cargar ese script.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <FieldLabel>Google Analytics 4 (G-XXXX)</FieldLabel>
+            <input className={fieldInputCls} value={pixels.ga4Id} onChange={(e) => setPixel("ga4Id", e.target.value)} placeholder="G-XXXXXXX" />
+          </div>
+          <div>
+            <FieldLabel>Google Tag Manager (GTM-XXXX)</FieldLabel>
+            <input className={fieldInputCls} value={pixels.gtmId} onChange={(e) => setPixel("gtmId", e.target.value)} placeholder="GTM-XXXXXX" />
+          </div>
+          <div>
+            <FieldLabel>Meta (Facebook) Pixel ID</FieldLabel>
+            <input className={fieldInputCls} value={pixels.metaPixelId} onChange={(e) => setPixel("metaPixelId", e.target.value)} placeholder="1376104130939852" />
+          </div>
+          <div>
+            <FieldLabel>TikTok Pixel ID</FieldLabel>
+            <input className={fieldInputCls} value={pixels.tiktokPixelId} onChange={(e) => setPixel("tiktokPixelId", e.target.value)} />
+          </div>
+          <div>
+            <FieldLabel>Microsoft Clarity ID</FieldLabel>
+            <input className={fieldInputCls} value={pixels.clarityId} onChange={(e) => setPixel("clarityId", e.target.value)} placeholder="92s8orl5ov" />
+          </div>
+          <div>
+            <FieldLabel>Google Search Console (verificación)</FieldLabel>
+            <input className={fieldInputCls} value={pixels.googleSiteVerification} onChange={(e) => setPixel("googleSiteVerification", e.target.value)} />
+          </div>
+        </div>
+      </div>
+
+      {/* Acciones */}
+      <div className="flex items-center justify-end gap-3 sticky bottom-4">
+        {error && <span className="text-xs text-destructive">{error}</span>}
+        {saved && <span className="flex items-center gap-1 text-xs text-chart-3"><CheckCircle2 className="w-3.5 h-3.5" /> Guardado</span>}
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:shadow-lg hover:shadow-primary/25 transition-all"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -737,6 +987,7 @@ export default function AdminDashboard() {
     { id: "conversations" as const, label: "Conversaciones", icon: MessageSquare },
     { id: "insights" as const, label: "Insights IA", icon: Lightbulb },
     { id: "overrides" as const, label: "Prompt Overrides", icon: Settings },
+    { id: "seo" as const, label: "SEO & Métricas", icon: Search },
   ]
 
   return (
@@ -824,6 +1075,7 @@ export default function AdminDashboard() {
         {activeTab === "conversations" && <ConversationsTab api={api} />}
         {activeTab === "insights" && <InsightsTab api={api} />}
         {activeTab === "overrides" && <OverridesTab api={api} />}
+        {activeTab === "seo" && <SeoTab api={api} />}
       </main>
     </div>
   )

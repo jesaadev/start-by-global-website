@@ -21,46 +21,46 @@ const values = [
   {
     icon: Target,
     title: "Orientados a Resultados",
-    description: "Cada accion esta guiada por datos y enfocada en metricas que impactan tu negocio real.",
+    description: "Cada accion esta guiada por datos y enfocada en métricas que impactan tu negocio real.",
   },
   {
     icon: Heart,
-    title: "Pasion por lo Digital",
+    title: "Pasión por lo Digital",
     description: "Vivimos y respiramos marketing digital. Nos apasiona lo que hacemos y se refleja en cada proyecto.",
   },
   {
     icon: Lightbulb,
-    title: "Innovacion Constante",
-    description: "Adoptamos las ultimas tecnologias y tendencias para mantener a nuestros clientes a la vanguardia.",
+    title: "Innovación Constante",
+    description: "Adoptamos las ultimas tecnologías y tendencias para mantener a nuestros clientes a la vanguardia.",
   },
   {
     icon: Globe,
-    title: "Vision Global",
+    title: "Visión Global",
     description: "Pensamos globalmente y actuamos localmente. Entendemos los matices culturales de cada mercado.",
   },
 ]
 
 const milestones = [
-  { year: "2020", title: "Fundacion", description: "Start By Global nace en Santo Domingo con 3 personas y una vision." },
-  { year: "2021", title: "Expansion a Espana", description: "Abrimos oficina en Madrid y comenzamos operaciones en el mercado europeo." },
-  { year: "2022", title: "50 Clientes", description: "Alcanzamos los 50 clientes activos y expandimos a Mexico y Colombia." },
+  { year: "2020", title: "Fundacion", description: "Start By Global nace en Santo Domingo con 3 personas y una visión." },
+  { year: "2021", title: "Expansion a España", description: "Abrimos oficina en Madrid y comenzamos operaciones en el mercado europeo." },
+  { year: "2022", title: "50 Clientes", description: "Alcanzamos los 50 clientes activos y expandimos a México y Colombia." },
   { year: "2023", title: "Oficina Miami", description: "Establecemos presencia en EE.UU. para atender el mercado norteamericano." },
-  { year: "2024", title: "100 Proyectos", description: "Superamos los 100 proyectos entregados con un 98% de satisfaccion." },
-  { year: "2025", title: "150+ Proyectos", description: "12 paises, 4 oficinas y un equipo de 30+ profesionales certificados." },
+  { year: "2024", title: "100 Proyectos", description: "Superamos los 100 proyectos entregados con un 98% de satisfacción." },
+  { year: "2025", title: "150+ Proyectos", description: "12 países, 4 oficinas y un equipo de 30+ profesionales certificados." },
 ]
 
 const bigNumbers = [
   { value: "150+", label: "Proyectos Entregados" },
   { value: "30+", label: "Profesionales" },
   { value: "4", label: "Oficinas" },
-  { value: "12", label: "Paises" },
-  { value: "98%", label: "Satisfaccion" },
+  { value: "12", label: "Países" },
+  { value: "98%", label: "Satisfacción" },
   { value: "$2M+", label: "Ads Gestionados" },
 ]
 
 export function AboutPageContent() {
   return (
-    <DashboardLayout title="Nosotros" subtitle="Conoce al equipo que impulsa tu exito digital">
+    <DashboardLayout title="Nosotros" subtitle="Conoce al equipo que impulsa tu éxito digital">
       {/* Big numbers */}
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
         {bigNumbers.map((stat, i) => (
@@ -81,18 +81,18 @@ export function AboutPageContent() {
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
                 <Rocket className="w-5 h-5 text-primary" />
               </div>
-              <h2 className="font-display text-xl font-bold text-foreground">Nuestra Mision</h2>
+              <h2 className="font-display text-xl font-bold text-foreground">Nuestra Misión</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              En Start By Global, nuestra mision es democratizar el acceso a soluciones de marketing digital
-              de clase mundial para empresas en Latinoamerica, el Caribe, Espana y Estados Unidos. Creemos
-              que cada negocio, sin importar su tamano o ubicacion, merece una presencia digital que
+              En Start By Global, nuestra misión es democratizar el acceso a soluciones de marketing digital
+              de clase mundial para empresas en Latinoamérica, el Caribe, España y Estados Unidos. Creemos
+              que cada negocio, sin importar su tamaño o ubicación, merece una presencia digital que
               impulse su crecimiento.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Fundada en 2020 en Santo Domingo, Rep. Dominicana, nacimos con la conviccion de que el
               talento hispanohablante puede competir con las mejores agencias del mundo. Hoy, con presencia
-              en 4 ciudades y un equipo de mas de 30 profesionales, seguimos comprometidos con esa vision.
+              en 4 ciudades y un equipo de más de 30 profesionales, seguimos comprometidos con esa visión.
             </p>
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm font-medium text-foreground italic">

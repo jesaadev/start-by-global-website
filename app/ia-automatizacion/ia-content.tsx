@@ -41,27 +41,27 @@ const services = [
       "Agente de soporte con base de conocimiento",
       "Bot de calificacion de leads por WhatsApp",
       "Asistente interno para equipos de trabajo",
-      "Automatizacion de onboarding de clientes",
+      "Automatización de onboarding de clientes",
     ],
     stack: ["OpenAI GPT-4o", "Anthropic Claude", "LangChain", "WhatsApp API", "Slack / Teams"],
-    metric: "80% reduccion en tickets de soporte",
+    metric: "80% reducción en tickets de soporte",
     color: "#7B61FF",
     bg: "from-[#7B61FF]/8 to-transparent",
     border: "border-[#7B61FF]/20 hover:border-[#7B61FF]/50",
   },
   {
-    id: "automatizacion",
+    id: "automatización",
     badge: "Servicio 02",
     icon: Workflow,
-    title: "Automatizacion de Procesos",
+    title: "Automatización de Procesos",
     subtitle: "Make · Zapier · N8N",
     description:
-      "Conectamos tus herramientas y eliminamos el trabajo repetitivo. Flujos que se ejecutan solos: sincronizacion de datos, notificaciones, reportes automaticos, facturacion y mucho mas.",
+      "Conectamos tus herramientas y eliminamos el trabajo repetitivo. Flujos que se ejecutan solos: sincronización de datos, notificaciones, reportes automáticos, facturación y mucho más.",
     useCases: [
       "Flujos entre CRM, email y WhatsApp",
-      "Sincronizacion automatica de inventarios",
-      "Generacion y envio de reportes periodicos",
-      "Automatizacion de facturacion recurrente",
+      "Sincronización automática de inventarios",
+      "Generación y envio de reportes periodicos",
+      "Automatización de facturación recurrente",
       "Pipelines de marketing completamente automatizados",
     ],
     stack: ["Make (Integromat)", "N8N self-hosted", "Zapier", "Webhooks", "APIs REST"],
@@ -80,13 +80,13 @@ const services = [
       "Convertimos tus datos en decisiones. Implementamos modelos predictivos, dashboards inteligentes y pipelines de datos que te dicen que va a pasar antes de que suceda.",
     useCases: [
       "Dashboard de ventas con prediccion de ingresos",
-      "Segmentacion automatica de clientes con ML",
+      "Segmentacion automática de clientes con ML",
       "Deteccion de anomalias en tiempo real",
       "Recomendaciones de productos personalizadas",
-      "Analisis de sentimiento de redes sociales",
+      "Análisis de sentimiento de redes sociales",
     ],
     stack: ["Python + Pandas", "Supabase / BigQuery", "Recharts / Metabase", "Scikit-learn", "OpenAI Embeddings"],
-    metric: "3x mas rapido en toma de decisiones",
+    metric: "3x más rápido en toma de decisiones",
     color: "#0074D9",
     bg: "from-[#0074D9]/8 to-transparent",
     border: "border-[#0074D9]/20 hover:border-[#0074D9]/50",
@@ -95,7 +95,7 @@ const services = [
     id: "contenido",
     badge: "Servicio 04",
     icon: FileText,
-    title: "Generacion de Contenido con IA",
+    title: "Generación de Contenido con IA",
     subtitle: "Copy · SEO · Multicanal",
     description:
       "Pipelines de contenido que producen blogs, emails, posts y anuncios en escala. Con tu voz de marca, optimizados para SEO y listos para publicar.",
@@ -104,10 +104,10 @@ const services = [
       "Newsletter semanal generado y enviado solo",
       "Anuncios A/B con variantes generadas por IA",
       "Fichas de producto para ecommerce masivo",
-      "Subtitulos y transcripciones automaticas para video",
+      "Subtitulos y transcripciones automáticas para video",
     ],
     stack: ["GPT-4o + Fine-tuning", "Perplexity API", "Notion / WordPress", "Resend", "Buffer / Hootsuite"],
-    metric: "10x mas contenido al mismo costo",
+    metric: "10x más contenido al mismo costo",
     color: "#F4A261",
     bg: "from-[#F4A261]/8 to-transparent",
     border: "border-[#F4A261]/20 hover:border-[#F4A261]/50",
@@ -124,16 +124,16 @@ const processSteps = [
   },
   {
     num: "02",
-    title: "Prototipo en 7 dias",
+    title: "Prototipo en 7 días",
     description:
-      "Entregamos un primer prototipo funcional en una semana. Nada de PowerPoints: codigo real corriendo en tu entorno.",
+      "Entregamos un primer prototipo funcional en una semana. Nada de PowerPoints: código real corriendo en tu entorno.",
     icon: Zap,
   },
   {
     num: "03",
-    title: "Integracion & Training",
+    title: "Integración & Training",
     description:
-      "Conectamos la solucion a tus sistemas existentes y entrenamos a tu equipo para que la adopcion sea inmediata.",
+      "Conectamos la solución a tus sistemas existentes y entrenamos a tu equipo para que la adopcion sea inmediata.",
     icon: GitBranch,
   },
   {
@@ -152,9 +152,9 @@ const plans = [
     period: "proyecto",
     description: "Un solo flujo o agente IA para un proceso especifico.",
     features: [
-      "1 automatizacion o chatbot",
-      "Integracion con 2 herramientas",
-      "Documentacion tecnica",
+      "1 automatización o chatbot",
+      "Integración con 2 herramientas",
+      "Documentacion técnica",
       "2 semanas de soporte post-entrega",
       "Acceso al panel de monitoreo",
     ],
@@ -168,11 +168,11 @@ const plans = [
     period: "mes",
     description: "Suite completa: automatizaciones, chatbot y dashboard de datos.",
     features: [
-      "Hasta 5 flujos de automatizacion",
+      "Hasta 5 flujos de automatización",
       "1 agente conversacional",
-      "Dashboard de metricas en tiempo real",
+      "Dashboard de métricas en tiempo real",
       "Soporte prioritario Slack",
-      "Optimizacion mensual incluida",
+      "Optimización mensual incluida",
       "Integraciones ilimitadas",
     ],
     cta: "Mejor Valor",
@@ -200,12 +200,12 @@ const plans = [
 
 const faqs = [
   {
-    q: "Necesito conocimientos tecnicos para implementar estas soluciones?",
-    a: "No. Nosotros manejamos todo el stack tecnico. Tu equipo solo necesita saber usar la herramienta final, que disenamos para ser lo mas intuitiva posible.",
+    q: "Necesito conocimientos técnicos para implementar estas soluciones?",
+    a: "No. Nosotros manejamos todo el stack técnico. Tu equipo solo necesita saber usar la herramienta final, que diseñamos para ser lo más intuitiva posible.",
   },
   {
-    q: "Mis datos estan seguros si los uso para entrenar modelos?",
-    a: "Si. Usamos contratos de procesamiento de datos, modelos con aislamiento por cliente y nunca compartimos datos entre clientes. Podemos firmar DPA o NDA si lo requieres.",
+    q: "¿Mis datos están seguros si los uso para entrenar modelos?",
+    a: "Sí. Usamos contratos de procesamiento de datos, modelos con aislamiento por cliente y nunca compartimos datos entre clientes. Podemos firmar DPA o NDA si lo requieres.",
   },
   {
     q: "Cuanto tiempo tarda en verse el ROI?",
@@ -217,7 +217,7 @@ const faqs = [
   },
   {
     q: "Que pasa si el modelo da respuestas incorrectas?",
-    a: "Disenamos circuitos de fallback y revision humana en todos nuestros agentes. Ademas, monitoreamos la calidad de respuestas semanalmente y ajustamos los prompts y el contexto.",
+    a: "Diseñamos circuitos de fallback y revision humana en todos nuestros agentes. Además, monitoreamos la calidad de respuestas semanalmente y ajustamos los prompts y el contexto.",
   },
 ]
 
@@ -249,7 +249,7 @@ export function IaContent() {
           name: formData.name,
           email: formData.email,
           company: formData.company,
-          service: "IA & Automatizacion",
+          service: "IA & Automatización",
           message: `Proceso a automatizar: ${formData.process}\n\n${formData.message}`,
         }),
       })
@@ -354,7 +354,7 @@ export function IaContent() {
             <AnimateIn delay={0.05}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#7B61FF]/10 border border-[#7B61FF]/25 text-[#7B61FF] text-xs font-semibold mb-8 tracking-wide uppercase">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#7B61FF] animate-pulse" />
-                Inteligencia Artificial & Automatizacion
+                Inteligencia Artificial & Automatización
               </div>
             </AnimateIn>
 
@@ -374,7 +374,7 @@ export function IaContent() {
 
             <AnimateIn delay={0.2}>
               <p className="text-lg text-white/50 leading-relaxed mb-10 max-w-xl">
-                Implementamos agentes IA, flujos de automatizacion y pipelines de datos para que tu empresa opere 10x mas rapido. Sin cambiar tu equipo — potenciandolo.
+                Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa opere 10x más rápido. Sin cambiar tu equipo — potenciandolo.
               </p>
             </AnimateIn>
 
@@ -399,7 +399,7 @@ export function IaContent() {
             <AnimateIn delay={0.4}>
               <div className="mt-12 flex flex-wrap gap-6">
                 {[
-                  { icon: Zap, label: "Prototipo en 7 dias" },
+                  { icon: Zap, label: "Prototipo en 7 días" },
                   { icon: Shield, label: "Datos 100% seguros" },
                   { icon: TrendingUp, label: "ROI en el primer mes" },
                 ].map((t) => (
@@ -435,7 +435,7 @@ export function IaContent() {
                       { label: "Tickets atendidos por bot", value: "2,847", change: "+18%", color: "#7B61FF" },
                       { label: "Horas ahorradas esta semana", value: "143h", change: "+32%", color: "#00C9C8" },
                       { label: "Leads calificados por IA", value: "412", change: "+55%", color: "#0074D9" },
-                      { label: "Costo por conversion", value: "$1.20", change: "-41%", color: "#F4A261" },
+                      { label: "Costo por conversión", value: "$1.20", change: "-41%", color: "#F4A261" },
                     ].map((m) => (
                       <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
                         <div className="flex items-center gap-3">
@@ -491,9 +491,9 @@ export function IaContent() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden">
             {[
-              { value: "+80", suffix: "%", label: "Reduccion en tareas manuales", color: "text-[#7B61FF]" },
-              { value: "7", suffix: " dias", label: "De diagnostico a primer prototipo", color: "text-[#00C9C8]" },
-              { value: "10x", suffix: "", label: "Mas contenido con el mismo equipo", color: "text-[#0074D9]" },
+              { value: "+80", suffix: "%", label: "Reducción en tareas manuales", color: "text-[#7B61FF]" },
+              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#00C9C8]" },
+              { value: "10x", suffix: "", label: "Más contenido con el mismo equipo", color: "text-[#0074D9]" },
               { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#F4A261]" },
             ].map((s) => (
               <div key={s.label} className="bg-[#0A0A0F] px-6 py-8 text-center">
@@ -528,11 +528,11 @@ export function IaContent() {
                 <p className="text-red-400 text-xs font-semibold uppercase tracking-wider mb-6">Sin IA</p>
                 <ul className="space-y-4">
                   {[
-                    "Responder los mismos mensajes de soporte cada dia",
+                    "Responder los mismos mensajes de soporte cada día",
                     "Copiar datos entre Excel, CRM y email manualmente",
-                    "Generar reportes que tardan medio dia en prepararse",
-                    "Perder leads por falta de seguimiento rapido",
-                    "Contratar mas gente para hacer mas de lo mismo",
+                    "Generar reportes que tardan medio día en prepararse",
+                    "Perder leads por falta de seguimiento rápido",
+                    "Contratar más gente para hacer más de lo mismo",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-white/50">
                       <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
@@ -551,9 +551,9 @@ export function IaContent() {
                 <ul className="space-y-4">
                   {[
                     "Agente IA responde el 80% de consultas sin humano",
-                    "Datos sincronizados automaticamente entre sistemas",
+                    "Datos sincronizados automáticamente entre sistemas",
                     "Reportes generados y enviados solos cada lunes",
-                    "Follow-up automatico en minutos, no dias",
+                    "Follow-up automático en minutos, no días",
                     "Escala sin contratar — la IA crece contigo",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-white/70">
@@ -575,7 +575,7 @@ export function IaContent() {
             <div className="mb-16">
               <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Nuestras Soluciones</p>
               <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                Cuatro lineas de IA.<br />Un solo equipo.
+                Cuatro líneas de IA.<br />Un solo equipo.
               </h2>
             </div>
           </AnimateIn>
@@ -723,7 +723,7 @@ export function IaContent() {
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#7B61FF] text-xs font-bold uppercase tracking-wide text-white">
-                      Mas popular
+                      Más popular
                     </div>
                   )}
 
@@ -916,17 +916,17 @@ export function IaContent() {
                     onChange={(e) => setFormData({ ...formData, process: e.target.value })}
                     className="px-4 py-3 rounded-xl bg-[#0A0A0F] border border-white/10 text-sm text-white/70 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                   >
-                    <option value="">Selecciona una opcion...</option>
+                    <option value="">Selecciona una opción...</option>
                     <option value="Chatbot / Agente IA">Chatbot / Agente IA</option>
-                    <option value="Flujos de automatizacion">Flujos de automatizacion</option>
-                    <option value="Analisis de datos / Reportes IA">Analisis de datos / Reportes IA</option>
-                    <option value="Generacion de contenido IA">Generacion de contenido IA</option>
+                    <option value="Flujos de automatización">Flujos de automatización</option>
+                    <option value="Análisis de datos / Reportes IA">Análisis de datos / Reportes IA</option>
+                    <option value="Generación de contenido IA">Generación de contenido IA</option>
                     <option value="Varios / No estoy seguro">Varios / No estoy seguro</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Cuentanos mas (opcional)</label>
+                  <label className="text-xs text-white/40 uppercase tracking-wide">Cuéntanos más (opcional)</label>
                   <textarea
                     rows={4}
                     value={formData.message}
@@ -961,7 +961,7 @@ export function IaContent() {
                 </button>
 
                 <p className="text-center text-xs text-white/20">
-                  Sin spam. Sin compromiso. Solo una conversacion tecnica.
+                  Sin spam. Sin compromiso. Solo una conversacion técnica.
                 </p>
               </form>
             )}

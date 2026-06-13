@@ -22,16 +22,16 @@ const projects = [
     category: "E-commerce",
     description: "Plataforma de pagos digitales con interfaz intuitiva y procesamiento en tiempo real para el mercado europeo.",
     metrics: { conversion: "+62%", traffic: "85K/mes" },
-    region: "Espana",
+    region: "España",
     color: "chart-2",
     tech: ["React", "Node.js", "PostgreSQL"],
   },
   {
     title: "Restaurante CDMX",
     category: "Branding",
-    description: "Rebranding completo y presencia digital para cadena de restaurantes gourmet en Ciudad de Mexico.",
+    description: "Rebranding completo y presencia digital para cadena de restaurantes gourmet en Ciudad de México.",
     metrics: { conversion: "+38%", traffic: "45K/mes" },
-    region: "Latinoamerica",
+    region: "Latinoamérica",
     color: "chart-4",
     tech: ["Figma", "WordPress", "Social Media"],
   },
@@ -47,18 +47,18 @@ const projects = [
   {
     title: "E-commerce Bogota",
     category: "E-commerce",
-    description: "Tienda en linea de moda sostenible con integracion de pasarelas de pago locales e internacionales.",
+    description: "Tienda en línea de moda sostenible con integración de pasarelas de pago locales e internacionales.",
     metrics: { conversion: "+55%", traffic: "95K/mes" },
-    region: "Latinoamerica",
+    region: "Latinoamérica",
     color: "primary",
     tech: ["Shopify", "Klaviyo", "Meta Ads"],
   },
   {
     title: "Clinica Madrid",
     category: "Web",
-    description: "Portal medico con reserva de citas online, telemedicina y gestion de pacientes para clinica privada.",
+    description: "Portal medico con reserva de citas online, telemedicina y gestión de pacientes para clinica privada.",
     metrics: { conversion: "+41%", traffic: "60K/mes" },
-    region: "Espana",
+    region: "España",
     color: "chart-2",
     tech: ["Next.js", "Supabase", "Tailwind"],
   },
@@ -181,12 +181,12 @@ export function PortfolioSection() {
 
                 <div className="flex items-center gap-4 pt-3 border-t border-border/50">
                   <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Conversion</span>
+                    <span className="text-xs text-muted-foreground">Conversión</span>
                     <span className="text-sm font-bold font-display text-chart-3">{project.metrics.conversion}</span>
                   </div>
                   <div className="w-px h-8 bg-border/50" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-muted-foreground">Trafico</span>
+                    <span className="text-xs text-muted-foreground">Tráfico</span>
                     <span className="text-sm font-bold font-display text-foreground">{project.metrics.traffic}</span>
                   </div>
                   <span className="ml-auto px-2 py-0.5 rounded-md bg-secondary/60 text-[10px] text-muted-foreground font-medium">

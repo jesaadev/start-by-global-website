@@ -24,14 +24,14 @@ const services = [
     icon: Globe,
     title: "Desarrollo Web",
     slug: "desarrollo-web",
-    description: "Sitios web y aplicaciones de alto rendimiento con tecnologias modernas. E-commerce, landing pages y plataformas a medida.",
-    longDescription: "Creamos experiencias digitales que convierten visitantes en clientes. Desde sitios corporativos hasta plataformas complejas de e-commerce, nuestro equipo domina las tecnologias mas avanzadas para entregar proyectos que destacan.",
+    description: "Sitios web y aplicaciones de alto rendimiento con tecnologías modernas. E-commerce, landing pages y plataformas a medida.",
+    longDescription: "Creamos experiencias digitales que convierten visitantes en clientes. Desde sitios corporativos hasta plataformas complejas de e-commerce, nuestro equipo domina las tecnologías más avanzadas para entregar proyectos que destacan.",
     features: [
       "Sitios web corporativos y landing pages",
       "Plataformas e-commerce con pasarelas de pago",
       "Aplicaciones web progresivas (PWA)",
       "Integraciones API y sistemas a medida",
-      "Optimizacion de rendimiento y Core Web Vitals",
+      "Optimización de rendimiento y Core Web Vitals",
       "Mantenimiento y soporte continuo",
     ],
     tech: ["Next.js", "React", "Node.js", "TypeScript", "Tailwind CSS", "PostgreSQL"],
@@ -42,14 +42,14 @@ const services = [
     icon: Search,
     title: "SEO & Posicionamiento",
     slug: "seo-posicionamiento",
-    description: "Estrategias de optimizacion para motores de busqueda que aumentan tu visibilidad organica y generan trafico cualificado.",
-    longDescription: "Posicionamos tu marca donde tus clientes te buscan. Combinamos estrategias tecnicas y de contenido para lograr rankings sostenibles que generan trafico organico de alta calidad.",
+    description: "Estrategias de optimización para motores de busqueda que aumentan tu visibilidad orgánica y generan tráfico cualificado.",
+    longDescription: "Posicionamos tu marca donde tus clientes te buscan. Combinamos estrategias técnicas y de contenido para lograr rankings sostenibles que generan tráfico orgánico de alta calidad.",
     features: [
-      "Auditorias SEO tecnicas completas",
-      "Optimizacion on-page y estructura web",
+      "Auditorias SEO técnicas completas",
+      "Optimización on-page y estructura web",
       "Estrategia de link building ético",
       "SEO local y multi-regional",
-      "Optimizacion de contenido y keywords",
+      "Optimización de contenido y keywords",
       "Monitoreo y reportes mensuales",
     ],
     tech: ["Google Search Console", "Ahrefs", "SEMrush", "Screaming Frog", "GA4"],
@@ -60,15 +60,15 @@ const services = [
     icon: Megaphone,
     title: "Marketing Digital",
     slug: "marketing-digital",
-    description: "Campanas de publicidad digital que maximizan tu retorno de inversion en todas las plataformas principales.",
-    longDescription: "Disenamos y ejecutamos campanas publicitarias que conectan con tu audiencia ideal. Desde Google Ads hasta TikTok, optimizamos cada dolar invertido para maximizar tu ROI.",
+    description: "Campañas de publicidad digital que maximizan tu retorno de inversion en todas las plataformas principales.",
+    longDescription: "Diseñamos y ejecutamos campañas publicitarias que conectan con tu audiencia ideal. Desde Google Ads hasta TikTok, optimizamos cada dolar invertido para maximizar tu ROI.",
     features: [
-      "Campanas Google Ads (Search, Display, Shopping)",
+      "Campañas Google Ads (Search, Display, Shopping)",
       "Meta Ads (Facebook e Instagram)",
       "TikTok Ads y LinkedIn Ads",
       "Estrategias de retargeting avanzado",
-      "Optimizacion de landing pages",
-      "A/B testing y optimizacion continua",
+      "Optimización de landing pages",
+      "A/B testing y optimización continua",
     ],
     tech: ["Google Ads", "Meta Business", "TikTok Ads", "LinkedIn Ads", "Hotjar"],
     color: "chart-4",
@@ -76,15 +76,15 @@ const services = [
   },
   {
     icon: Palette,
-    title: "Branding & Diseno",
+    title: "Branding & Diseño",
     slug: "branding-diseno",
-    description: "Identidad visual que conecta con tu audiencia. Logos, guias de marca y material grafico para todos tus canales.",
-    longDescription: "Construimos marcas que inspiran confianza y generan conexion emocional. Desde la conceptualizacion hasta la implementacion, creamos identidades visuales memorables.",
+    description: "Identidad visual que conecta con tu audiencia. Logos, guias de marca y material gráfico para todos tus canales.",
+    longDescription: "Construimos marcas que inspiran confianza y generan conexión emocional. Desde la conceptualizacion hasta la implementación, creamos identidades visuales memorables.",
     features: [
-      "Diseno de logotipos e identidad visual",
-      "Guias de marca y sistemas de diseno",
-      "Diseno UI/UX para web y mobile",
-      "Material grafico para redes sociales",
+      "Diseño de logotipos e identidad visual",
+      "Guias de marca y sistemas de diseño",
+      "Diseño UI/UX para web y mobile",
+      "Material gráfico para redes sociales",
       "Presentaciones corporativas",
       "Packaging y material impreso",
     ],
@@ -94,16 +94,16 @@ const services = [
   },
   {
     icon: BarChart3,
-    title: "Analitica & Data",
+    title: "Analítica & Data",
     slug: "analitica-data",
     description: "Dashboards personalizados y reportes avanzados para tomar decisiones basadas en datos reales.",
-    longDescription: "Transformamos datos en decisiones estrategicas. Implementamos soluciones de analitica que te dan visibilidad completa sobre el rendimiento de tu negocio digital.",
+    longDescription: "Transformamos datos en decisiones estratégicas. Implementamos soluciones de analítica que te dan visibilidad completa sobre el rendimiento de tu negocio digital.",
     features: [
-      "Implementacion de Google Analytics 4",
+      "Implementación de Google Analytics 4",
       "Dashboards personalizados en tiempo real",
-      "Configuracion de conversiones y eventos",
+      "Configuración de conversiones y eventos",
       "Reportes automatizados mensuales",
-      "Analisis de cohortes y atribucion",
+      "Análisis de cohortes y atribucion",
       "Data visualization y storytelling",
     ],
     tech: ["GA4", "Looker Studio", "BigQuery", "Tag Manager", "Mixpanel"],
@@ -112,17 +112,17 @@ const services = [
   },
   {
     icon: Code,
-    title: "Automatizacion",
-    slug: "automatizacion",
+    title: "Automatización",
+    slug: "automatización",
     description: "Flujos automatizados que optimizan procesos, desde email marketing hasta integraciones con CRM.",
     longDescription: "Eliminamos tareas repetitivas y optimizamos flujos de trabajo. Conectamos tus herramientas y creamos automatizaciones que ahorran tiempo y reducen errores.",
     features: [
-      "Automatizacion de email marketing",
-      "Integracion de CRM (HubSpot, Salesforce)",
+      "Automatización de email marketing",
+      "Integración de CRM (HubSpot, Salesforce)",
       "Workflows de lead nurturing",
-      "Conexion de APIs y webhooks",
-      "Chatbots y atencion automatizada",
-      "Reportes y alertas automaticas",
+      "Conexión de APIs y webhooks",
+      "Chatbots y atención automatizada",
+      "Reportes y alertas automáticas",
     ],
     tech: ["HubSpot", "Zapier", "Make", "n8n", "API REST", "Webhooks"],
     color: "chart-2",
@@ -132,9 +132,9 @@ const services = [
 
 const whyUs = [
   { icon: Zap, title: "Velocidad", description: "Entregamos proyectos en tiempo record sin sacrificar calidad." },
-  { icon: Shield, title: "Confianza", description: "Mas de 150 clientes satisfechos en 4 regiones internacionales." },
+  { icon: Shield, title: "Confianza", description: "Más de 150 clientes satisfechos en 4 regiones internacionales." },
   { icon: Clock, title: "Soporte 24/7", description: "Equipo distribuido que asegura cobertura en todas las zonas horarias." },
-  { icon: Users, title: "Equipo Experto", description: "Profesionales certificados en cada area de especialidad." },
+  { icon: Users, title: "Equipo Experto", description: "Profesionales certificados en cada área de especialidad." },
 ]
 
 export function ServicesPageContent() {
@@ -198,7 +198,7 @@ export function ServicesPageContent() {
                         </div>
                         <div className="flex flex-col">
                           <span className="font-display text-lg font-bold text-chart-3">{service.stats.satisfaction}</span>
-                          <span className="text-[10px] text-muted-foreground">Satisfaccion</span>
+                          <span className="text-[10px] text-muted-foreground">Satisfacción</span>
                         </div>
                         <div className="flex flex-col">
                           <span className="font-display text-lg font-bold text-foreground">{service.stats.avgDelivery}</span>
@@ -243,13 +243,13 @@ export function ServicesPageContent() {
               Listo para transformar tu presencia digital?
             </h2>
             <p className="text-muted-foreground max-w-lg">
-              Agenda una consultoria gratuita y descubre como podemos impulsar tu negocio.
+              Agenda una consultoría gratuita y descubre como podemos impulsar tu negocio.
             </p>
             <Link
               href="/contacto"
               className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] mt-2"
             >
-              Agendar Consultoria
+              Agendar Consultoría
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
