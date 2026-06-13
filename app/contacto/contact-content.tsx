@@ -45,6 +45,7 @@ export function ContactPageContent() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
+  const [accepted, setAccepted] = useState(false)
 
   // Opciones de presupuesto según moneda
   const budgetOptions = {
@@ -238,6 +239,20 @@ export function ContactPageContent() {
                   />
                 </div>
 
+                <label className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={accepted}
+                    onChange={(e) => setAccepted(e.target.checked)}
+                    className="mt-0.5 accent-primary"
+                  />
+                  <span>
+                    He leído y acepto la{" "}
+                    <a href="/privacidad" target="_blank" className="text-primary hover:underline">Política de Privacidad</a>.
+                  </span>
+                </label>
+
                 {error && (
                   <div className="px-4 py-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
                     {error}
@@ -246,7 +261,7 @@ export function ContactPageContent() {
 
                 <button
                   type="submit"
-                  disabled={sending}
+                  disabled={sending || !accepted}
                   className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:pointer-events-none"
                 >
                   {sending ? (

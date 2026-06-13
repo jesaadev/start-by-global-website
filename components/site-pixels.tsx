@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { useEffect, Suspense } from "react"
 import Script from "next/script"
 import type { PixelSettings } from "@/lib/site-settings"
+import { useConsent } from "@/hooks/use-consent"
 
 declare global {
   interface Window {
@@ -17,21 +18,24 @@ declare global {
 function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const consent = useConsent()
 
   useEffect(() => {
     if (!pathname) return
     const url = pathname + (searchParams?.toString() ? `?${searchParams}` : "")
 
-    if (typeof window.fbq === "function") window.fbq("track", "PageView")
-    if (typeof window.ttq?.page === "function") window.ttq.page()
+    if (consent.marketing) {
+      if (typeof window.fbq === "function") window.fbq("track", "PageView")
+      if (typeof window.ttq?.page === "function") window.ttq.page()
+    }
 
     // GA4 en navegación SPA: solo si NO hay GTM. Con GTM, GA4 vive dentro del
     // contenedor (su medición optimizada captura los cambios de historial),
     // así que el sitio no debe enviar page_view por su cuenta para no duplicar.
-    if (!gtmId && ga4Id && typeof window.gtag === "function") {
+    if (consent.analytics && !gtmId && ga4Id && typeof window.gtag === "function") {
       window.gtag("config", ga4Id, { page_path: url })
     }
-  }, [pathname, searchParams, ga4Id, gtmId])
+  }, [pathname, searchParams, ga4Id, gtmId, consent.analytics, consent.marketing])
 
   return null
 }
@@ -42,11 +46,14 @@ function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) 
  */
 export function SitePixels({ pixels }: { pixels: PixelSettings }) {
   const { ga4Id, gtmId, metaPixelId, clarityId, tiktokPixelId } = pixels
+  const consent = useConsent()
+  const analytics = consent.analytics
+  const marketing = consent.marketing
 
   return (
     <>
-      {/* Google Tag Manager */}
-      {gtmId && (
+      {/* Google Tag Manager (analítica) */}
+      {analytics && gtmId && (
         <>
           <Script id="gtm" strategy="afterInteractive">
             {`(function(w,l){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});})(window,'dataLayer');`}
@@ -72,7 +79,7 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
       {/* Google Analytics 4 / gtag — solo directo cuando NO hay GTM.
           Con GTM presente, GA4 se configura como etiqueta dentro del contenedor
           para evitar enviar los datos por duplicado. */}
-      {ga4Id && !gtmId && (
+      {analytics && ga4Id && !gtmId && (
         <>
           <Script
             id="ga4-src"
@@ -85,8 +92,8 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
         </>
       )}
 
-      {/* Meta (Facebook) Pixel */}
-      {metaPixelId && (
+      {/* Meta (Facebook) Pixel (marketing) */}
+      {marketing && metaPixelId && (
         <>
           <Script id="fb-pixel" strategy="afterInteractive">
             {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`}
@@ -104,15 +111,15 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
         </>
       )}
 
-      {/* TikTok Pixel */}
-      {tiktokPixelId && (
+      {/* TikTok Pixel (marketing) */}
+      {marketing && tiktokPixelId && (
         <Script id="tiktok-pixel" strategy="afterInteractive">
           {`!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load('${tiktokPixelId}');ttq.page();}(window,document,'ttq');`}
         </Script>
       )}
 
-      {/* Microsoft Clarity */}
-      {clarityId && (
+      {/* Microsoft Clarity (analítica) */}
+      {analytics && clarityId && (
         <Script id="ms-clarity" strategy="afterInteractive">
           {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarityId}");`}
         </Script>

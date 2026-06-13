@@ -1,5 +1,6 @@
 import { Globe } from "lucide-react"
 import Link from "next/link"
+import { CookiePrefsButton } from "@/components/cookie-prefs-button"
 
 export function Footer() {
   return (
@@ -59,6 +60,14 @@ export function Footer() {
             </span>
             <span>© 2026 Start By Global</span>
           </div>
+        </div>
+
+        {/* Legal row */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border/50 pt-4 text-[10px] text-muted-foreground">
+          <Link href="/privacidad" className="hover:text-foreground transition-colors">Privacidad</Link>
+          <Link href="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+          <Link href="/aviso-legal" className="hover:text-foreground transition-colors">Aviso Legal</Link>
+          <CookiePrefsButton variant="link" className="text-[10px] text-muted-foreground" />
         </div>
       </div>
     </footer>

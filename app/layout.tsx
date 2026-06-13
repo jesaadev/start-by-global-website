@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ChatWidget } from '@/components/chat-widget'
 import { SitePixels } from '@/components/site-pixels'
 import { AttributionTracker } from '@/components/attribution-tracker'
+import { CookieConsent } from '@/components/cookie-consent'
 import { JsonLd } from '@/components/json-ld'
 import { getSiteSettings } from '@/lib/site-settings'
 
@@ -80,6 +81,7 @@ export default async function RootLayout({
         <JsonLd settings={settings} />
         <SitePixels pixels={settings.pixels} />
         <AttributionTracker />
+        <CookieConsent />
         <SpeedInsights />
       </body>
     </html>
