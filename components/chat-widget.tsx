@@ -155,6 +155,12 @@ function EmailCapture({
             Omitir
           </button>
         </div>
+        <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+          Al enviar aceptas nuestra{" "}
+          <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            Política de Privacidad
+          </a>.
+        </p>
       </form>
     </div>
   )

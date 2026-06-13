@@ -3,6 +3,7 @@
 import { useEffect, Suspense } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { captureAttribution, getStoredAttribution, getMetaCookies } from "@/lib/attribution"
+import { useConsent } from "@/hooks/use-consent"
 
 function newEventId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID()
@@ -12,8 +13,13 @@ function newEventId(): string {
 function Tracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const consent = useConsent()
 
   useEffect(() => {
+    // Atribución y PageView server-side son tracking de marketing: requieren
+    // consentimiento (en la UE; fuera está concedido por defecto).
+    if (!consent.marketing) return
+
     // 1) Captura first-touch de atribución (solo escribe la cookie una vez).
     captureAttribution()
 
@@ -34,7 +40,7 @@ function Tracker() {
       }),
     }).catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, searchParams])
+  }, [pathname, searchParams, consent.marketing])
 
   return null
 }

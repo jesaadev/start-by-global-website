@@ -3,6 +3,7 @@
 // evento server-side.
 
 import { getStoredAttribution, getMetaCookies, type Attribution } from "@/lib/attribution"
+import { getConsent } from "@/lib/consent"
 
 function newEventId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID()
@@ -16,7 +17,7 @@ function fbqTrack(event: string, eventId: string) {
 
 export interface LeadTrackingPayload {
   source_type: "contact_form" | "chat_email"
-  eventId: string
+  eventId?: string
   attribution: Attribution | null
   fbp?: string
   fbc?: string
@@ -24,11 +25,17 @@ export interface LeadTrackingPayload {
 }
 
 /**
- * Dispara el evento Lead en el pixel del navegador y devuelve los datos de
- * tracking para adjuntarlos al POST de /api/contact (que enviará el mismo
- * evento por CAPI con idéntico event_id).
+ * Dispara el evento Lead en el pixel del navegador (solo con consentimiento de
+ * marketing) y devuelve los datos de tracking para adjuntarlos al POST de
+ * /api/contact, que enviará el mismo evento por CAPI con idéntico event_id.
+ * Sin consentimiento: no se dispara el pixel ni se envía event_id (el servidor
+ * omite CAPI), pero el lead se sigue registrando.
  */
 export function fireLead(sourceType: "contact_form" | "chat_email"): LeadTrackingPayload {
+  const page_url = typeof window !== "undefined" ? window.location.href : ""
+  if (!getConsent().marketing) {
+    return { source_type: sourceType, attribution: null, page_url }
+  }
   const eventId = newEventId()
   fbqTrack("Lead", eventId)
   const { fbp, fbc } = getMetaCookies()
@@ -38,16 +45,18 @@ export function fireLead(sourceType: "contact_form" | "chat_email"): LeadTrackin
     attribution: getStoredAttribution(),
     fbp,
     fbc,
-    page_url: typeof window !== "undefined" ? window.location.href : "",
+    page_url,
   }
 }
 
 /**
  * Dispara el evento Contact (p. ej. clic en WhatsApp) en el pixel del navegador
- * y lo envía por CAPI (fire-and-forget) con el mismo event_id.
+ * y lo envía por CAPI (fire-and-forget) con el mismo event_id. Requiere
+ * consentimiento de marketing.
  */
 export function fireContact(): void {
   if (typeof window === "undefined") return
+  if (!getConsent().marketing) return
   const eventId = newEventId()
   fbqTrack("Contact", eventId)
   const { fbp, fbc } = getMetaCookies()
