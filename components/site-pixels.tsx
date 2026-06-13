@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-function RouteChangeTracker({ ga4Id }: { ga4Id: string }) {
+function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -24,10 +24,14 @@ function RouteChangeTracker({ ga4Id }: { ga4Id: string }) {
 
     if (typeof window.fbq === "function") window.fbq("track", "PageView")
     if (typeof window.ttq?.page === "function") window.ttq.page()
-    if (ga4Id && typeof window.gtag === "function") {
+
+    // GA4 en navegación SPA: solo si NO hay GTM. Con GTM, GA4 vive dentro del
+    // contenedor (su medición optimizada captura los cambios de historial),
+    // así que el sitio no debe enviar page_view por su cuenta para no duplicar.
+    if (!gtmId && ga4Id && typeof window.gtag === "function") {
       window.gtag("config", ga4Id, { page_path: url })
     }
-  }, [pathname, searchParams, ga4Id])
+  }, [pathname, searchParams, ga4Id, gtmId])
 
   return null
 }
@@ -65,8 +69,10 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
         </>
       )}
 
-      {/* Google Analytics 4 / gtag */}
-      {ga4Id && (
+      {/* Google Analytics 4 / gtag — solo directo cuando NO hay GTM.
+          Con GTM presente, GA4 se configura como etiqueta dentro del contenedor
+          para evitar enviar los datos por duplicado. */}
+      {ga4Id && !gtmId && (
         <>
           <Script
             id="ga4-src"
@@ -113,7 +119,7 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
       )}
 
       <Suspense fallback={null}>
-        <RouteChangeTracker ga4Id={ga4Id} />
+        <RouteChangeTracker ga4Id={ga4Id} gtmId={gtmId} />
       </Suspense>
     </>
   )
