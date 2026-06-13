@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { SidebarNav } from "@/components/sidebar-nav"
 import { HeroSection } from "@/components/hero-section"
 import { MetricsSection } from "@/components/metrics-section"
@@ -17,19 +18,26 @@ export default function Page() {
       <main className="flex-1 min-w-0 lg:ml-[240px] transition-all duration-300 overflow-x-hidden">
         <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
           {/* Top bar */}
-          <header className="flex items-center justify-between pl-12 lg:pl-0">
+          <header className="flex items-center justify-between gap-3 pl-12 lg:pl-0">
             <div>
-              <h2 className="font-display text-lg font-bold text-foreground">Bienvenido</h2>
-              <p className="text-xs text-muted-foreground">Panel de control - Start By Global</p>
+              <h2 className="font-display text-lg font-bold text-foreground">Start By Global</h2>
+              <p className="text-xs text-muted-foreground">Marketing digital y desarrollo web que genera clientes</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border/50">
-                <div className="w-2 h-2 rounded-full bg-chart-3" />
-                <span className="text-xs text-muted-foreground">Online</span>
-              </div>
-              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary font-display font-bold text-xs border border-primary/20">
-                SG
-              </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href="https://wa.me/18493562247"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center px-3 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary/60 transition-colors"
+              >
+                WhatsApp
+              </a>
+              <Link
+                href="/contacto"
+                className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all"
+              >
+                Iniciar Proyecto
+              </Link>
             </div>
           </header>
 

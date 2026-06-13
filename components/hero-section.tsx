@@ -1,11 +1,12 @@
 "use client"
 
-import { ArrowRight, Play, Sparkles } from "lucide-react"
+import { ArrowRight, Play, Sparkles, MessageCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
 import { SocialProofTicker } from "@/components/social-proof-ticker"
 import { ClientLogos } from "@/components/client-logos"
+import { fireContact } from "@/lib/track-client"
 
 const words = ["impulsan", "transforman", "escalan", "potencian"]
 
@@ -94,17 +95,26 @@ export function HeroSection() {
                 <Play className="w-4 h-4" />
                 Ver Portafolio
               </Link>
+              <a
+                href="https://wa.me/18493562247?text=Hola%20Start%20By%20Global%2C%20quiero%20info%20sobre%20sus%20servicios"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => fireContact()}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-[#25D366]/40 text-foreground font-semibold text-sm transition-all duration-200 hover:bg-[#25D366]/10 hover:border-[#25D366]/60"
+              >
+                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                WhatsApp
+              </a>
             </div>
           </AnimateIn>
 
           {/* Quick stats row */}
           <AnimateIn delay={400}>
-            <div className="grid grid-cols-4 gap-3 pt-4 mt-2 border-t border-border/50">
+            <div className="grid grid-cols-3 gap-3 pt-4 mt-2 border-t border-border/50">
               {[
-                { value: "150+", label: "Proyectos" },
-                { value: "12", label: "Países" },
-                { value: "98%", label: "Satisfacción" },
-                { value: "5", label: "Años" },
+                { value: "+50", label: "Proyectos" },
+                { value: "+4", label: "Países" },
+                { value: "300%", label: "ROI promedio" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col">
                   <span className="font-display text-lg sm:text-xl font-bold text-foreground">{stat.value}</span>
@@ -134,7 +144,10 @@ export function HeroSection() {
                   <div className="w-2.5 h-2.5 rounded-full bg-chart-4/80" />
                   <div className="w-2.5 h-2.5 rounded-full bg-chart-3/80" />
                 </div>
-                <span className="text-[10px] text-muted-foreground font-mono truncate">dashboard.sbg.com</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-secondary/70 text-muted-foreground shrink-0">Ejemplo</span>
+                  <span className="text-[10px] text-muted-foreground font-mono truncate">dashboard.sbg.com</span>
+                </div>
               </div>
 
               {/* Animated analytics bars */}
@@ -160,7 +173,7 @@ export function HeroSection() {
                   { label: "Tasa de Conversión", val: "4.8%", trend: "+12%" },
                   { label: "Tráfico Web", val: "24.5K", trend: "+8%" },
                   { label: "Leads Generados", val: "342", trend: "+23%" },
-                  { label: "ROI", val: "285%", trend: "+15%" },
+                  { label: "ROI", val: "300%", trend: "+15%" },
                 ].map((metric) => (
                   <div key={metric.label} className="rounded-lg bg-secondary/50 p-3">
                     <p className="text-[10px] text-muted-foreground mb-1">{metric.label}</p>
