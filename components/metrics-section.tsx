@@ -13,13 +13,13 @@ const kpiCards = [
 
 const regionData = [
   { region: "Rep. Dominicana", clients: 45, revenue: "120K", growth: 28 },
-  { region: "Espana", clients: 32, revenue: "210K", growth: 15 },
-  { region: "Latinoamerica", clients: 58, revenue: "180K", growth: 34 },
+  { region: "España", clients: 32, revenue: "210K", growth: 15 },
+  { region: "Latinoamérica", clients: 58, revenue: "180K", growth: 34 },
   { region: "EE.UU.", clients: 27, revenue: "350K", growth: 22 },
 ]
 
 const channelPerformance = [
-  { channel: "SEO Organico", sessions: 45, color: "bg-primary" },
+  { channel: "SEO Orgánico", sessions: 45, color: "bg-primary" },
   { channel: "Redes Sociales", sessions: 25, color: "bg-chart-2" },
   { channel: "Email Marketing", sessions: 18, color: "bg-chart-4" },
   { channel: "Publicidad PPC", sessions: 12, color: "bg-chart-3" },
@@ -98,7 +98,7 @@ export function MetricsSection() {
             Rendimiento Global
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Vista general de metricas en tiempo real
+            Vista general de métricas en tiempo real
           </p>
         </div>
         <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
@@ -156,7 +156,7 @@ export function MetricsSection() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
               <Globe className="w-4 h-4 text-primary" />
-              Rendimiento por Region
+              Rendimiento por Región
             </h3>
           </div>
           <div className="flex flex-col gap-3">
@@ -195,7 +195,7 @@ export function MetricsSection() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
               <Target className="w-4 h-4 text-primary" />
-              Canales de Trafico
+              Canales de Tráfico
             </h3>
           </div>
 

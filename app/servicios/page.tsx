@@ -2,7 +2,7 @@ import { ServicesPageContent } from "./services-content"
 
 export const metadata = {
   title: "Servicios | Start By Global",
-  description: "Descubre nuestros servicios de marketing digital: desarrollo web, SEO, publicidad, branding, analitica y automatizacion.",
+  description: "Descubre nuestros servicios de marketing digital: desarrollo web, SEO, publicidad, branding, analítica y automatización.",
 }
 
 export default function ServiciosPage() {

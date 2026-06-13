@@ -30,16 +30,16 @@ const services = [
     title: "WordPress",
     subtitle: "Sites & Tiendas",
     description:
-      "Desarrollo full-stack en WordPress para agencias que necesitan entregar sitios corporativos, blogs y WooCommerce con velocidad y calidad garantizada. Tu cliente ve tu marca, nosotros ponemos el codigo.",
+      "Desarrollo full-stack en WordPress para agencias que necesitan entregar sitios corporativos, blogs y WooCommerce con velocidad y calidad garantizada. Tu cliente ve tu marca, nosotros ponemos el código.",
     stack: ["WordPress 6.x", "WooCommerce", "ACF Pro", "Elementor / Gutenberg", "WPML Multilingue"],
     deliverables: [
-      "Diseno personalizado pixel-perfect",
-      "Optimizacion Core Web Vitals 90+",
+      "Diseño personalizado pixel-perfect",
+      "Optimización Core Web Vitals 90+",
       "SEO On-Page configurado",
       "Seguridad Hardening incluida",
       "Documentacion para tu equipo",
     ],
-    turnaround: "7 - 21 dias",
+    turnaround: "7 - 21 días",
     color: "#0074D9",
     bg: "from-[#0074D9]/8 to-transparent",
     border: "border-[#0074D9]/20 hover:border-[#0074D9]/50",
@@ -51,7 +51,7 @@ const services = [
     title: "Corporativas",
     subtitle: "Sin CMS — Astro & React",
     description:
-      "Para clientes que priorizan velocidad extrema y seguridad maxima. Paginas corporativas estaticas con Astro o React que cargan en milisegundos, sin base de datos ni superficie de ataque.",
+      "Para clientes que priorizan velocidad extrema y seguridad maxima. Páginas corporativas estaticas con Astro o React que cargan en milisegundos, sin base de datos ni superficie de ataque.",
     stack: ["Astro 5.x", "React + Next.js", "Tailwind CSS", "Framer Motion", "Vercel / Cloudflare"],
     deliverables: [
       "Performance Score 99/100 garantizado",
@@ -60,7 +60,7 @@ const services = [
       "Animaciones fluidas e interactivas",
       "Accesibilidad WCAG 2.1 AA",
     ],
-    turnaround: "5 - 14 dias",
+    turnaround: "5 - 14 días",
     color: "#00C9C8",
     bg: "from-[#00C9C8]/8 to-transparent",
     border: "border-[#00C9C8]/20 hover:border-[#00C9C8]/50",
@@ -70,18 +70,18 @@ const services = [
     badge: "Servicio 03",
     icon: Megaphone,
     title: "Landing Pages",
-    subtitle: "Embudos de Conversion",
+    subtitle: "Embudos de Conversión",
     description:
-      "Landing pages disenadas para convertir: embudos para campanas de paid media, lanzamientos de productos, webinars y estrategias de lead generation. Cada elemento optimizado para el CPA de tu cliente.",
+      "Landing pages disenadas para convertir: embudos para campañas de paid media, lanzamientos de productos, webinars y estrategias de lead generation. Cada elemento optimizado para el CPA de tu cliente.",
     stack: ["Next.js App Router", "A/B Testing Ready", "Meta Pixel + GTM", "CRM Integration", "Heatmap Ready"],
     deliverables: [
-      "Copy persuasivo orientado a conversion",
-      "Diseno orientado a CRO",
-      "Formularios con automatizacion",
-      "Integracion con cualquier CRM",
+      "Copy persuasivo orientado a conversión",
+      "Diseño orientado a CRO",
+      "Formularios con automatización",
+      "Integración con cualquier CRM",
       "Variantes A/B configuradas",
     ],
-    turnaround: "3 - 10 dias",
+    turnaround: "3 - 10 días",
     color: "#7B61FF",
     bg: "from-[#7B61FF]/8 to-transparent",
     border: "border-[#7B61FF]/20 hover:border-[#7B61FF]/50",
@@ -95,19 +95,19 @@ const faqs = [
   },
   {
     q: "Como funciona el proceso de entrega?",
-    a: "Recibes un brief, lo pasas a nosotros con tus especificaciones. Nosotros disenamos, desarrollamos y te entregamos todo listo en un repositorio privado o staging bajo tu dominio. Tu haces el delivery final al cliente.",
+    a: "Recibes un brief, lo pasas a nosotros con tus especificaciones. Nosotros diseñamos, desarrollamos y te entregamos todo listo en un repositorio privado o staging bajo tu dominio. Tu haces el delivery final al cliente.",
   },
   {
-    q: "Que pasa si el cliente pide revisiones despues de entregado?",
+    q: "Que pasa si el cliente pide revisiones después de entregado?",
     a: "Cada proyecto incluye 2 rondas de revision sin costo. Revisiones adicionales o cambios de scope se cotizan aparte con tarifa de partner preferencial.",
   },
   {
     q: "Trabajan con agencias fuera de Republica Dominicana?",
-    a: "Si. Tenemos partners activos en Venezuela, Espana, Mexico, Colombia y EE.UU. Nos comunicamos por Slack, Notion o la herramienta que ya uses.",
+    a: "Si. Tenemos partners activos en Venezuela, España, México, Colombia y EE.UU. Nos comunicamos por Slack, Notion o la herramienta que ya uses.",
   },
   {
-    q: "Cual es el volumen minimo de proyectos?",
-    a: "No hay volumen minimo para empezar. Sin embargo, los margenes mejoran con el plan Partner (desde 3 proyectos/mes) y Partner Pro (desde 6 proyectos/mes).",
+    q: "Cual es el volumen mínimo de proyectos?",
+    a: "No hay volumen mínimo para empezar. Sin embargo, los margenes mejoran con el plan Partner (desde 3 proyectos/mes) y Partner Pro (desde 6 proyectos/mes).",
   },
 ]
 
@@ -243,7 +243,7 @@ export function OutsourcingContent() {
 
             <AnimateIn delay={0.2}>
               <p className="text-lg text-white/55 leading-relaxed mb-10 max-w-lg">
-                Entregamos WordPress, sitios corporativos en Astro/React y Landing Pages de alta conversion bajo tu marca. Sin creditos, sin rastro. Solo resultados.
+                Entregamos WordPress, sitios corporativos en Astro/React y Landing Pages de alta conversión bajo tu marca. Sin creditos, sin rastro. Solo resultados.
               </p>
             </AnimateIn>
 
@@ -289,8 +289,8 @@ export function OutsourcingContent() {
                   {[
                     { value: "+120", label: "Proyectos entregados", color: "text-[#0074D9]" },
                     { value: "100%", label: "Confidencialidad", color: "text-[#00C9C8]" },
-                    { value: "3-21", label: "Dias de entrega", color: "text-[#7B61FF]" },
-                    { value: "5+", label: "Paises con partners", color: "text-[#0074D9]" },
+                    { value: "3-21", label: "Días de entrega", color: "text-[#7B61FF]" },
+                    { value: "5+", label: "Países con partners", color: "text-[#0074D9]" },
                   ].map((s) => (
                     <div key={s.label} className="bg-[#0E0E0E] p-6">
                       <div className={`font-display text-4xl font-bold mb-1 ${s.color}`}>{s.value}</div>
@@ -321,7 +321,7 @@ export function OutsourcingContent() {
               <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight">
                 Rechazas clientes por falta de{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#00C9C8]">
-                  capacidad tecnica.
+                  capacidad técnica.
                 </span>
               </h2>
             </div>
@@ -333,7 +333,7 @@ export function OutsourcingContent() {
                 <p className="text-red-400 text-xs font-semibold uppercase tracking-wider mb-6">Sin Partner</p>
                 <ul className="space-y-4">
                   {[
-                    "Contratas freelancers sin garantia de calidad",
+                    "Contratas freelancers sin garantía de calidad",
                     "Nómina fija aunque no haya proyectos",
                     "Recuerzas proyectos por problemas de entrega",
                     "Cuellos de botella en picos de demanda",
@@ -354,11 +354,11 @@ export function OutsourcingContent() {
                 <p className="text-[#00C9C8] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global</p>
                 <ul className="space-y-4">
                   {[
-                    "Equipo tecnico certificado en tu back-office",
+                    "Equipo técnico certificado en tu back-office",
                     "Solo pagas por proyecto entregado (costo variable)",
                     "Calidad garantizada con Lighthouse 90+",
                     "Escala instantanea: 1 o 10 proyectos al mes",
-                    "Tu marca, tu credito, nuestro codigo",
+                    "Tu marca, tu credito, nuestro código",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-white/70">
                       <CheckCircle2 className="w-5 h-5 text-[#00C9C8] shrink-0 mt-0.5" />
@@ -483,7 +483,7 @@ export function OutsourcingContent() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden">
             {[
               { step: "01", title: "Brief Confidencial", desc: "Nos envias los requerimientos del proyecto con NDA firmado. Ningun dato de tu cliente sale de ese canal." },
-              { step: "02", title: "Propuesta en 24h", desc: "Enviamos cotizacion detallada con desglose tecnico, cronograma y alcance. Tu la revisas y ajustas." },
+              { step: "02", title: "Propuesta en 24h", desc: "Enviamos cotización detallada con desglose técnico, cronograma y alcance. Tu la revisas y ajustas." },
               { step: "03", title: "Desarrollo en Silencio", desc: "Trabajamos en staging bajo tu dominio o un temporal. Updates por Slack/Notion con tu marca." },
               { step: "04", title: "Entrega Lista para Deploy", desc: "Recibes repositorio, credenciales y documentacion. Tu haces el handoff final. Credito 100% tuyo." },
             ].map((step, i) => (
@@ -522,7 +522,7 @@ export function OutsourcingContent() {
                 name: "Puntual",
                 tagline: "Por proyecto",
                 desc: "Ideal para agencias que necesitan apoyo esporadico o que quieren probar la alianza.",
-                perks: ["Sin compromiso de volumen", "Cotizacion por proyecto", "Pago 50% inicio / 50% entrega", "Soporte via email", "1 revision incluida"],
+                perks: ["Sin compromiso de volumen", "Cotización por proyecto", "Pago 50% inicio / 50% entrega", "Soporte via email", "1 revision incluida"],
                 cta: "Empezar ahora",
                 highlight: false,
                 color: "#ffffff",
@@ -556,7 +556,7 @@ export function OutsourcingContent() {
                 >
                   {plan.highlight && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#0074D9] text-white text-xs font-semibold">
-                      Mas popular
+                      Más popular
                     </div>
                   )}
                   <div className="mb-6">
@@ -609,9 +609,9 @@ export function OutsourcingContent() {
                 <div className="space-y-4">
                   {[
                     { icon: Award, text: "Reportes brandables con tu logo para tu cliente" },
-                    { icon: Code2, text: "Codigo limpio, comentado y documentado" },
-                    { icon: Globe2, text: "Optimizacion multiregion: RD, ES, US" },
-                    { icon: Star, text: "Soporte post-entrega durante 30 dias" },
+                    { icon: Code2, text: "Código limpio, comentado y documentado" },
+                    { icon: Globe2, text: "Optimización multiregion: RD, ES, US" },
+                    { icon: Star, text: "Soporte post-entrega durante 30 días" },
                   ].map((g) => (
                     <div key={g.text} className="flex items-center gap-4">
                       <div className="w-9 h-9 rounded-lg bg-[#0074D9]/10 flex items-center justify-center shrink-0">
@@ -774,11 +774,11 @@ export function OutsourcingContent() {
                       <option value="1-2" className="bg-[#0E0E0E]">1-2 proyectos</option>
                       <option value="3-5" className="bg-[#0E0E0E]">3-5 proyectos</option>
                       <option value="6-10" className="bg-[#0E0E0E]">6-10 proyectos</option>
-                      <option value="10+" className="bg-[#0E0E0E]">Mas de 10</option>
+                      <option value="10+" className="bg-[#0E0E0E]">Más de 10</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Cuentanos tu necesidad</label>
+                    <label className="block text-xs text-white/40 uppercase tracking-wider mb-2">Cuéntanos tu necesidad</label>
                     <textarea
                       required
                       rows={4}
@@ -806,12 +806,12 @@ export function OutsourcingContent() {
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Solicitar informacion de partner
+                        Solicitar información de partner
                       </>
                     )}
                   </button>
                   <p className="text-center text-xs text-white/20">
-                    Al enviar aceptas que te contactemos. Nunca compartimos tu informacion.
+                    Al enviar aceptas que te contactemos. Nunca compartimos tu información.
                   </p>
                 </form>
               )}

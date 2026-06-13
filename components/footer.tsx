@@ -18,15 +18,14 @@ export function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
-            {["LinkedIn", "Instagram", "X"].map((social) => (
-              <a
-                key={social}
-                href="#"
-                className="px-3 py-1.5 rounded-md bg-secondary/60 text-[10px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                {social}
-              </a>
-            ))}
+            <a
+              href="https://www.instagram.com/startbyglobal/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 rounded-md bg-secondary/60 text-[10px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              Instagram
+            </a>
           </div>
         </div>
 
@@ -58,7 +57,7 @@ export function Footer() {
               <Globe className="w-3 h-3" />
               RD / ES / LATAM / US
             </span>
-            <span>2026 Start By Global</span>
+            <span>© 2026 Start By Global</span>
           </div>
         </div>
       </div>

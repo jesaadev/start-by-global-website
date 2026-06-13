@@ -135,38 +135,28 @@ export async function POST(request: Request) {
       try {
         const resend = new Resend(resendApiKey)
 
-        // Send to info@startbyglobal.com
-        const { error: error1 } = await resend.emails.send({
-          from: "Start By Global <onboarding@startbyglobal.com>",
-          to: ["info@startbyglobal.com"],
+        const fromEmail = process.env.CONTACT_FROM_EMAIL ?? "Start By Global <onboarding@startbyglobal.com>"
+        const toEmails = (process.env.CONTACT_TO_EMAILS ?? "info@startbyglobal.com")
+          .split(",").map((s) => s.trim()).filter(Boolean)
+        const ccEmails = process.env.CONTACT_CC_EMAILS
+          ?.split(",").map((s) => s.trim()).filter(Boolean)
+
+        const { error: sendError } = await resend.emails.send({
+          from: fromEmail,
+          to: toEmails,
+          ...(ccEmails?.length ? { cc: ccEmails } : {}),
           replyTo: formData.email,
           subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
           html: htmlContent,
           text: textContent,
         })
 
-        if (error1) {
-          console.error("[Contact API] Resend error (info):", error1)
+        if (sendError) {
+          console.error("[Contact API] Resend error:", sendError)
           return NextResponse.json(
             { error: "Error al enviar el email. Por favor intenta de nuevo." },
             { status: 500 }
           )
-        }
-
-        // Send copy to additional recipients
-        const { error: error2 } = await resend.emails.send({
-          from: "Start By Global <onboarding@startbyglobal.com>",
-          to: ["jhonesaa23@gmail.com"],
-          cc: ["startbyglobal@gmail.com"],
-          replyTo: [],
-          subject: `Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ""}`,
-          html: htmlContent,
-          text: textContent,
-        })
-
-        if (error2) {
-          console.error("[Contact API] Resend error (copy):", error2)
-          // Don't fail the request if the copy fails, main email was sent
         }
 
         return NextResponse.json({ success: true, method: "resend" })
@@ -179,16 +169,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fallback: Log the contact submission and return success
-    // In production, configure RESEND_API_KEY for email delivery
-    console.log("[Contact API] New submission (no RESEND_API_KEY configured):")
-    console.log("[Contact API] To: info@startbyglobal.com")
-    console.log("[Contact API] From:", formData.email)
-    console.log("[Contact API] Name:", formData.name)
-    console.log("[Contact API] Company:", formData.company || "N/A")
-    console.log("[Contact API] Service:", formData.service || "N/A")
-    console.log("[Contact API] Budget:", formData.budget || "N/A")
-    console.log("[Contact API] Message:", formData.message)
+    // Sin RESEND_API_KEY no se puede enviar el email. No registramos datos
+    // personales (PII) en los logs; solo avisamos de la falta de configuración.
+    console.warn("[Contact API] RESEND_API_KEY no configurado: el mensaje no se envió por email.")
 
     return NextResponse.json({
       success: true,

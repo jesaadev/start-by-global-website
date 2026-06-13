@@ -6,10 +6,15 @@ import { useState } from "react"
 import { AnimateIn } from "@/components/animate-in"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", phone: "+1 (809) 555-0100", timezone: "GMT-4" },
-  { city: "Madrid", country: "Espana", phone: "+34 91 555 0100", timezone: "GMT+1" },
-  { city: "Ciudad de Mexico", country: "Mexico", phone: "+52 55 5555 0100", timezone: "GMT-6" },
-  { city: "Miami", country: "EE.UU.", phone: "+1 (305) 555-0100", timezone: "GMT-5" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", timezone: "GMT-4" },
+  { city: "Madrid", country: "España", timezone: "GMT+1" },
+  { city: "Ciudad de México", country: "México", timezone: "GMT-6" },
+  { city: "Miami", country: "EE.UU.", timezone: "GMT-5" },
+]
+
+const WHATSAPP_NUMBERS = [
+  { label: "RD / Internacional", number: "18493562247", display: "+1 849 356 2247" },
+  { label: "Rep. Dominicana", number: "18096378488", display: "+1 809 637 8488" },
 ]
 
 export function ContactSection() {
@@ -47,7 +52,7 @@ export function ContactSection() {
       setFormData({ name: "", email: "", company: "", service: "", message: "" })
       setTimeout(() => setSubmitted(false), 5000)
     } catch {
-      setError("Error de conexion. Verifica tu internet e intenta de nuevo.")
+      setError("Error de conexión. Verifica tu internet e intenta de nuevo.")
     } finally {
       setSending(false)
     }
@@ -58,7 +63,7 @@ export function ContactSection() {
       <AnimateIn>
         <div>
           <h2 className="font-display text-2xl font-bold text-foreground">Contacto</h2>
-          <p className="text-sm text-muted-foreground mt-1">Hablemos sobre tu proximo proyecto</p>
+          <p className="text-sm text-muted-foreground mt-1">Hablemos sobre tu próximo proyecto</p>
         </div>
       </AnimateIn>
 
@@ -73,7 +78,7 @@ export function ContactSection() {
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground">Mensaje Enviado</h3>
                 <p className="text-sm text-muted-foreground text-center max-w-xs">
-                  Gracias por contactarnos. Nuestro equipo te respondera en las proximas 24 horas.
+                  Gracias por contactarnos. Nuestro equipo te responderá en las próximas 24 horas.
                 </p>
               </div>
             ) : (
@@ -125,7 +130,7 @@ export function ContactSection() {
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="service" className="text-xs text-muted-foreground font-medium">
-                      Servicio de interes
+                      Servicio de interés
                     </label>
                     <select
                       id="service"
@@ -138,8 +143,8 @@ export function ContactSection() {
                       <option value="seo" className="bg-card text-foreground">SEO</option>
                       <option value="marketing" className="bg-card text-foreground">Marketing Digital</option>
                       <option value="branding" className="bg-card text-foreground">Branding</option>
-                      <option value="analytics" className="bg-card text-foreground">Analitica</option>
-                      <option value="automation" className="bg-card text-foreground">Automatizacion</option>
+                      <option value="analytics" className="bg-card text-foreground">Analítica</option>
+                      <option value="automation" className="bg-card text-foreground">Automatización</option>
                     </select>
                   </div>
                 </div>
@@ -155,7 +160,7 @@ export function ContactSection() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-                    placeholder="Cuentanos sobre tu proyecto..."
+                    placeholder="Cuéntanos sobre tu proyecto..."
                   />
                 </div>
 
@@ -217,9 +222,9 @@ export function ContactSection() {
 
             {/* Quick contact card */}
             <div className="glass-card rounded-xl p-5 glow-accent">
-              <h3 className="font-display font-semibold text-foreground mb-3">Respuesta Rapida</h3>
+              <h3 className="font-display font-semibold text-foreground mb-3">Respuesta Rápida</h3>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                Necesitas una cotizacion urgente? Nuestro equipo responde en menos de 2 horas en horario laboral.
+                ¿Necesitas una cotización urgente? Nuestro equipo responde en menos de 2 horas en horario laboral.
               </p>
               <div className="flex flex-col gap-2">
                 <a
@@ -230,6 +235,20 @@ export function ContactSection() {
                   info@startbyglobal.com
                   <ArrowUpRight className="w-3 h-3 ml-auto" />
                 </a>
+                {WHATSAPP_NUMBERS.map((wa) => (
+                  <a
+                    key={wa.number}
+                    href={`https://wa.me/${wa.number}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-foreground hover:text-[#25D366] transition-colors"
+                  >
+                    <Phone className="w-4 h-4 text-[#25D366]" />
+                    {wa.display}
+                    <span className="text-[10px] text-muted-foreground">· {wa.label}</span>
+                    <ArrowUpRight className="w-3 h-3 ml-auto" />
+                  </a>
+                ))}
               </div>
             </div>
           </div>

@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
+import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "sbg-admin-2026"
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
 function checkAuth(request: Request): boolean {
+  // Falla de forma segura: sin ADMIN_PASSWORD configurado, nadie entra.
+  if (!ADMIN_PASSWORD) {
+    console.error("[Admin API] ADMIN_PASSWORD no está configurado en el entorno.")
+    return false
+  }
   const auth = request.headers.get("x-admin-password")
   return auth === ADMIN_PASSWORD
 }
@@ -61,6 +67,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ data, total: count, page, limit })
     }
 
+    if (resource === "seo") {
+      const data = await readSiteSettings()
+      return NextResponse.json({ data })
+    }
+
     if (resource === "overrides") {
       const { data, error } = await supabaseAdmin
         .from("prompt_overrides")
@@ -111,6 +122,11 @@ export async function PATCH(request: Request) {
   try {
     const body = await request.json()
     const { resource, id, ...updates } = body
+
+    if (resource === "seo") {
+      const saved = await saveSiteSettings(updates.data)
+      return NextResponse.json({ data: saved })
+    }
 
     if (resource === "insight") {
       const { data, error } = await supabaseAdmin

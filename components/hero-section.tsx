@@ -72,7 +72,7 @@ export function HeroSection() {
           <AnimateIn delay={200}>
             <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-xl">
               En Start By Global transformamos ideas en experiencias digitales excepcionales. Presencia activa en
-              Rep. Dominicana, Espana, Latinoamerica y EE.UU.
+              Rep. Dominicana, España, Latinoamérica y EE.UU.
             </p>
           </AnimateIn>
 
@@ -102,9 +102,9 @@ export function HeroSection() {
             <div className="grid grid-cols-4 gap-3 pt-4 mt-2 border-t border-border/50">
               {[
                 { value: "150+", label: "Proyectos" },
-                { value: "12", label: "Paises" },
-                { value: "98%", label: "Satisfaccion" },
-                { value: "5", label: "Anos" },
+                { value: "12", label: "Países" },
+                { value: "98%", label: "Satisfacción" },
+                { value: "5", label: "Años" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col">
                   <span className="font-display text-lg sm:text-xl font-bold text-foreground">{stat.value}</span>
@@ -157,8 +157,8 @@ export function HeroSection() {
               {/* Mock metrics grid */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Tasa de Conversion", val: "4.8%", trend: "+12%" },
-                  { label: "Trafico Web", val: "24.5K", trend: "+8%" },
+                  { label: "Tasa de Conversión", val: "4.8%", trend: "+12%" },
+                  { label: "Tráfico Web", val: "24.5K", trend: "+8%" },
                   { label: "Leads Generados", val: "342", trend: "+23%" },
                   { label: "ROI", val: "285%", trend: "+15%" },
                 ].map((metric) => (
