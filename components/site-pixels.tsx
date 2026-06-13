@@ -43,16 +43,26 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
     <>
       {/* Google Tag Manager */}
       {gtmId && (
-        <Script id="gtm" strategy="afterInteractive">
-          {`(function(w,l){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});})(window,'dataLayer');`}
-        </Script>
-      )}
-      {gtmId && (
-        <Script
-          id="gtm-src"
-          strategy="afterInteractive"
-          src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}
-        />
+        <>
+          <Script id="gtm" strategy="afterInteractive">
+            {`(function(w,l){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});})(window,'dataLayer');`}
+          </Script>
+          <Script
+            id="gtm-src"
+            strategy="afterInteractive"
+            src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}
+          />
+          {/* Respaldo sin JavaScript */}
+          <noscript>
+            <iframe
+              title="gtm"
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height={0}
+              width={0}
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        </>
       )}
 
       {/* Google Analytics 4 / gtag */}
