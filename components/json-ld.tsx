@@ -1,4 +1,5 @@
 import type { SiteSettings } from "@/lib/site-settings"
+import { safeBaseUrl } from "@/lib/site-settings"
 
 /**
  * Datos estructurados (JSON-LD) globales: Organization + WebSite.
@@ -7,7 +8,7 @@ import type { SiteSettings } from "@/lib/site-settings"
  */
 export function JsonLd({ settings }: { settings: SiteSettings }) {
   const { seo, organization } = settings
-  const base = seo.canonicalBase.replace(/\/$/, "")
+  const base = safeBaseUrl(seo.canonicalBase)
   const abs = (path: string) =>
     path?.startsWith("http") ? path : `${base}${path?.startsWith("/") ? "" : "/"}${path ?? ""}`
 

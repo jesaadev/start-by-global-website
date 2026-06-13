@@ -733,14 +733,22 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     let active = true
     const fetchSeo = async () => {
       setLoading(true)
-      const res = await api.get({ resource: "seo" })
-      if (!active) return
-      if (res.data) {
-        setSettings(res.data)
-        setKeywordsStr((res.data.seo.keywords ?? []).join(", "))
-        setSameAsStr((res.data.organization.sameAs ?? []).join("\n"))
+      setError("")
+      try {
+        const res = await api.get({ resource: "seo" })
+        if (!active) return
+        if (res.data) {
+          setSettings(res.data)
+          setKeywordsStr((res.data.seo.keywords ?? []).join(", "))
+          setSameAsStr((res.data.organization.sameAs ?? []).join("\n"))
+        } else {
+          setError(res.error || "No se pudieron cargar los datos de SEO.")
+        }
+      } catch {
+        if (active) setError("Error de conexión al cargar los datos.")
+      } finally {
+        if (active) setLoading(false)
       }
-      setLoading(false)
     }
     fetchSeo()
     return () => { active = false }
@@ -757,32 +765,52 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     if (!settings) return
     setSaving(true)
     setError("")
-    const payload: SiteSettings = {
-      ...settings,
-      seo: {
-        ...settings.seo,
-        keywords: keywordsStr.split(",").map((k) => k.trim()).filter(Boolean),
-      },
-      organization: {
-        ...settings.organization,
-        sameAs: sameAsStr.split("\n").map((u) => u.trim()).filter(Boolean),
-      },
+    try {
+      const payload: SiteSettings = {
+        ...settings,
+        seo: {
+          ...settings.seo,
+          keywords: keywordsStr.split(",").map((k) => k.trim()).filter(Boolean),
+        },
+        organization: {
+          ...settings.organization,
+          sameAs: sameAsStr.split("\n").map((u) => u.trim()).filter(Boolean),
+        },
+      }
+      const res = await api.patch({ resource: "seo", data: payload })
+      if (res.data) {
+        setSettings(res.data)
+        setSaved(true)
+        setTimeout(() => setSaved(false), 2500)
+      } else {
+        setError(res.error || "No se pudo guardar.")
+      }
+    } catch {
+      setError("Ocurrió un error inesperado al guardar.")
+    } finally {
+      setSaving(false)
     }
-    const res = await api.patch({ resource: "seo", data: payload })
-    if (res.data) {
-      setSettings(res.data)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2500)
-    } else {
-      setError(res.error || "No se pudo guardar.")
-    }
-    setSaving(false)
   }
 
-  if (loading || !settings) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!settings) {
+    return (
+      <div className="glass-card rounded-xl p-6 text-center space-y-3">
+        <p className="text-sm text-destructive">{error || "No se pudieron cargar los datos de SEO."}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:shadow-md transition-all"
+        >
+          Recargar página
+        </button>
       </div>
     )
   }

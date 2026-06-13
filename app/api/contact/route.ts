@@ -136,8 +136,10 @@ export async function POST(request: Request) {
         const resend = new Resend(resendApiKey)
 
         const fromEmail = process.env.CONTACT_FROM_EMAIL ?? "Start By Global <onboarding@startbyglobal.com>"
-        const toEmails = (process.env.CONTACT_TO_EMAILS ?? "info@startbyglobal.com")
+        const parsedToEmails = (process.env.CONTACT_TO_EMAILS ?? "")
           .split(",").map((s) => s.trim()).filter(Boolean)
+        // Fallback si la env var está vacía o solo tiene espacios: Resend exige >=1 destinatario.
+        const toEmails = parsedToEmails.length > 0 ? parsedToEmails : ["info@startbyglobal.com"]
         const ccEmails = process.env.CONTACT_CC_EMAILS
           ?.split(",").map((s) => s.trim()).filter(Boolean)
 

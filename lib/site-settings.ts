@@ -99,6 +99,24 @@ export function mergeSettings(partial: unknown): SiteSettings {
   }
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const FALLBACK_BASE = "https://startbyglobal.com"
+
+/**
+ * Normaliza la URL base canónica editable desde el admin. Si es inválida o le
+ * falta el protocolo (p. ej. "startbyglobal.com"), cae a un fallback seguro
+ * para no generar canonicals, sitemap, robots ni JSON-LD con URLs rotas.
+ */
+export function safeBaseUrl(raw: string): string {
+  try {
+    return new URL(raw).toString().replace(/\/$/, "")
+  } catch {
+    console.warn(`[SiteSettings] canonicalBase inválida ("${raw}"), usando ${FALLBACK_BASE}`)
+    return FALLBACK_BASE
+  }
+}
+
 // ─── Reads ────────────────────────────────────────────────────────────────────
 
 // Lectura directa sin caché (para el admin, que necesita ver lo más reciente).

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { getSiteSettings } from "@/lib/site-settings"
+import { getSiteSettings, safeBaseUrl } from "@/lib/site-settings"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 
 export const revalidate = 300
@@ -18,7 +18,7 @@ const STATIC_ROUTES: Array<{ path: string; priority: number; changeFrequency: Me
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { seo } = await getSiteSettings()
-  const base = seo.canonicalBase.replace(/\/$/, "")
+  const base = safeBaseUrl(seo.canonicalBase)
   const now = new Date()
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
