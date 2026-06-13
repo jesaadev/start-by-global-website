@@ -1,10 +1,22 @@
 // Utilidades de protección para rutas API (anti-abuso).
 
-/** Extrae la IP del cliente desde los headers (Vercel / proxies). */
+/**
+ * Extrae la IP del cliente priorizando headers fijados por el proxy de confianza
+ * (no falsificables por el cliente) antes que X-Forwarded-For, cuyo primer
+ * elemento sí puede manipularse para evadir el rate limit.
+ * Orden: CF-Connecting-IP (Cloudflare) → X-Real-IP (Vercel) → X-Forwarded-For.
+ */
 export function clientIp(headers: Headers): string {
+  const cf = headers.get("cf-connecting-ip")
+  if (cf) return cf.trim()
+
+  const real = headers.get("x-real-ip")
+  if (real) return real.trim()
+
   const fwd = headers.get("x-forwarded-for")
   if (fwd) return fwd.split(",")[0].trim()
-  return headers.get("x-real-ip") ?? "unknown"
+
+  return "unknown"
 }
 
 /**

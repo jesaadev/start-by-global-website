@@ -1,5 +1,6 @@
 import crypto from "node:crypto"
 import { getSiteSettings } from "@/lib/site-settings"
+import { clientIp } from "@/lib/request-guards"
 
 // Meta Conversions API (server-side). Envía eventos a Meta con los datos del
 // usuario hasheados (SHA-256) y un event_id compartido con el pixel del
@@ -99,9 +100,8 @@ export async function sendCapiEvent(ev: CapiEvent): Promise<CapiStatus> {
   }
 }
 
-/** Extrae IP del cliente desde los headers de la request (Vercel / proxies). */
+/** IP del cliente para CAPI (usa la extracción centralizada con headers de confianza). */
 export function getClientIp(headers: Headers): string | undefined {
-  const fwd = headers.get("x-forwarded-for")
-  if (fwd) return fwd.split(",")[0].trim()
-  return headers.get("x-real-ip") ?? undefined
+  const ip = clientIp(headers)
+  return ip === "unknown" ? undefined : ip
 }

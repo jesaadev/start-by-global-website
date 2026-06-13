@@ -65,9 +65,8 @@ export function ContactPageContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // Honeypot: leer de forma síncrona antes de cualquier await.
-    const honeypot =
-      (e.currentTarget as HTMLFormElement).elements.namedItem("company_website") as HTMLInputElement | null
-    const company_website = honeypot?.value ?? ""
+    const company_website =
+      (new FormData(e.currentTarget as HTMLFormElement).get("company_website") as string) ?? ""
     setSending(true)
     setError("")
 
