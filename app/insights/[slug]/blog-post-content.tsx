@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { AnimateIn } from "@/components/animate-in"
 import {
   ArrowLeft,
@@ -274,10 +275,13 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
       {/* Hero Image */}
       <AnimateIn delay={0.2}>
         <div className="relative h-[260px] sm:h-[420px] rounded-2xl overflow-hidden">
-          <img
+          <Image
             src={post.image}
             alt={post.title}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 1200px"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
         </div>
