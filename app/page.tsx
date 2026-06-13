@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { SidebarNav } from "@/components/sidebar-nav"
+import { WhatsAppLink } from "@/components/whatsapp-link"
 import { HeroSection } from "@/components/hero-section"
 import { MetricsSection } from "@/components/metrics-section"
 import { ServicesSection } from "@/components/services-section"
@@ -24,14 +25,9 @@ export default function Page() {
               <p className="text-xs text-muted-foreground">Marketing digital y desarrollo web que genera clientes</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <a
-                href="https://wa.me/18493562247"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center px-3 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary/60 transition-colors"
-              >
+              <WhatsAppLink className="hidden sm:inline-flex items-center px-3 py-2 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-secondary/60 transition-colors">
                 WhatsApp
-              </a>
+              </WhatsAppLink>
               <Link
                 href="/contacto"
                 className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all"

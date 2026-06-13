@@ -6,7 +6,7 @@ import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
 import { SocialProofTicker } from "@/components/social-proof-ticker"
 import { ClientLogos } from "@/components/client-logos"
-import { fireContact } from "@/lib/track-client"
+import { WhatsAppLink } from "@/components/whatsapp-link"
 
 const words = ["impulsan", "transforman", "escalan", "potencian"]
 
@@ -95,16 +95,10 @@ export function HeroSection() {
                 <Play className="w-4 h-4" />
                 Ver Portafolio
               </Link>
-              <a
-                href="https://wa.me/18493562247?text=Hola%20Start%20By%20Global%2C%20quiero%20info%20sobre%20sus%20servicios"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => fireContact()}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-[#25D366]/40 text-foreground font-semibold text-sm transition-all duration-200 hover:bg-[#25D366]/10 hover:border-[#25D366]/60"
-              >
+              <WhatsAppLink className="flex items-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-[#25D366]/40 text-foreground font-semibold text-sm transition-all duration-200 hover:bg-[#25D366]/10 hover:border-[#25D366]/60">
                 <MessageCircle className="w-4 h-4 text-[#25D366]" />
                 WhatsApp
-              </a>
+              </WhatsAppLink>
             </div>
           </AnimateIn>
 
