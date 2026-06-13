@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server"
 import { Resend } from "resend"
+import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
+import { logLeadEvent } from "@/lib/lead-events"
+import type { Attribution } from "@/lib/attribution"
 
 interface ContactFormData {
   name: string
@@ -8,6 +11,15 @@ interface ContactFormData {
   service?: string
   budget?: string
   message: string
+}
+
+interface LeadTracking {
+  source_type?: "contact_form" | "chat_email"
+  eventId?: string
+  attribution?: Attribution | null
+  fbp?: string
+  fbc?: string
+  page_url?: string
 }
 
 function escapeHtml(text: string): string {
@@ -125,6 +137,39 @@ export async function POST(request: Request) {
       message: message.trim(),
     }
 
+    // ── Tracking de conversión (Meta CAPI + medidor de atribución) ──
+    // Se ejecuta aunque el envío de email falle: un lead es un lead.
+    const tracking = body as LeadTracking
+    const sourceType = tracking.source_type === "chat_email" ? "chat_email" : "contact_form"
+    let capiStatus: string | undefined
+    try {
+      if (tracking.eventId) {
+        capiStatus = await sendCapiEvent({
+          eventName: "Lead",
+          eventId: tracking.eventId,
+          eventSourceUrl: tracking.page_url,
+          email: formData.email,
+          firstName: formData.name,
+          clientIp: getClientIp(request.headers),
+          userAgent: request.headers.get("user-agent") ?? undefined,
+          fbp: tracking.fbp,
+          fbc: tracking.fbc,
+          fbclid: tracking.attribution?.fbclid,
+        })
+      }
+      await logLeadEvent({
+        event_name: "Lead",
+        source_type: sourceType,
+        email: formData.email,
+        name: formData.name,
+        attribution: tracking.attribution,
+        page_url: tracking.page_url,
+        capi_status: capiStatus,
+      })
+    } catch (e) {
+      console.error("[Contact API] tracking error:", e)
+    }
+
     const htmlContent = buildEmailHtml(formData)
     const textContent = buildPlainText(formData)
 
@@ -136,8 +181,10 @@ export async function POST(request: Request) {
         const resend = new Resend(resendApiKey)
 
         const fromEmail = process.env.CONTACT_FROM_EMAIL ?? "Start By Global <onboarding@startbyglobal.com>"
-        const toEmails = (process.env.CONTACT_TO_EMAILS ?? "info@startbyglobal.com")
+        const parsedToEmails = (process.env.CONTACT_TO_EMAILS ?? "")
           .split(",").map((s) => s.trim()).filter(Boolean)
+        // Fallback si la env var está vacía o solo tiene espacios: Resend exige >=1 destinatario.
+        const toEmails = parsedToEmails.length > 0 ? parsedToEmails : ["info@startbyglobal.com"]
         const ccEmails = process.env.CONTACT_CC_EMAILS
           ?.split(",").map((s) => s.trim()).filter(Boolean)
 

@@ -4,6 +4,7 @@ import React from "react"
 import { Send, MapPin, Phone, Mail, Clock, ArrowUpRight, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import { AnimateIn } from "@/components/animate-in"
+import { fireLead, fireContact } from "@/lib/track-client"
 
 const offices = [
   { city: "Santo Domingo", country: "Rep. Dominicana", timezone: "GMT-4" },
@@ -35,10 +36,11 @@ export function ContactSection() {
     setError("")
 
     try {
+      const tracking = fireLead("contact_form")
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...tracking }),
       })
       const data = await res.json()
 
@@ -241,6 +243,7 @@ export function ContactSection() {
                     href={`https://wa.me/${wa.number}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => fireContact()}
                     className="flex items-center gap-2 text-sm text-foreground hover:text-[#25D366] transition-colors"
                   >
                     <Phone className="w-4 h-4 text-[#25D366]" />

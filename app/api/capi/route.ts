@@ -1,0 +1,60 @@
+import { NextResponse } from "next/server"
+import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
+import { logLeadEvent } from "@/lib/lead-events"
+import type { Attribution } from "@/lib/attribution"
+
+interface CapiBody {
+  eventName: "Contact" | "PageView"
+  eventId: string
+  source_type?: "whatsapp"
+  email?: string | null
+  name?: string | null
+  attribution?: Attribution | null
+  fbp?: string
+  fbc?: string
+  eventSourceUrl?: string
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as CapiBody
+
+    if (!body?.eventName || !body?.eventId) {
+      return NextResponse.json({ error: "Datos inválidos." }, { status: 400 })
+    }
+
+    const clientIp = getClientIp(request.headers)
+    const userAgent = request.headers.get("user-agent") ?? undefined
+
+    const status = await sendCapiEvent({
+      eventName: body.eventName,
+      eventId: body.eventId,
+      eventSourceUrl: body.eventSourceUrl,
+      email: body.email,
+      firstName: body.name,
+      clientIp,
+      userAgent,
+      fbp: body.fbp,
+      fbc: body.fbc,
+      fbclid: body.attribution?.fbclid,
+    })
+
+    // Solo registramos eventos significativos (Contact). PageView no se almacena.
+    if (body.eventName === "Contact") {
+      await logLeadEvent({
+        event_name: "Contact",
+        source_type: body.source_type ?? "whatsapp",
+        email: body.email,
+        name: body.name,
+        attribution: body.attribution,
+        page_url: body.eventSourceUrl,
+        capi_status: status,
+      })
+    }
+
+    return NextResponse.json({ ok: true, capi: status })
+  } catch (error) {
+    console.error("[CAPI route] error:", error)
+    return NextResponse.json({ error: "Error interno." }, { status: 500 })
+  }
+}

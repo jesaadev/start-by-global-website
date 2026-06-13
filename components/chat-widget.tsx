@@ -7,6 +7,7 @@ import {
   Phone, ArrowRight, AlertCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { fireLead, fireContact } from "@/lib/track-client"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -195,6 +196,7 @@ function WhatsAppCTA({
         href={buildWhatsAppUrl(summary)}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => fireContact()}
         className={cn(
           "mt-3 flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl",
           "bg-[#25D366] text-white text-sm font-semibold",
@@ -242,6 +244,7 @@ function ChatInactive() {
           href={buildWhatsAppUrl("consulta general")}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => fireContact()}
           className={cn(
             "flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
             "bg-[#25D366] text-white transition-all duration-200",
@@ -357,6 +360,7 @@ function ChatWidgetInner() {
   // Enviar lead al CRM
   const sendLeadToCRM = useCallback(async (email: string, name: string, summary: string) => {
     try {
+      const tracking = fireLead("chat_email")
       await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -365,6 +369,7 @@ function ChatWidgetInner() {
           email,
           message: `Lead capturado desde el Chat Widget.\n\nResumen de la conversación:\n${summary}`,
           service: "Chat Widget Lead",
+          ...tracking,
         }),
       })
     } catch {
@@ -549,6 +554,7 @@ function ChatWidgetInner() {
               href={buildWhatsAppUrl(conversationSummary || "consulta general")}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => fireContact()}
               className="p-1.5 rounded-lg text-muted-foreground hover:text-[#25D366] hover:bg-[#25D366]/10 transition-colors"
               aria-label="Abrir WhatsApp"
               title="Hablar por WhatsApp"

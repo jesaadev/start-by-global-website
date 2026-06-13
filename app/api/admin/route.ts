@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
 import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
+import { getAttributionStats } from "@/lib/lead-events"
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
@@ -69,6 +70,12 @@ export async function GET(request: Request) {
 
     if (resource === "seo") {
       const data = await readSiteSettings()
+      return NextResponse.json({ data })
+    }
+
+    if (resource === "attribution") {
+      const days = parseInt(searchParams.get("days") ?? "30")
+      const data = await getAttributionStats(Number.isFinite(days) ? days : 30)
       return NextResponse.json({ data })
     }
 

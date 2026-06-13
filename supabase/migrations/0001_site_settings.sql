@@ -6,7 +6,8 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 create table if not exists public.site_settings (
-  id          text primary key default 'global',
+  -- CHECK garantiza el patrón singleton: solo puede existir la fila 'global'.
+  id          text primary key default 'global' check (id = 'global'),
   data        jsonb not null default '{}'::jsonb,
   updated_at  timestamptz not null default now()
 );
