@@ -98,12 +98,12 @@ export function MetricsSection() {
             Rendimiento Global
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Vista general de métricas en tiempo real
+            Métricas representativas de los resultados que generamos
           </p>
         </div>
         <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="w-2 h-2 rounded-full bg-chart-3 animate-pulse" />
-          Actualizado en tiempo real
+          <div className="w-2 h-2 rounded-full bg-chart-3" />
+          Datos ilustrativos
         </div>
       </div>
 

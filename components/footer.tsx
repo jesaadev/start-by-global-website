@@ -34,7 +34,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 border-t border-border/50 pt-4">
           <nav className="flex items-center gap-4 flex-wrap">
             {[
-              { label: "Dashboard", href: "/" },
+              { label: "Inicio", href: "/" },
               { label: "Servicios", href: "/servicios" },
               { label: "Portafolio", href: "/portafolio" },
               { label: "Nosotros", href: "/nosotros" },
