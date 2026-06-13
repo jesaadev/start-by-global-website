@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server"
-import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
+import { sendCapiEvent, getClientIp, type CapiStatus } from "@/lib/meta-capi"
 import { logLeadEvent } from "@/lib/lead-events"
 import { enforceRateLimit } from "@/lib/rate-limit"
 import { sameOriginOk } from "@/lib/request-guards"
 import type { Attribution } from "@/lib/attribution"
 
 interface CapiBody {
-  eventName: "Contact" | "PageView"
-  eventId: string
+  eventName: "Lead" | "Contact" | "PageView"
+  eventId?: string
   source_type?: "whatsapp"
   email?: string | null
   name?: string | null
+  service?: string | null
   attribution?: Attribution | null
   fbp?: string
   fbc?: string
@@ -27,30 +28,35 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as CapiBody
 
-    if (!body?.eventName || !body?.eventId) {
+    if (!body?.eventName) {
       return NextResponse.json({ error: "Datos inválidos." }, { status: 400 })
     }
 
-    const clientIp = getClientIp(request.headers)
-    const userAgent = request.headers.get("user-agent") ?? undefined
+    // Envío a Meta (CAPI) solo si llega event_id, que el cliente incluye
+    // únicamente cuando hay consentimiento de marketing.
+    let status: CapiStatus = "skipped"
+    if (body.eventId) {
+      status = await sendCapiEvent({
+        eventName: body.eventName,
+        eventId: body.eventId,
+        eventSourceUrl: body.eventSourceUrl,
+        email: body.email,
+        firstName: body.name,
+        clientIp: getClientIp(request.headers),
+        userAgent: request.headers.get("user-agent") ?? undefined,
+        fbp: body.fbp,
+        fbc: body.fbc,
+        fbclid: body.attribution?.fbclid,
+        customData: body.service ? { content_name: body.service } : undefined,
+      })
+    }
 
-    const status = await sendCapiEvent({
-      eventName: body.eventName,
-      eventId: body.eventId,
-      eventSourceUrl: body.eventSourceUrl,
-      email: body.email,
-      firstName: body.name,
-      clientIp,
-      userAgent,
-      fbp: body.fbp,
-      fbc: body.fbc,
-      fbclid: body.attribution?.fbclid,
-    })
-
-    // Solo registramos eventos significativos (Contact). PageView no se almacena.
-    if (body.eventName === "Contact") {
+    // Registramos eventos significativos (Lead, Contact) siempre — alimentan el
+    // medidor de atribución aunque no haya consentimiento de marketing.
+    // PageView no se almacena.
+    if (body.eventName === "Lead" || body.eventName === "Contact") {
       await logLeadEvent({
-        event_name: "Contact",
+        event_name: body.eventName,
         source_type: body.source_type ?? "whatsapp",
         email: body.email,
         name: body.name,

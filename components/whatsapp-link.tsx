@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react"
 import { MessageCircle, X, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { fireContact } from "@/lib/track-client"
+import { fireWhatsAppLead } from "@/lib/track-client"
 
 // Datos centralizados del canal de WhatsApp (evita duplicación entre vistas).
 export const WHATSAPP_NUMBER = "18493562247"
@@ -58,7 +58,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, ..
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const url = buildWhatsAppUrl(number, { name: name.trim(), service, detail: detail.trim() })
-    fireContact()
+    fireWhatsAppLead({ name: name.trim(), service })
     window.open(url, "_blank", "noopener,noreferrer")
     setOpen(false)
   }

@@ -75,3 +75,39 @@ export function fireContact(): void {
     }),
   }).catch(() => {})
 }
+
+/**
+ * Registra un Lead enviado desde el modal de WhatsApp: siempre lo registra
+ * server-side (aparece en el medidor de Atribución) y, solo con consentimiento
+ * de marketing, dispara también el pixel del navegador y CAPI con event_id
+ * compartido para deduplicar.
+ */
+export function fireWhatsAppLead(info: { name?: string; service?: string }): void {
+  if (typeof window === "undefined") return
+  const marketing = getConsent().marketing
+
+  const payload: Record<string, unknown> = {
+    eventName: "Lead",
+    source_type: "whatsapp",
+    name: info.name || null,
+    service: info.service || null,
+    eventSourceUrl: window.location.href,
+    attribution: marketing ? getStoredAttribution() : null,
+  }
+
+  if (marketing) {
+    const eventId = newEventId()
+    fbqTrack("Lead", eventId)
+    const { fbp, fbc } = getMetaCookies()
+    payload.eventId = eventId
+    payload.fbp = fbp
+    payload.fbc = fbc
+  }
+
+  fetch("/api/capi", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    keepalive: true,
+    body: JSON.stringify(payload),
+  }).catch(() => {})
+}
