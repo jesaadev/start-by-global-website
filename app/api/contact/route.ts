@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { Resend } from "resend"
 import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
 import { logLeadEvent } from "@/lib/lead-events"
+import { enforceRateLimit } from "@/lib/rate-limit"
+import { sameOriginOk, isBot } from "@/lib/request-guards"
 import type { Attribution } from "@/lib/attribution"
 
 interface ContactFormData {
@@ -107,7 +109,20 @@ const serviceLabels: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
+    // Anti-abuso: límite de envíos por IP y validación de origen.
+    const limited = enforceRateLimit(request, "contact", 5, 10 * 60 * 1000)
+    if (limited) return limited
+    if (!sameOriginOk(request)) {
+      return NextResponse.json({ error: "Origen no permitido." }, { status: 403 })
+    }
+
     const body = await request.json()
+
+    // Honeypot: si el bot rellenó el campo trampa, fingimos éxito sin procesar.
+    if (isBot(body)) {
+      return NextResponse.json({ success: true })
+    }
+
     const { name, email, company, service, budget, message } = body as ContactFormData
 
     // Validation

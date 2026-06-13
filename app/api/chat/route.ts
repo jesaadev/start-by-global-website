@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { getActiveInsights, getActiveOverrides, buildDynamicPromptBlock } from "@/lib/supabase"
+import { enforceRateLimit } from "@/lib/rate-limit"
+import { sameOriginOk } from "@/lib/request-guards"
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
@@ -69,6 +71,13 @@ function detectHighIntent(message: string): boolean {
 
 export async function POST(request: Request) {
   try {
+    // Anti-abuso: límite por IP (protege el coste de la API) y origen.
+    const limited = enforceRateLimit(request, "chat", 30, 60 * 1000)
+    if (limited) return limited
+    if (!sameOriginOk(request)) {
+      return NextResponse.json({ error: "Origen no permitido." }, { status: 403 })
+    }
+
     if (!GEMINI_API_KEY) {
       return NextResponse.json({ error: "Servicio de chat no configurado." }, { status: 500 })
     }

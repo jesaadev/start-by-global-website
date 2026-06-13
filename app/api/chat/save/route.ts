@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { saveConversation, upsertInsight, type ConversationAnalysis } from "@/lib/supabase"
+import { enforceRateLimit } from "@/lib/rate-limit"
+import { sameOriginOk } from "@/lib/request-guards"
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
@@ -66,6 +68,13 @@ async function analyzeWithGemini(
 
 export async function POST(request: Request) {
   try {
+    // Anti-abuso: límite por IP y origen (evita inyección de conversaciones).
+    const limited = enforceRateLimit(request, "chat-save", 20, 60 * 1000)
+    if (limited) return limited
+    if (!sameOriginOk(request)) {
+      return NextResponse.json({ error: "Origen no permitido." }, { status: 403 })
+    }
+
     const body = await request.json()
     const {
       session_id,
