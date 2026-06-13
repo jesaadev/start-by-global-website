@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
 import { logLeadEvent } from "@/lib/lead-events"
+import { enforceRateLimit } from "@/lib/rate-limit"
+import { sameOriginOk } from "@/lib/request-guards"
 import type { Attribution } from "@/lib/attribution"
 
 interface CapiBody {
@@ -17,6 +19,12 @@ interface CapiBody {
 
 export async function POST(request: Request) {
   try {
+    const limited = enforceRateLimit(request, "capi", 60, 60 * 1000)
+    if (limited) return limited
+    if (!sameOriginOk(request)) {
+      return NextResponse.json({ error: "Origen no permitido." }, { status: 403 })
+    }
+
     const body = (await request.json()) as CapiBody
 
     if (!body?.eventName || !body?.eventId) {

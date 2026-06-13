@@ -64,6 +64,10 @@ export function ContactPageContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Honeypot: leer de forma síncrona antes de cualquier await.
+    const honeypot =
+      (e.currentTarget as HTMLFormElement).elements.namedItem("company_website") as HTMLInputElement | null
+    const company_website = honeypot?.value ?? ""
     setSending(true)
     setError("")
 
@@ -72,7 +76,7 @@ export function ContactPageContent() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, ...tracking }),
+        body: JSON.stringify({ ...formData, ...tracking, company_website }),
       })
       const data = await res.json()
 
@@ -132,6 +136,15 @@ export function ContactPageContent() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* Honeypot anti-bots: oculto para usuarios reales */}
+                <input
+                  type="text"
+                  name="company_website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                />
                 <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
                   <Send className="w-4 h-4 text-primary" />
                   Enviar Mensaje

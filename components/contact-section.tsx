@@ -33,6 +33,10 @@ export function ContactSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Honeypot: leer el campo trampa de forma síncrona antes de cualquier await.
+    const honeypot =
+      (e.currentTarget as HTMLFormElement).elements.namedItem("company_website") as HTMLInputElement | null
+    const company_website = honeypot?.value ?? ""
     setSending(true)
     setError("")
 
@@ -41,7 +45,7 @@ export function ContactSection() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, ...tracking }),
+        body: JSON.stringify({ ...formData, ...tracking, company_website }),
       })
       const data = await res.json()
 
@@ -86,6 +90,15 @@ export function ContactSection() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                {/* Honeypot anti-bots: oculto para usuarios reales */}
+                <input
+                  type="text"
+                  name="company_website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="name" className="text-xs text-muted-foreground font-medium">
