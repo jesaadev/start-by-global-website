@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { AnimateIn } from "@/components/animate-in"
 import {
   TrendingUp,
@@ -209,10 +210,13 @@ export function InsightsContent() {
               <div className="grid lg:grid-cols-2 gap-0">
                 {/* Image */}
                 <div className="relative h-64 lg:h-auto overflow-hidden">
-                  <img
+                  <Image
                     src={featuredPost.image}
                     alt={featuredPost.title}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-card/90 to-transparent" />
                   <div className="absolute top-4 left-4">
@@ -265,10 +269,12 @@ export function InsightsContent() {
               <div className="glass-card-hover rounded-2xl overflow-hidden h-full flex flex-col group">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
                   <div className="absolute bottom-3 left-3">
