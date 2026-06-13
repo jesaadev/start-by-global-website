@@ -6,7 +6,7 @@ import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Eye,
   ChevronLeft, ChevronRight, Loader2, CheckCircle2,
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
-  Search, Building2, Activity,
+  Search, Building2, Activity, Megaphone,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
@@ -987,11 +987,243 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   )
 }
 
+// ─── Atribución Tab ───────────────────────────────────────────────────────────
+
+interface AttributionStats {
+  total: number
+  total_leads: number
+  total_contacts: number
+  by_channel: Record<string, number>
+  by_source: Record<string, number>
+  top_campaigns: Array<{ campaign: string; count: number }>
+  recent: Array<{
+    event_name: string
+    source_type: string
+    channel: string
+    email: string | null
+    name: string | null
+    utm_campaign: string | null
+    capi_status: string | null
+    created_at: string
+  }>
+  days: number
+}
+
+const CHANNEL_META: Record<string, { label: string; color: string }> = {
+  organic: { label: "Orgánico", color: "bg-chart-3" },
+  paid: { label: "Ads / Pago", color: "bg-primary" },
+  referral: { label: "Referido", color: "bg-chart-2" },
+  direct: { label: "Directo", color: "bg-chart-4" },
+  unknown: { label: "Desconocido", color: "bg-muted-foreground" },
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  contact_form: "Formulario",
+  chat_email: "Chat (email)",
+  whatsapp: "WhatsApp",
+}
+
+function AttributionTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [stats, setStats] = useState<AttributionStats | null>(null)
+  const [days, setDays] = useState(30)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    let active = true
+    const fetchStats = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const res = await api.get({ resource: "attribution", days: String(days) })
+        if (!active) return
+        if (res.data) setStats(res.data)
+        else setError(res.error || "No se pudieron cargar los datos.")
+      } catch {
+        if (active) setError("Error de conexión.")
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    fetchStats()
+    return () => { active = false }
+  }, [api, days])
+
+  const channelTotal = stats ? Object.values(stats.by_channel).reduce((a, b) => a + b, 0) : 0
+
+  return (
+    <div className="space-y-4">
+      {/* Rango de fechas */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground">
+          Atribución de leads y contactos por canal y campaña (modelo first-touch).
+        </p>
+        <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg">
+          {[7, 30, 90].map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDays(d)}
+              className={cn(
+                "px-3 py-1 rounded-md text-xs font-medium transition-all",
+                days === d ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {d}d
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : error ? (
+        <div className="glass-card rounded-xl p-6 text-center text-sm text-destructive">{error}</div>
+      ) : stats ? (
+        <>
+          {/* Tarjetas resumen */}
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { label: "Eventos totales", value: stats.total, icon: Activity, color: "text-chart-2" },
+              { label: "Leads", value: stats.total_leads, icon: TrendingUp, color: "text-chart-3" },
+              { label: "Contactos", value: stats.total_contacts, icon: Mail, color: "text-primary" },
+            ].map((c) => {
+              const Icon = c.icon
+              return (
+                <div key={c.label} className="glass-card rounded-xl p-4 flex items-center gap-3">
+                  <div className={cn("flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/60", c.color)}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-display text-xl font-bold text-foreground">{c.value}</p>
+                    <p className="text-[10px] text-muted-foreground">{c.label}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Desglose por canal */}
+          <div className="glass-card rounded-xl p-5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Por canal
+            </p>
+            {channelTotal === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Sin datos en este rango.</p>
+            ) : (
+              <div className="space-y-2.5">
+                {Object.entries(stats.by_channel)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([channel, count]) => {
+                    const meta = CHANNEL_META[channel] ?? CHANNEL_META.unknown
+                    const pct = Math.round((count / channelTotal) * 100)
+                    return (
+                      <div key={channel}>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-medium text-foreground">{meta.label}</span>
+                          <span className="text-muted-foreground">{count} ({pct}%)</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                          <div className={cn("h-full rounded-full transition-all", meta.color)} style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Por fuente */}
+            <div className="glass-card rounded-xl p-5">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Por fuente</p>
+              {Object.keys(stats.by_source).length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">Sin datos.</p>
+              ) : (
+                <div className="space-y-2">
+                  {Object.entries(stats.by_source).sort((a, b) => b[1] - a[1]).map(([src, count]) => (
+                    <div key={src} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{SOURCE_LABELS[src] ?? src}</span>
+                      <span className="text-muted-foreground">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top campañas */}
+            <div className="glass-card rounded-xl p-5">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Top campañas (UTM)</p>
+              {stats.top_campaigns.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">Sin campañas etiquetadas.</p>
+              ) : (
+                <div className="space-y-2">
+                  {stats.top_campaigns.map((c) => (
+                    <div key={c.campaign} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground truncate mr-2">{c.campaign}</span>
+                      <span className="text-muted-foreground shrink-0">{c.count}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Eventos recientes */}
+          <div className="glass-card rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/50 bg-secondary/30">
+                  {["Fecha", "Evento", "Canal", "Fuente", "Campaña", "CAPI"].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recent.length === 0 ? (
+                  <tr><td colSpan={6} className="px-4 py-6 text-center text-xs text-muted-foreground italic">Aún no hay eventos registrados.</td></tr>
+                ) : stats.recent.map((r, i) => {
+                  const meta = CHANNEL_META[r.channel] ?? CHANNEL_META.unknown
+                  return (
+                    <tr key={i} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleDateString("es-DO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-foreground">{r.event_name}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-foreground">
+                          <span className={cn("w-2 h-2 rounded-full", meta.color)} />{meta.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{SOURCE_LABELS[r.source_type] ?? r.source_type}</td>
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground truncate max-w-[140px]">{r.utm_campaign ?? "—"}</td>
+                      <td className="px-4 py-2.5">
+                        <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded",
+                          r.capi_status === "sent" ? "text-chart-3 bg-chart-3/10"
+                          : r.capi_status === "error" ? "text-destructive bg-destructive/10"
+                          : "text-muted-foreground bg-secondary/60")}>
+                          {r.capi_status ?? "—"}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : null}
+    </div>
+  )
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -1016,6 +1248,7 @@ export default function AdminDashboard() {
     { id: "insights" as const, label: "Insights IA", icon: Lightbulb },
     { id: "overrides" as const, label: "Prompt Overrides", icon: Settings },
     { id: "seo" as const, label: "SEO & Métricas", icon: Search },
+    { id: "attribution" as const, label: "Atribución", icon: Megaphone },
   ]
 
   return (
@@ -1104,6 +1337,7 @@ export default function AdminDashboard() {
         {activeTab === "insights" && <InsightsTab api={api} />}
         {activeTab === "overrides" && <OverridesTab api={api} />}
         {activeTab === "seo" && <SeoTab api={api} />}
+        {activeTab === "attribution" && <AttributionTab api={api} />}
       </main>
     </div>
   )

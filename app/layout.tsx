@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ChatWidget } from '@/components/chat-widget'
 import { SitePixels } from '@/components/site-pixels'
+import { AttributionTracker } from '@/components/attribution-tracker'
 import { JsonLd } from '@/components/json-ld'
 import { getSiteSettings } from '@/lib/site-settings'
 
@@ -78,6 +79,7 @@ export default async function RootLayout({
         <ChatWidget />
         <JsonLd settings={settings} />
         <SitePixels pixels={settings.pixels} />
+        <AttributionTracker />
         <SpeedInsights />
       </body>
     </html>

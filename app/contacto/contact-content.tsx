@@ -17,6 +17,7 @@ import {
   Video,
 } from "lucide-react"
 import { useState } from "react"
+import { fireLead } from "@/lib/track-client"
 
 const offices = [
   { city: "Santo Domingo", country: "Rep. Dominicana", address: "Torre Empresarial, Av. Winston Churchill", phone: "+1 (849) 356-2247", email: "info@startbyglobal.com", timezone: "GMT-4", hours: "8:00 AM - 6:00 PM" },
@@ -66,10 +67,11 @@ export function ContactPageContent() {
     setError("")
 
     try {
+      const tracking = fireLead("contact_form")
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...tracking }),
       })
       const data = await res.json()
 
