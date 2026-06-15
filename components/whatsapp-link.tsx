@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import { MessageCircle, X, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { fireWhatsAppLead } from "@/lib/track-client"
@@ -71,7 +72,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
         {children}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
           onClick={() => setOpen(false)}
@@ -149,7 +150,8 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
