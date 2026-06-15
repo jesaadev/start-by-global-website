@@ -2,6 +2,11 @@ import { cookies } from "next/headers"
 import { SidebarNav } from "@/components/sidebar-nav"
 import { TopNav } from "@/components/top-nav"
 import { HeroSegmented } from "@/components/home/hero-segmented"
+import { ProblemSection } from "@/components/home/problem-section"
+import { FunnelMethod } from "@/components/home/funnel-method"
+import { ProcessSteps } from "@/components/home/process-steps"
+import { OutsourcingBlock } from "@/components/home/outsourcing-block"
+import { GuaranteeFaq } from "@/components/home/guarantee-faq"
 import { MetricsSection } from "@/components/metrics-section"
 import { ServicesSection } from "@/components/services-section"
 import { PortfolioSection } from "@/components/portfolio-section"
@@ -15,12 +20,17 @@ export default async function Page() {
   const navVariant = (await cookies()).get("sbg_nav")?.value === "b" ? "b" : "a"
 
   const content = (
-    <div className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+    <div className="flex flex-col gap-10 sm:gap-12 p-4 sm:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
       <HeroSegmented />
-      <MetricsSection />
+      <ProblemSection />
+      <FunnelMethod />
       <ServicesSection />
+      <MetricsSection />
+      <ProcessSteps />
       <PortfolioSection />
+      <OutsourcingBlock />
       <TestimonialsSection />
+      <GuaranteeFaq />
       <ContactSection />
       <CtaBanner />
       <Footer />
