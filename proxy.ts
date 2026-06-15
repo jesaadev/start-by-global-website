@@ -10,6 +10,7 @@ const CONSENT_REQUIRED_COUNTRIES = new Set([
 ])
 
 const REGION_COOKIE = "sbg_region"
+const NAV_COOKIE = "sbg_nav" // A/B de navegación de la home: 'a' (sidebar) | 'b' (top nav)
 
 export function proxy(request: NextRequest) {
   const response = NextResponse.next()
@@ -28,6 +29,16 @@ export function proxy(request: NextRequest) {
     maxAge: 60 * 60 * 24, // 1 día
     sameSite: "lax",
   })
+
+  // Asignación A/B sticky: una sola vez por visitante (50/50), para mantener
+  // una experiencia consistente y una medición válida del test de navegación.
+  if (!request.cookies.get(NAV_COOKIE)) {
+    response.cookies.set(NAV_COOKIE, Math.random() < 0.5 ? "a" : "b", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 días
+      sameSite: "lax",
+    })
+  }
 
   return response
 }
