@@ -37,6 +37,7 @@ export function OutsourcingBlock() {
               </Link>
               <WhatsAppLink
                 defaultService="Outsourcing / Marca Blanca"
+                segment="outsourcing"
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-foreground font-semibold text-sm hover:bg-secondary/60 transition-colors"
               >
                 Hablar de mi caso

@@ -51,7 +51,7 @@ export function TopNav() {
 
         {/* CTAs (desktop) */}
         <div className="hidden lg:flex items-center gap-2 shrink-0">
-          <WhatsAppLink className="px-3 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-secondary/60 transition-colors">
+          <WhatsAppLink segment="nav" className="px-3 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-secondary/60 transition-colors">
             WhatsApp
           </WhatsAppLink>
           <Link
@@ -88,7 +88,7 @@ export function TopNav() {
               </Link>
             ))}
             <div className="flex gap-2 pt-2">
-              <WhatsAppLink className="flex-1 text-center px-3 py-2.5 rounded-lg text-sm font-medium border border-border text-foreground">
+              <WhatsAppLink segment="nav" className="flex-1 text-center px-3 py-2.5 rounded-lg text-sm font-medium border border-border text-foreground">
                 WhatsApp
               </WhatsAppLink>
               <Link

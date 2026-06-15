@@ -8,9 +8,24 @@ const GUARANTEES = [
   { icon: FileLock, title: "Confidencialidad (NDA)", desc: "Tu información y tus clientes, protegidos." },
 ]
 
+const FAQ_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+}
+
 export function GuaranteeFaq() {
   return (
     <section className="flex flex-col gap-6">
+      {/* Datos estructurados para rich snippets de FAQ en buscadores */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSONLD) }}
+      />
       {/* Garantías */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {GUARANTEES.map((g, i) => {

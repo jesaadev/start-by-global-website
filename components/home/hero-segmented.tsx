@@ -15,6 +15,7 @@ const PATHS = [
     cta: "Quiero mi web",
     type: "whatsapp" as const,
     service: "Desarrollo Web",
+    segment: "sin_presencia",
     color: "#0074D9",
   },
   {
@@ -33,6 +34,7 @@ const PATHS = [
     cta: "Auditar mi web",
     type: "whatsapp" as const,
     service: "Marketing Digital",
+    segment: "web_no_genera",
     color: "#e05a2b",
   },
 ]
@@ -70,7 +72,7 @@ export function HeroSegmented() {
           {/* Jerarquía de CTAs: WhatsApp → Agenda → Formulario */}
           <AnimateIn delay={300}>
             <div className="flex flex-wrap items-center gap-3">
-              <WhatsAppLink className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#25D366] text-white font-semibold text-sm transition-all duration-300 hover:bg-[#25D366]/90 hover:shadow-lg hover:shadow-[#25D366]/25">
+              <WhatsAppLink segment="hero_cta" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#25D366] text-white font-semibold text-sm transition-all duration-300 hover:bg-[#25D366]/90 hover:shadow-lg hover:shadow-[#25D366]/25">
                 <MessageCircle className="w-4 h-4" />
                 Hablar por WhatsApp
               </WhatsAppLink>
@@ -128,7 +130,7 @@ export function HeroSegmented() {
                 "flex items-start gap-3 p-4 rounded-xl bg-card/60 border border-border/50 text-left h-full w-full transition-all duration-200 hover:border-border hover:bg-card hover:-translate-y-0.5"
 
               return p.type === "whatsapp" ? (
-                <WhatsAppLink key={p.eyebrow} defaultService={p.service} className={cardCls} aria-label={p.cta}>
+                <WhatsAppLink key={p.eyebrow} defaultService={p.service} segment={p.segment} className={cardCls} aria-label={p.cta}>
                   {inner}
                 </WhatsAppLink>
               ) : (

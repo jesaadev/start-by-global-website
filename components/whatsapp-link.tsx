@@ -33,6 +33,7 @@ type WhatsAppLinkProps = {
   className?: string
   number?: string
   defaultService?: string
+  segment?: string
   "aria-label"?: string
   title?: string
 }
@@ -43,7 +44,7 @@ type WhatsAppLinkProps = {
  * prellenados en el mensaje, registrando el evento de conversión (Contact).
  * Es un Client Component, por lo que puede usarse desde Server Components.
  */
-export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, defaultService = "", ...rest }: WhatsAppLinkProps) {
+export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, defaultService = "", segment, ...rest }: WhatsAppLinkProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [service, setService] = useState(defaultService)
@@ -59,7 +60,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const url = buildWhatsAppUrl(number, { name: name.trim(), service, detail: detail.trim() })
-    fireWhatsAppLead({ name: name.trim(), service })
+    fireWhatsAppLead({ name: name.trim(), service, segment })
     window.open(url, "_blank", "noopener,noreferrer")
     setOpen(false)
   }

@@ -22,6 +22,8 @@ interface LeadTracking {
   fbp?: string
   fbc?: string
   page_url?: string
+  nav_variant?: string | null
+  segment?: string | null
 }
 
 function escapeHtml(text: string): string {
@@ -180,6 +182,8 @@ export async function POST(request: Request) {
         attribution: tracking.attribution,
         page_url: tracking.page_url,
         capi_status: capiStatus,
+        nav_variant: tracking.nav_variant,
+        segment: tracking.segment ?? "form",
       })
     } catch (e) {
       console.error("[Contact API] tracking error:", e)
