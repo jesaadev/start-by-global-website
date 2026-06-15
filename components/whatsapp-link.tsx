@@ -76,7 +76,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-sm glass-card rounded-2xl p-5 sm:p-6 space-y-4"
+            className="w-full max-w-sm bg-card border border-border/50 shadow-2xl rounded-2xl p-5 sm:p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
