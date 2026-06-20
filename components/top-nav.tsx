@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: "/servicios", label: "Servicios" },
   { href: "/outsourcing", label: "Outsourcing" },
   { href: "/ia-automatizacion", label: "IA & Automatización" },
+  { href: "/publicidad-ads", label: "Publicidad & Ads" },
   { href: "/portafolio", label: "Portafolio" },
   { href: "/insights", label: "Insights" },
   { href: "/nosotros", label: "Nosotros" },

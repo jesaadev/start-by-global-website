@@ -23,7 +23,7 @@ export const blogPostsData: Record<string, BlogPost> = {
     dateISO: "2026-03-16",
     readTime: "8 min",
     category: "Tendencias Tech",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-6.avif",
+    image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=1200&q=80",
     keywords: [
       "Arquetipos Web",
       "Branding Digital",
@@ -98,7 +98,7 @@ export const blogPostsData: Record<string, BlogPost> = {
     dateISO: "2026-03-16",
     readTime: "6 min",
     category: "Desarrollo Web",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-7.avif",
+    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
     keywords: [
       "Estructura Web",
       "Arquitectura de Información",
@@ -175,7 +175,7 @@ export const blogPostsData: Record<string, BlogPost> = {
     dateISO: "2026-03-16",
     readTime: "7 min",
     category: "Tendencias Tech",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-8.avif",
+    image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&q=80",
     keywords: [
       "Búsqueda Generativa",
       "GEO",

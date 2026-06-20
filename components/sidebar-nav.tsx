@@ -21,6 +21,7 @@ import {
   BookOpen,
   Layers,
   Cpu,
+  Megaphone,
 } from "lucide-react"
 
 const navItems = [
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/insights", label: "Insights", icon: BookOpen },
   { href: "/outsourcing", label: "Outsourcing", icon: Layers, highlight: true, highlightColor: "#0074D9" },
   { href: "/ia-automatizacion", label: "IA & Automatización", icon: Cpu, highlight: true, highlightColor: "#7B61FF" },
+  { href: "/publicidad-ads", label: "Publicidad & Ads", icon: Megaphone, highlight: true, highlightColor: "#F43F5E" },
   { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
