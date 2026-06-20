@@ -15,6 +15,13 @@ function fbqTrack(event: string, eventId: string) {
   if (typeof fbq === "function") fbq("track", event, {}, { eventID: eventId })
 }
 
+/** Lee la variante A/B de navegación (cookie asignada en proxy.ts). */
+function getNavVariant(): string | undefined {
+  if (typeof document === "undefined") return undefined
+  const m = document.cookie.match(/(?:^|; )sbg_nav=([^;]*)/)
+  return m ? decodeURIComponent(m[1]) : undefined
+}
+
 export interface LeadTrackingPayload {
   source_type: "contact_form" | "chat_email"
   eventId?: string
@@ -22,6 +29,8 @@ export interface LeadTrackingPayload {
   fbp?: string
   fbc?: string
   page_url: string
+  nav_variant?: string
+  segment?: string
 }
 
 /**
@@ -31,10 +40,14 @@ export interface LeadTrackingPayload {
  * Sin consentimiento: no se dispara el pixel ni se envía event_id (el servidor
  * omite CAPI), pero el lead se sigue registrando.
  */
-export function fireLead(sourceType: "contact_form" | "chat_email"): LeadTrackingPayload {
+export function fireLead(
+  sourceType: "contact_form" | "chat_email",
+  segment?: string
+): LeadTrackingPayload {
   const page_url = typeof window !== "undefined" ? window.location.href : ""
+  const nav_variant = getNavVariant()
   if (!getConsent().marketing) {
-    return { source_type: sourceType, attribution: null, page_url }
+    return { source_type: sourceType, attribution: null, page_url, nav_variant, segment }
   }
   const eventId = newEventId()
   fbqTrack("Lead", eventId)
@@ -46,6 +59,8 @@ export function fireLead(sourceType: "contact_form" | "chat_email"): LeadTrackin
     fbp,
     fbc,
     page_url,
+    nav_variant,
+    segment,
   }
 }
 
@@ -54,7 +69,7 @@ export function fireLead(sourceType: "contact_form" | "chat_email"): LeadTrackin
  * y lo envía por CAPI (fire-and-forget) con el mismo event_id. Requiere
  * consentimiento de marketing.
  */
-export function fireContact(): void {
+export function fireContact(segment?: string): void {
   if (typeof window === "undefined") return
   if (!getConsent().marketing) return
   const eventId = newEventId()
@@ -72,6 +87,8 @@ export function fireContact(): void {
       fbp,
       fbc,
       eventSourceUrl: window.location.href,
+      nav_variant: getNavVariant(),
+      segment,
     }),
   }).catch(() => {})
 }
@@ -82,7 +99,7 @@ export function fireContact(): void {
  * de marketing, dispara también el pixel del navegador y CAPI con event_id
  * compartido para deduplicar.
  */
-export function fireWhatsAppLead(info: { name?: string; service?: string }): void {
+export function fireWhatsAppLead(info: { name?: string; service?: string; segment?: string }): void {
   if (typeof window === "undefined") return
   const marketing = getConsent().marketing
 
@@ -93,6 +110,8 @@ export function fireWhatsAppLead(info: { name?: string; service?: string }): voi
     service: info.service || null,
     eventSourceUrl: window.location.href,
     attribution: marketing ? getStoredAttribution() : null,
+    nav_variant: getNavVariant(),
+    segment: info.segment || null,
   }
 
   if (marketing) {

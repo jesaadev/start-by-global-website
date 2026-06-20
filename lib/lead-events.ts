@@ -9,6 +9,8 @@ export interface LeadEventInput {
   attribution?: Attribution | null
   page_url?: string | null
   capi_status?: string | null
+  nav_variant?: string | null
+  segment?: string | null
 }
 
 /** Registra un evento de conversión con su atribución para el medidor de Insights. */
@@ -31,6 +33,8 @@ export async function logLeadEvent(input: LeadEventInput): Promise<void> {
     fbclid: a?.fbclid ?? null,
     gclid: a?.gclid ?? null,
     capi_status: input.capi_status ?? null,
+    nav_variant: input.nav_variant ?? null,
+    segment: input.segment ?? null,
   })
   if (error) console.error("[lead_events] insert error:", error)
 }
@@ -46,6 +50,8 @@ interface LeadRow {
   utm_source: string | null
   utm_campaign: string | null
   capi_status: string | null
+  nav_variant: string | null
+  segment: string | null
   created_at: string
 }
 
@@ -55,6 +61,8 @@ export interface AttributionStats {
   total_contacts: number
   by_channel: Record<string, number>
   by_source: Record<string, number>
+  by_variant: Record<string, number>
+  by_segment: Record<string, number>
   top_campaigns: Array<{ campaign: string; count: number }>
   recent: LeadRow[]
   days: number
@@ -65,7 +73,7 @@ export async function getAttributionStats(days = 30): Promise<AttributionStats> 
 
   const { data, error } = await supabaseAdmin
     .from("lead_events")
-    .select("event_name, source_type, channel, email, name, utm_source, utm_campaign, capi_status, created_at")
+    .select("event_name, source_type, channel, email, name, utm_source, utm_campaign, capi_status, nav_variant, segment, created_at")
     .gte("created_at", since)
     .order("created_at", { ascending: false })
     .limit(2000)
@@ -75,6 +83,8 @@ export async function getAttributionStats(days = 30): Promise<AttributionStats> 
 
   const by_channel: Record<string, number> = {}
   const by_source: Record<string, number> = {}
+  const by_variant: Record<string, number> = {}
+  const by_segment: Record<string, number> = {}
   const campaigns: Record<string, number> = {}
   let total_leads = 0
   let total_contacts = 0
@@ -82,6 +92,8 @@ export async function getAttributionStats(days = 30): Promise<AttributionStats> 
   for (const r of rows) {
     by_channel[r.channel] = (by_channel[r.channel] ?? 0) + 1
     by_source[r.source_type] = (by_source[r.source_type] ?? 0) + 1
+    if (r.nav_variant) by_variant[r.nav_variant] = (by_variant[r.nav_variant] ?? 0) + 1
+    if (r.segment) by_segment[r.segment] = (by_segment[r.segment] ?? 0) + 1
     if (r.event_name === "Lead") total_leads++
     else if (r.event_name === "Contact") total_contacts++
     if (r.utm_campaign) campaigns[r.utm_campaign] = (campaigns[r.utm_campaign] ?? 0) + 1
@@ -98,6 +110,8 @@ export async function getAttributionStats(days = 30): Promise<AttributionStats> 
     total_contacts,
     by_channel,
     by_source,
+    by_variant,
+    by_segment,
     top_campaigns,
     recent: rows.slice(0, 25),
     days,

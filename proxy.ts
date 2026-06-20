@@ -10,10 +10,9 @@ const CONSENT_REQUIRED_COUNTRIES = new Set([
 ])
 
 const REGION_COOKIE = "sbg_region"
+const NAV_COOKIE = "sbg_nav" // A/B de navegación de la home: 'a' (sidebar) | 'b' (top nav)
 
 export function proxy(request: NextRequest) {
-  const response = NextResponse.next()
-
   // Vercel expone el país del visitante en este header.
   const country = (request.headers.get("x-vercel-ip-country") || "").toUpperCase()
 
@@ -23,11 +22,35 @@ export function proxy(request: NextRequest) {
     ? CONSENT_REQUIRED_COUNTRIES.has(country) ? "eu" : "row"
     : "eu"
 
+  // Asignación A/B sticky: una sola vez por visitante (50/50).
+  const existingNav = request.cookies.get(NAV_COOKIE)?.value
+  const navVariant = existingNav ?? (Math.random() < 0.5 ? "a" : "b")
+
+  // Si la variante es nueva, inyectarla en los headers de la PETICIÓN para que
+  // los Server Components la lean en este mismo render. Las cookies de la
+  // respuesta no se reflejan en la request inicial, lo que provocaría un flash
+  // de variante 'a' y datos A/B corruptos en la primera visita.
+  const requestHeaders = new Headers(request.headers)
+  if (!existingNav) {
+    const existing = requestHeaders.get("cookie") || ""
+    requestHeaders.set("cookie", `${existing}${existing ? "; " : ""}${NAV_COOKIE}=${navVariant}`)
+  }
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } })
+
   response.cookies.set(REGION_COOKIE, region, {
     path: "/",
     maxAge: 60 * 60 * 24, // 1 día
     sameSite: "lax",
   })
+
+  if (!existingNav) {
+    response.cookies.set(NAV_COOKIE, navVariant, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30, // 30 días
+      sameSite: "lax",
+    })
+  }
 
   return response
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import { MessageCircle, X, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { fireWhatsAppLead } from "@/lib/track-client"
@@ -32,6 +33,9 @@ type WhatsAppLinkProps = {
   children: ReactNode
   className?: string
   number?: string
+  defaultService?: string
+  segment?: string
+  onClick?: () => void
   "aria-label"?: string
   title?: string
 }
@@ -42,10 +46,10 @@ type WhatsAppLinkProps = {
  * prellenados en el mensaje, registrando el evento de conversión (Contact).
  * Es un Client Component, por lo que puede usarse desde Server Components.
  */
-export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, ...rest }: WhatsAppLinkProps) {
+export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, defaultService = "", segment, onClick, ...rest }: WhatsAppLinkProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
-  const [service, setService] = useState("")
+  const [service, setService] = useState(defaultService)
   const [detail, setDetail] = useState("")
 
   useEffect(() => {
@@ -58,24 +62,32 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, ..
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const url = buildWhatsAppUrl(number, { name: name.trim(), service, detail: detail.trim() })
-    fireWhatsAppLead({ name: name.trim(), service })
+    fireWhatsAppLead({ name: name.trim(), service, segment })
     window.open(url, "_blank", "noopener,noreferrer")
     setOpen(false)
   }
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={className} {...rest}>
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(true)
+          onClick?.()
+        }}
+        className={className}
+        {...rest}
+      >
         {children}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           className="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-sm glass-card rounded-2xl p-5 sm:p-6 space-y-4"
+            className="w-full max-w-sm bg-card border border-border/50 shadow-2xl rounded-2xl p-5 sm:p-6 space-y-4"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -147,7 +159,8 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, ..
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

@@ -995,6 +995,8 @@ interface AttributionStats {
   total_contacts: number
   by_channel: Record<string, number>
   by_source: Record<string, number>
+  by_variant: Record<string, number>
+  by_segment: Record<string, number>
   top_campaigns: Array<{ campaign: string; count: number }>
   recent: Array<{
     event_name: string
@@ -1021,6 +1023,15 @@ const SOURCE_LABELS: Record<string, string> = {
   contact_form: "Formulario",
   chat_email: "Chat (email)",
   whatsapp: "WhatsApp",
+}
+
+const SEGMENT_LABELS: Record<string, string> = {
+  sin_presencia: "Sin presencia digital",
+  web_no_genera: "Web que no vende",
+  outsourcing: "Outsourcing / agencias",
+  hero_cta: "Hero (CTA principal)",
+  nav: "Navegación",
+  form: "Formulario",
 }
 
 function AttributionTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
@@ -1164,6 +1175,41 @@ function AttributionTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                     <div key={c.campaign} className="flex items-center justify-between text-sm">
                       <span className="text-foreground truncate mr-2">{c.campaign}</span>
                       <span className="text-muted-foreground shrink-0">{c.count}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* A/B de navegación y caminos del hero */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="glass-card rounded-xl p-5">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Por variante (A/B nav)</p>
+              {Object.keys(stats.by_variant).length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">Sin datos.</p>
+              ) : (
+                <div className="space-y-2">
+                  {Object.entries(stats.by_variant).sort((a, b) => b[1] - a[1]).map(([v, count]) => (
+                    <div key={v} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{v === "a" ? "A · Sidebar" : v === "b" ? "B · Nav horizontal" : v}</span>
+                      <span className="text-muted-foreground">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="glass-card rounded-xl p-5">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Por camino (segmento)</p>
+              {Object.keys(stats.by_segment).length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">Sin datos.</p>
+              ) : (
+                <div className="space-y-2">
+                  {Object.entries(stats.by_segment).sort((a, b) => b[1] - a[1]).map(([s, count]) => (
+                    <div key={s} className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">{SEGMENT_LABELS[s] ?? s}</span>
+                      <span className="text-muted-foreground">{count}</span>
                     </div>
                   ))}
                 </div>
