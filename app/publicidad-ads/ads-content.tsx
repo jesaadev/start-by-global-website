@@ -278,11 +278,11 @@ export function AdsContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30" />
                 <select value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground focus:outline-none focus:border-foreground/30 appearance-none">
-                  <option value="">Presupuesto mensual de pauta...</option>
-                  <option value="<500">Menos de $500</option>
-                  <option value="500-2000">$500 - $2,000</option>
-                  <option value="2000-5000">$2,000 - $5,000</option>
-                  <option value=">5000">Más de $5,000</option>
+                  <option value="" className="bg-background text-foreground">Presupuesto mensual de pauta...</option>
+                  <option value="<500" className="bg-background text-foreground">Menos de $500</option>
+                  <option value="500-2000" className="bg-background text-foreground">$500 - $2,000</option>
+                  <option value="2000-5000" className="bg-background text-foreground">$2,000 - $5,000</option>
+                  <option value=">5000" className="bg-background text-foreground">Más de $5,000</option>
                 </select>
               </div>
               <textarea rows={3} placeholder="¿Qué vendes y cuál es tu objetivo?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 resize-none" />

@@ -916,12 +916,12 @@ export function IaContent() {
                     onChange={(e) => setFormData({ ...formData, process: e.target.value })}
                     className="px-4 py-3 rounded-xl bg-background border border-foreground/10 text-sm text-foreground/70 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                   >
-                    <option value="">Selecciona una opción...</option>
-                    <option value="Chatbot / Agente IA">Chatbot / Agente IA</option>
-                    <option value="Flujos de automatización">Flujos de automatización</option>
-                    <option value="Análisis de datos / Reportes IA">Análisis de datos / Reportes IA</option>
-                    <option value="Generación de contenido IA">Generación de contenido IA</option>
-                    <option value="Varios / No estoy seguro">Varios / No estoy seguro</option>
+                    <option value="" className="bg-background text-foreground">Selecciona una opción...</option>
+                    <option value="Chatbot / Agente IA" className="bg-background text-foreground">Chatbot / Agente IA</option>
+                    <option value="Flujos de automatización" className="bg-background text-foreground">Flujos de automatización</option>
+                    <option value="Análisis de datos / Reportes IA" className="bg-background text-foreground">Análisis de datos / Reportes IA</option>
+                    <option value="Generación de contenido IA" className="bg-background text-foreground">Generación de contenido IA</option>
+                    <option value="Varios / No estoy seguro" className="bg-background text-foreground">Varios / No estoy seguro</option>
                   </select>
                 </div>
 
