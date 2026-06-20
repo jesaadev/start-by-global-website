@@ -17,21 +17,21 @@
     --card-foreground: 220 25% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
-    /* primary oscurecido en claro: texto y botones cumplen WCAG AA sobre blanco */
-    --primary: 16 90% 45%;
+    /* primary oscurecido en claro: texto y botones cumplen WCAG AA sobre blanco (~5:1) */
+    --primary: 16 90% 42%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 16% 95%;
     --secondary-foreground: 220 25% 20%;
     --muted: 220 16% 95%;
     --muted-foreground: 215 16% 38%;
-    --accent: 16 90% 45%;
+    --accent: 16 90% 42%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 42%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 13% 88%;
     --input: 220 13% 88%;
-    --ring: 16 90% 45%;
-    --chart-1: 16 90% 45%;
+    --ring: 16 90% 42%;
+    --chart-1: 16 90% 42%;
     --chart-2: 190 75% 32%;
     --chart-3: 150 65% 30%;
     --chart-4: 38 90% 38%;
