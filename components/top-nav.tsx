@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { WhatsAppLink } from "@/components/whatsapp-link"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
@@ -27,7 +28,7 @@ export function TopNav() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3 shrink-0" onClick={() => setOpen(false)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-black.svg" alt="Start By Global" className="h-9 invert" />
+          <img src="/logo-black.svg" alt="Start By Global" className="h-9 dark:invert" />
         </Link>
 
         {/* Links (desktop) */}
@@ -51,6 +52,7 @@ export function TopNav() {
 
         {/* CTAs (desktop) */}
         <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <ThemeToggle className="w-9 h-9 border border-border/60" />
           <WhatsAppLink segment="nav" className="px-3 py-2 rounded-lg text-sm font-medium border border-border text-foreground hover:bg-secondary/60 transition-colors">
             WhatsApp
           </WhatsAppLink>
@@ -62,15 +64,18 @@ export function TopNav() {
           </Link>
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-border/50 text-foreground"
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* Mobile controls */}
+        <div className="lg:hidden flex items-center gap-2">
+          <ThemeToggle className="w-10 h-10 border border-border/50" />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="flex items-center justify-center w-10 h-10 rounded-lg border border-border/50 text-foreground"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile panel */}
