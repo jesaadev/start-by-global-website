@@ -62,7 +62,7 @@ export function ClientLogos() {
                 <p className="text-[10px] font-medium text-muted-foreground">
                   {client.name}
                 </p>
-                <p className="text-[9px] text-muted-foreground/70">
+                <p className="text-[9px] text-muted-foreground">
                   {client.industry}
                 </p>
               </div>

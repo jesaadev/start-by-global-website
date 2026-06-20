@@ -113,7 +113,7 @@ function EmailCapture({
           className={cn(
             "w-full px-3 py-2 rounded-lg text-sm",
             "bg-secondary/50 border border-border/50 text-foreground",
-            "placeholder:text-muted-foreground/50",
+            "placeholder:text-muted-foreground",
             "focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
           )}
         />
@@ -125,7 +125,7 @@ function EmailCapture({
           className={cn(
             "w-full px-3 py-2 rounded-lg text-sm",
             "bg-secondary/50 border text-foreground",
-            "placeholder:text-muted-foreground/50",
+            "placeholder:text-muted-foreground",
             "focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all",
             error ? "border-destructive/50" : "border-border/50"
           )}
@@ -155,7 +155,7 @@ function EmailCapture({
             Omitir
           </button>
         </div>
-        <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+        <p className="text-[10px] text-muted-foreground leading-relaxed">
           Al enviar aceptas nuestra{" "}
           <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
             Política de Privacidad
@@ -688,7 +688,7 @@ function ChatWidgetInner() {
                       className={cn(
                         "flex-1 resize-none px-3.5 py-2.5 rounded-xl text-sm",
                         "bg-secondary/50 border border-border/50 text-foreground",
-                        "placeholder:text-muted-foreground/50",
+                        "placeholder:text-muted-foreground",
                         "focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20",
                         "disabled:opacity-50 transition-all min-h-[40px] max-h-24"
                       )}
@@ -717,7 +717,7 @@ function ChatWidgetInner() {
                       }
                     </button>
                   </div>
-                  <p className="text-[10px] text-muted-foreground/40 text-center mt-2">
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
                     Powered by Gemini AI · Start By Global
                   </p>
                 </div>

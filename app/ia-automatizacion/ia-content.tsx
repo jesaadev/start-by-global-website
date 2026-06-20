@@ -285,7 +285,7 @@ export function IaContent() {
               <a
                 key={l.href}
                 href={l.href}
-                className="text-sm text-foreground/50 hover:text-foreground transition-colors animated-underline"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline"
               >
                 {l.label}
               </a>
@@ -295,7 +295,7 @@ export function IaContent() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm text-foreground/40 hover:text-foreground/70 transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground/70 transition-colors"
             >
               Volver al sitio
             </Link>
@@ -373,7 +373,7 @@ export function IaContent() {
             </AnimateIn>
 
             <AnimateIn delay={0.2}>
-              <p className="text-lg text-foreground/50 leading-relaxed mb-10 max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
                 Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa opere 10x más rápido. Sin cambiar tu equipo — potenciandolo.
               </p>
             </AnimateIn>
@@ -425,7 +425,7 @@ export function IaContent() {
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00C9C8]/10 border border-[#00C9C8]/20">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#00C9C8] animate-pulse" />
-                      <span className="text-[10px] text-[#00C9C8] font-semibold">En vivo</span>
+                      <span className="text-[10px] text-[#0E7490] dark:text-[#00C9C8] font-semibold">En vivo</span>
                     </div>
                   </div>
 
@@ -440,7 +440,7 @@ export function IaContent() {
                       <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-foreground/[0.03] border border-foreground/5">
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
-                          <span className="text-xs text-foreground/50">{m.label}</span>
+                          <span className="text-xs text-muted-foreground">{m.label}</span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="font-display font-bold text-sm">{m.value}</span>
@@ -492,9 +492,9 @@ export function IaContent() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-foreground/5 rounded-2xl overflow-hidden">
             {[
               { value: "+80", suffix: "%", label: "Reducción en tareas manuales", color: "text-[#7B61FF]" },
-              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#00C9C8]" },
+              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#0E7490] dark:text-[#00C9C8]" },
               { value: "10x", suffix: "", label: "Más contenido con el mismo equipo", color: "text-[#0074D9]" },
-              { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#F4A261]" },
+              { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#B45309] dark:text-[#F4A261]" },
             ].map((s) => (
               <div key={s.label} className="bg-background px-6 py-8 text-center">
                 <div className={`font-display text-4xl lg:text-5xl font-bold mb-2 ${s.color}`}>
@@ -534,7 +534,7 @@ export function IaContent() {
                     "Perder leads por falta de seguimiento rápido",
                     "Contratar más gente para hacer más de lo mismo",
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-foreground/50">
+                    <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
                       <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
                         <div className="w-1.5 h-1.5 bg-red-400 rounded-full" />
                       </div>
@@ -557,7 +557,7 @@ export function IaContent() {
                     "Escala sin contratar — la IA crece contigo",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-foreground/70">
-                      <CheckCircle2 className="w-5 h-5 text-[#00C9C8] shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-[#0E7490] dark:text-[#00C9C8] shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -610,7 +610,7 @@ export function IaContent() {
                           </span>
                         </div>
 
-                        <p className="text-foreground/55 leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
+                        <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
 
                         <div className="grid sm:grid-cols-2 gap-8">
                           {/* Use cases */}
@@ -618,7 +618,7 @@ export function IaContent() {
                             <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Casos de Uso</p>
                             <ul className="space-y-2">
                               {svc.useCases.map((u) => (
-                                <li key={u} className="flex items-start gap-2 text-xs text-foreground/55">
+                                <li key={u} className="flex items-start gap-2 text-xs text-muted-foreground">
                                   <div className="w-1 h-1 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: svc.color }} />
                                   {u}
                                 </li>
@@ -631,7 +631,7 @@ export function IaContent() {
                             <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Stack</p>
                             <div className="flex flex-wrap gap-2">
                               {svc.stack.map((s) => (
-                                <span key={s} className="px-2.5 py-1 rounded-md bg-foreground/5 border border-foreground/8 text-xs text-foreground/55 font-mono">
+                                <span key={s} className="px-2.5 py-1 rounded-md bg-foreground/5 border border-foreground/8 text-xs text-muted-foreground font-mono">
                                   {s}
                                 </span>
                               ))}
@@ -687,7 +687,7 @@ export function IaContent() {
                       </span>
                     </div>
                     <h3 className="font-display text-lg font-bold mb-3">{step.title}</h3>
-                    <p className="text-sm text-foreground/45 leading-relaxed">{step.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                     {i < processSteps.length - 1 && (
                       <div className="hidden lg:block absolute top-10 -right-3 w-6 h-px bg-foreground/10" />
                     )}
@@ -729,7 +729,7 @@ export function IaContent() {
 
                   <div className="mb-6">
                     <h3 className="font-display text-xl font-bold mb-1">{plan.name}</h3>
-                    <p className="text-sm text-foreground/40 mb-5">{plan.description}</p>
+                    <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-display text-4xl font-bold" style={{ color: plan.color }}>
                         {plan.price}
@@ -791,7 +791,7 @@ export function IaContent() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 rounded-lg bg-foreground/[0.04] border border-foreground/8 text-xs text-foreground/40 font-mono hover:text-foreground/70 hover:border-foreground/15 transition-colors cursor-default"
+                className="px-3 py-1.5 rounded-lg bg-foreground/[0.04] border border-foreground/8 text-xs text-muted-foreground font-mono hover:text-foreground/70 hover:border-foreground/15 transition-colors cursor-default"
               >
                 {tech}
               </span>
@@ -821,11 +821,11 @@ export function IaContent() {
                   >
                     <span className="text-sm font-medium text-foreground/80">{faq.q}</span>
                     <ChevronDown
-                      className={`w-4 h-4 text-foreground/40 shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
                     />
                   </button>
                   {openFaq === i && (
-                    <div className="px-6 pb-5 text-sm text-foreground/50 leading-relaxed border-t border-foreground/5 pt-4">
+                    <div className="px-6 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-foreground/5 pt-4">
                       {faq.a}
                     </div>
                   )}
@@ -845,7 +845,7 @@ export function IaContent() {
               <h2 className="font-display text-4xl md:text-5xl font-bold text-balance mb-4">
                 Agenda tu demo gratuita.
               </h2>
-              <p className="text-foreground/45 text-lg">
+              <p className="text-muted-foreground text-lg">
                 30 minutos para mostrarte exactamente que podemos automatizar en tu empresa — sin compromiso.
               </p>
             </div>
@@ -855,10 +855,10 @@ export function IaContent() {
             {sent ? (
               <div className="p-10 rounded-2xl border border-[#00C9C8]/25 bg-[#00C9C8]/5 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-[#00C9C8]/10 border border-[#00C9C8]/20 flex items-center justify-center mx-auto mb-5">
-                  <CheckCircle2 className="w-7 h-7 text-[#00C9C8]" />
+                  <CheckCircle2 className="w-7 h-7 text-[#0E7490] dark:text-[#00C9C8]" />
                 </div>
                 <h3 className="font-display text-2xl font-bold mb-2">Solicitud recibida</h3>
-                <p className="text-foreground/50 text-sm mb-6">
+                <p className="text-muted-foreground text-sm mb-6">
                   Te contactaremos en menos de 24 horas para coordinar la demo. Revisa tu bandeja de entrada.
                 </p>
                 <button
@@ -876,7 +876,7 @@ export function IaContent() {
               >
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-foreground/40 uppercase tracking-wide">Nombre *</label>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Nombre *</label>
                     <input
                       required
                       value={formData.name}
@@ -886,7 +886,7 @@ export function IaContent() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-foreground/40 uppercase tracking-wide">Empresa *</label>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Empresa *</label>
                     <input
                       required
                       value={formData.company}
@@ -898,7 +898,7 @@ export function IaContent() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-foreground/40 uppercase tracking-wide">Email *</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Email *</label>
                   <input
                     required
                     type="email"
@@ -910,7 +910,7 @@ export function IaContent() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-foreground/40 uppercase tracking-wide">Que proceso quieres automatizar?</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Que proceso quieres automatizar?</label>
                   <select
                     value={formData.process}
                     onChange={(e) => setFormData({ ...formData, process: e.target.value })}
@@ -926,7 +926,7 @@ export function IaContent() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-foreground/40 uppercase tracking-wide">Cuéntanos más (opcional)</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Cuéntanos más (opcional)</label>
                   <textarea
                     rows={4}
                     value={formData.message}
@@ -976,9 +976,9 @@ export function IaContent() {
             <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-40 hover:opacity-70 transition-opacity" />
           </Link>
           <div className="flex items-center gap-6 text-xs text-foreground/25">
-            <Link href="/outsourcing" className="hover:text-foreground/50 transition-colors">Outsourcing Web</Link>
-            <Link href="/servicios" className="hover:text-foreground/50 transition-colors">Servicios</Link>
-            <a href="mailto:info@startbyglobal.com" className="hover:text-foreground/50 transition-colors">info@startbyglobal.com</a>
+            <Link href="/outsourcing" className="hover:text-muted-foreground transition-colors">Outsourcing Web</Link>
+            <Link href="/servicios" className="hover:text-muted-foreground transition-colors">Servicios</Link>
+            <a href="mailto:info@startbyglobal.com" className="hover:text-muted-foreground transition-colors">info@startbyglobal.com</a>
           </div>
           <p className="text-xs text-foreground/20">2026 Start By Global</p>
         </div>

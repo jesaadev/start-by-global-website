@@ -10,6 +10,8 @@ import { fireLead } from "@/lib/track-client"
 
 // Gama propia de la landing de Ads: rose + orange + amber (energía "performance").
 const ACCENT = "#F43F5E"
+// Texto de acento con contraste WCAG AA: rose-600 en claro, rose-400 en oscuro.
+const ACCENT_TEXT = "text-rose-600 dark:text-rose-400"
 
 const PLATFORMS = [
   { icon: Megaphone, name: "Meta Ads", desc: "Facebook e Instagram: prospección y retargeting que llenan tu pipeline." },
@@ -92,13 +94,13 @@ export function AdsContent() {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-foreground/50 hover:text-foreground transition-colors animated-underline">
+              <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline">
                 {l.label}
               </a>
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/" className="hidden md:flex items-center text-sm text-foreground/40 hover:text-foreground/70 transition-colors">
+            <Link href="/" className="hidden md:flex items-center text-sm text-muted-foreground hover:text-foreground/70 transition-colors">
               Volver al sitio
             </Link>
             <a
@@ -137,8 +139,8 @@ export function AdsContent() {
         />
         <div className="relative max-w-4xl mx-auto text-center flex flex-col items-center gap-6">
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
-            style={{ backgroundColor: `${ACCENT}1a`, color: ACCENT, border: `1px solid ${ACCENT}40` }}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${ACCENT_TEXT}`}
+            style={{ backgroundColor: `${ACCENT}1a`, border: `1px solid ${ACCENT}40` }}
           >
             <Target className="w-3 h-3" /> Publicidad de performance
           </span>
@@ -158,7 +160,7 @@ export function AdsContent() {
               Ver cómo trabajamos
             </a>
           </div>
-          <p className="text-xs text-foreground/50">
+          <p className="text-xs text-muted-foreground">
             <span className="text-foreground font-semibold">Gestión desde $400/mes.</span> Para empresas listas para escalar su inversión.
           </p>
         </div>
@@ -170,7 +172,7 @@ export function AdsContent() {
           {RESULTS.map((r) => (
             <div key={r.label} className="rounded-xl border border-foreground/10 bg-foreground/[0.03] p-5 text-center">
               <p className="font-display text-3xl font-bold" style={{ color: ACCENT }}>{r.value}</p>
-              <p className="text-xs text-foreground/55 mt-1">{r.label}</p>
+              <p className="text-xs text-muted-foreground mt-1">{r.label}</p>
             </div>
           ))}
         </div>
@@ -181,7 +183,7 @@ export function AdsContent() {
         <div className="max-w-6xl mx-auto">
           <div className="max-w-2xl mb-8">
             <h2 className="font-display text-3xl font-bold">Pautamos donde está tu cliente</h2>
-            <p className="text-foreground/55 mt-2">Estrategia y ejecución por plataforma, con un solo objetivo: rentabilidad.</p>
+            <p className="text-muted-foreground mt-2">Estrategia y ejecución por plataforma, con un solo objetivo: rentabilidad.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {PLATFORMS.map((p) => {
@@ -192,7 +194,7 @@ export function AdsContent() {
                     <Icon className="w-5 h-5" style={{ color: ACCENT }} />
                   </div>
                   <h3 className="font-semibold text-foreground">{p.name}</h3>
-                  <p className="text-sm text-foreground/55 mt-1.5 leading-relaxed">{p.desc}</p>
+                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{p.desc}</p>
                 </div>
               )
             })}
@@ -204,7 +206,7 @@ export function AdsContent() {
       <section id="proceso" className="px-6 py-16 border-y border-foreground/5">
         <div className="max-w-6xl mx-auto">
           <div className="max-w-2xl mb-8">
-            <span className="text-xs uppercase tracking-wider font-semibold" style={{ color: ACCENT }}>Cómo trabajamos</span>
+            <span className={`text-xs uppercase tracking-wider font-semibold ${ACCENT_TEXT}`}>Cómo trabajamos</span>
             <h2 className="font-display text-3xl font-bold mt-1">De la auditoría al ROI</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -217,7 +219,7 @@ export function AdsContent() {
                     <span className="font-display text-3xl font-bold text-foreground/15">0{i + 1}</span>
                   </div>
                   <h3 className="font-semibold text-foreground">{s.title}</h3>
-                  <p className="text-sm text-foreground/55 mt-1.5 leading-relaxed">{s.desc}</p>
+                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{s.desc}</p>
                 </div>
               )
             })}
@@ -255,7 +257,7 @@ export function AdsContent() {
               <BarChart3 className="w-6 h-6" style={{ color: ACCENT }} />
             </div>
             <h2 className="font-display text-3xl font-bold">Solicita tu auditoría gratuita</h2>
-            <p className="text-foreground/55 mt-2">Revisamos tus cuentas y te decimos dónde está el dinero.</p>
+            <p className="text-muted-foreground mt-2">Revisamos tus cuentas y te decimos dónde está el dinero.</p>
           </div>
 
           {sent ? (
@@ -270,11 +272,11 @@ export function AdsContent() {
             <form onSubmit={handleSubmit} className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6 flex flex-col gap-4">
               <input type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input required placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-foreground/30" />
-                <input placeholder="Empresa" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-foreground/30" />
+                <input required placeholder="Nombre" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30" />
+                <input placeholder="Empresa" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-foreground/30" />
+                <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30" />
                 <select value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground focus:outline-none focus:border-foreground/30 appearance-none">
                   <option value="">Presupuesto mensual de pauta...</option>
                   <option value="<500">Menos de $500</option>
@@ -283,7 +285,7 @@ export function AdsContent() {
                   <option value=">5000">Más de $5,000</option>
                 </select>
               </div>
-              <textarea rows={3} placeholder="¿Qué vendes y cuál es tu objetivo?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-foreground/30 resize-none" />
+              <textarea rows={3} placeholder="¿Qué vendes y cuál es tu objetivo?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="px-4 py-2.5 rounded-lg bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 resize-none" />
               {error && <p className="text-xs text-destructive">{error}</p>}
               <button type="submit" disabled={sending} className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
                 {sending ? "Enviando..." : <>Solicitar auditoría <Send className="w-4 h-4" /></>}
@@ -299,7 +301,7 @@ export function AdsContent() {
           <Link href="/" className="flex items-center">
             <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-60 hover:opacity-100 transition-opacity" />
           </Link>
-          <p className="text-xs text-foreground/40">© 2026 Start By Global · Publicidad Digital & Ads</p>
+          <p className="text-xs text-muted-foreground">© 2026 Start By Global · Publicidad Digital & Ads</p>
         </div>
       </footer>
     </div>

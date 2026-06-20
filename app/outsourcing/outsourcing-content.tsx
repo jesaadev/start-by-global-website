@@ -163,7 +163,7 @@ export function OutsourcingContent() {
               { href: "#precios", label: "Precios" },
               { href: "#faq", label: "FAQ" },
             ].map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-foreground/50 hover:text-foreground transition-colors animated-underline">
+              <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline">
                 {l.label}
               </a>
             ))}
@@ -172,7 +172,7 @@ export function OutsourcingContent() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm text-foreground/40 hover:text-foreground/70 transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground/70 transition-colors"
             >
               Volver al sitio
             </Link>
@@ -248,7 +248,7 @@ export function OutsourcingContent() {
             </AnimateIn>
 
             <AnimateIn delay={0.2}>
-              <p className="text-lg text-foreground/55 leading-relaxed mb-10 max-w-lg">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-lg">
                 Entregamos WordPress, sitios corporativos en Astro/React y Landing Pages de alta conversión bajo tu marca. Sin creditos, sin rastro. Solo resultados.
               </p>
             </AnimateIn>
@@ -278,8 +278,8 @@ export function OutsourcingContent() {
                   { icon: Shield, label: "Marca Blanca 100%" },
                   { icon: Zap, label: "Lighthouse 90+ garantizado" },
                 ].map((t) => (
-                  <div key={t.label} className="flex items-center gap-2 text-sm text-foreground/40">
-                    <t.icon className="w-4 h-4 text-[#00C9C8]" />
+                  <div key={t.label} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <t.icon className="w-4 h-4 text-[#0E7490] dark:text-[#00C9C8]" />
                     {t.label}
                   </div>
                 ))}
@@ -294,13 +294,13 @@ export function OutsourcingContent() {
                 <div className="grid grid-cols-2 gap-px bg-foreground/8 rounded-xl overflow-hidden">
                   {[
                     { value: "+120", label: "Proyectos entregados", color: "text-[#0074D9]" },
-                    { value: "100%", label: "Confidencialidad", color: "text-[#00C9C8]" },
+                    { value: "100%", label: "Confidencialidad", color: "text-[#0E7490] dark:text-[#00C9C8]" },
                     { value: "3-21", label: "Días de entrega", color: "text-[#7B61FF]" },
                     { value: "5+", label: "Países con partners", color: "text-[#0074D9]" },
                   ].map((s) => (
                     <div key={s.label} className="bg-background p-6">
                       <div className={`font-display text-4xl font-bold mb-1 ${s.color}`}>{s.value}</div>
-                      <div className="text-xs text-foreground/40">{s.label}</div>
+                      <div className="text-xs text-muted-foreground">{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -310,7 +310,7 @@ export function OutsourcingContent() {
                       <div key={c} className="w-8 h-8 rounded-full border-2 border-background" style={{ backgroundColor: c + "33", borderColor: c + "66" }} />
                     ))}
                   </div>
-                  <p className="text-xs text-foreground/40">Agencias activas en RD, ES, VE, MX, US</p>
+                  <p className="text-xs text-muted-foreground">Agencias activas en RD, ES, VE, MX, US</p>
                 </div>
               </div>
             </div>
@@ -345,7 +345,7 @@ export function OutsourcingContent() {
                     "Cuellos de botella en picos de demanda",
                     "Riesgo reputacional en cada proyecto",
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-foreground/50">
+                    <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
                       <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
                         <div className="w-1.5 h-1.5 bg-red-400 rounded-full" />
                       </div>
@@ -357,7 +357,7 @@ export function OutsourcingContent() {
             </AnimateIn>
             <AnimateIn delay={0.15}>
               <div className="p-8 rounded-2xl border border-[#0074D9]/20 bg-gradient-to-br from-[#0074D9]/6 to-transparent">
-                <p className="text-[#00C9C8] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global</p>
+                <p className="text-[#0E7490] dark:text-[#00C9C8] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global</p>
                 <ul className="space-y-4">
                   {[
                     "Equipo técnico certificado en tu back-office",
@@ -367,7 +367,7 @@ export function OutsourcingContent() {
                     "Tu marca, tu credito, nuestro código",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-foreground/70">
-                      <CheckCircle2 className="w-5 h-5 text-[#00C9C8] shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 text-[#0E7490] dark:text-[#00C9C8] shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -419,7 +419,7 @@ export function OutsourcingContent() {
                           </span>
                         </div>
 
-                        <p className="text-foreground/55 leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
+                        <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
 
                         <div className="grid sm:grid-cols-2 gap-8">
                           <div>
@@ -436,7 +436,7 @@ export function OutsourcingContent() {
                             <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Entregables</p>
                             <ul className="space-y-2">
                               {svc.deliverables.map((d) => (
-                                <li key={d} className="flex items-center gap-2 text-xs text-foreground/55">
+                                <li key={d} className="flex items-center gap-2 text-xs text-muted-foreground">
                                   <div className="w-1 h-1 rounded-full shrink-0" style={{ backgroundColor: svc.color }} />
                                   {d}
                                 </li>
@@ -498,7 +498,7 @@ export function OutsourcingContent() {
                   <div className="font-display text-5xl font-bold text-foreground/5">{step.step}</div>
                   <div>
                     <h3 className="font-display text-lg font-bold text-foreground mb-2">{step.title}</h3>
-                    <p className="text-sm text-foreground/45 leading-relaxed">{step.desc}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               </AnimateIn>
@@ -516,7 +516,7 @@ export function OutsourcingContent() {
               <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
                 El margen es tuyo. Siempre.
               </h2>
-              <p className="text-foreground/45 mt-4 max-w-xl mx-auto">
+              <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
                 Nuestros precios son para ti. Tu pones el markup que quieras a tu cliente. Sin restricciones, sin competencia directa.
               </p>
             </div>
@@ -568,7 +568,7 @@ export function OutsourcingContent() {
                   <div className="mb-6">
                     <h3 className="font-display text-2xl font-bold mb-1" style={{ color: plan.color }}>{plan.name}</h3>
                     <p className="text-xs text-foreground/35 uppercase tracking-widest mb-4">{plan.tagline}</p>
-                    <p className="text-sm text-foreground/50 leading-relaxed">{plan.desc}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{plan.desc}</p>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.perks.map((perk) => (
@@ -602,14 +602,14 @@ export function OutsourcingContent() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <AnimateIn>
               <div>
-                <p className="text-[#00C9C8] text-sm font-semibold uppercase tracking-widest mb-4">Nuestra Promesa</p>
+                <p className="text-[#0E7490] dark:text-[#00C9C8] text-sm font-semibold uppercase tracking-widest mb-4">Nuestra Promesa</p>
                 <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight mb-6">
                   Si no cumplimos el score,{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#00C9C8]">
                     lo rehacemos gratis.
                   </span>
                 </h2>
-                <p className="text-foreground/50 leading-relaxed mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-8">
                   Cada proyecto sale con un informe de Lighthouse y Core Web Vitals adjunto. Si el Performance Score no alcanza 90/100, continuamos hasta lograrlo sin costo adicional.
                 </p>
                 <div className="space-y-4">
@@ -642,7 +642,7 @@ export function OutsourcingContent() {
                   ].map((m) => (
                     <div key={m.label}>
                       <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-foreground/50">{m.label}</span>
+                        <span className="text-muted-foreground">{m.label}</span>
                         <span className="font-semibold" style={{ color: m.color }}>{m.score}</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-foreground/5 overflow-hidden">
@@ -653,7 +653,7 @@ export function OutsourcingContent() {
                 </div>
                 <div className="mt-6 pt-5 border-t border-foreground/5 flex items-center justify-between">
                   <span className="text-xs text-foreground/25">Tiempo de carga</span>
-                  <span className="font-display text-2xl font-bold text-[#00C9C8]">{'< 1.1s'}</span>
+                  <span className="font-display text-2xl font-bold text-[#0E7490] dark:text-[#00C9C8]">{'< 1.1s'}</span>
                 </div>
               </div>
             </AnimateIn>
@@ -685,7 +685,7 @@ export function OutsourcingContent() {
                   />
                 </button>
                 {openFaq === i && (
-                  <p className="text-sm text-foreground/50 leading-relaxed pb-6 -mt-2">{faq.a}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed pb-6 -mt-2">{faq.a}</p>
                 )}
               </AnimateIn>
             ))}
@@ -703,7 +703,7 @@ export function OutsourcingContent() {
                 <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight mb-6">
                   Cuéntanos tu primer proyecto.
                 </h2>
-                <p className="text-foreground/45 leading-relaxed mb-10">
+                <p className="text-muted-foreground leading-relaxed mb-10">
                   Completar el formulario tarda menos de 2 minutos. Respondemos en menos de 24 horas con una propuesta preliminar y un NDA listo para firmar.
                 </p>
                 <div className="space-y-5">
@@ -726,10 +726,10 @@ export function OutsourcingContent() {
               {sent ? (
                 <div className="flex flex-col items-center justify-center gap-4 h-full py-20 text-center">
                   <div className="w-16 h-16 rounded-full bg-[#00C9C8]/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-8 h-8 text-[#00C9C8]" />
+                    <CheckCircle2 className="w-8 h-8 text-[#0E7490] dark:text-[#00C9C8]" />
                   </div>
                   <h3 className="font-display text-2xl font-bold">Mensaje recibido.</h3>
-                  <p className="text-foreground/45 max-w-sm">Te respondemos en menos de 24 horas con una propuesta preliminar y el NDA listo.</p>
+                  <p className="text-muted-foreground max-w-sm">Te respondemos en menos de 24 horas con una propuesta preliminar y el NDA listo.</p>
                   <button type="button" onClick={() => setSent(false)} className="text-sm text-[#0074D9] hover:underline mt-2">
                     Enviar otro mensaje
                   </button>
@@ -738,7 +738,7 @@ export function OutsourcingContent() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-xs text-foreground/40 uppercase tracking-wider mb-2">Tu nombre</label>
+                      <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu nombre</label>
                       <input
                         required
                         value={formData.name}
@@ -748,7 +748,7 @@ export function OutsourcingContent() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-foreground/40 uppercase tracking-wider mb-2">Agencia / empresa</label>
+                      <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Agencia / empresa</label>
                       <input
                         required
                         value={formData.agency}
@@ -759,7 +759,7 @@ export function OutsourcingContent() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-foreground/40 uppercase tracking-wider mb-2">Email de contacto</label>
+                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Email de contacto</label>
                     <input
                       required
                       type="email"
@@ -770,7 +770,7 @@ export function OutsourcingContent() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-foreground/40 uppercase tracking-wider mb-2">Proyectos estimados al mes</label>
+                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Proyectos estimados al mes</label>
                     <select
                       value={formData.volume}
                       onChange={(e) => setFormData((f) => ({ ...f, volume: e.target.value }))}
@@ -784,7 +784,7 @@ export function OutsourcingContent() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-foreground/40 uppercase tracking-wider mb-2">Cuéntanos tu necesidad</label>
+                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Cuéntanos tu necesidad</label>
                     <textarea
                       required
                       rows={4}
@@ -833,8 +833,8 @@ export function OutsourcingContent() {
             <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-40 hover:opacity-70 transition-opacity" />
           </Link>
           <div className="flex items-center gap-6 text-xs text-foreground/25">
-            <Link href="/" className="hover:text-foreground/50 transition-colors">Volver al sitio principal</Link>
-            <Link href="/contacto" className="hover:text-foreground/50 transition-colors">Contacto</Link>
+            <Link href="/" className="hover:text-muted-foreground transition-colors">Volver al sitio principal</Link>
+            <Link href="/contacto" className="hover:text-muted-foreground transition-colors">Contacto</Link>
             <span>2026 Start By Global</span>
           </div>
         </div>

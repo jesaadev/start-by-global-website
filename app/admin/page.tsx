@@ -138,7 +138,7 @@ function LoginScreen({ onLogin }: { onLogin: (pw: string) => void }) {
             onChange={(e) => { setPw(e.target.value); setError(false) }}
             className={cn(
               "w-full px-4 py-3 rounded-xl text-sm bg-secondary/50 border text-foreground",
-              "placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all",
+              "placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all",
               error ? "border-destructive/50" : "border-border/50 focus:border-primary/50"
             )}
           />
@@ -490,19 +490,19 @@ function InsightsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Frase del cliente (trigger)</label>
             <input type="text" value={form.trigger_phrase} onChange={(e) => setForm({ ...form, trigger_phrase: e.target.value })}
               placeholder="ej: es muy caro"
-              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
+              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
           </div>
           <div>
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Mejor respuesta</label>
             <textarea rows={3} value={form.best_response} onChange={(e) => setForm({ ...form, best_response: e.target.value })}
               placeholder="Cómo debe responder el agente..."
-              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 resize-none" />
+              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
           </div>
           <div>
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Contexto (opcional)</label>
             <input type="text" value={form.context} onChange={(e) => setForm({ ...form, context: e.target.value })}
               placeholder="Cuándo aplica este insight"
-              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
+              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
           </div>
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={() => { setCreating(false); setEditing(null) }}
@@ -646,7 +646,7 @@ function OverridesTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Clave única</label>
               <input type="text" value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })}
                 placeholder="ej: special_offer_abril"
-                className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50" />
+                className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Prioridad</label>
@@ -658,7 +658,7 @@ function OverridesTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">Instrucción para el agente</label>
             <textarea rows={4} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
               placeholder="Escribe la instrucción exacta que recibirá el agente de ventas..."
-              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 resize-none" />
+              className="w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
           </div>
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={() => { setCreating(false); setEditing(null) }}
@@ -714,7 +714,7 @@ function OverridesTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
 // ─── SEO & Métricas Tab ───────────────────────────────────────────────────────
 
 const fieldInputCls =
-  "w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50"
+  "w-full px-3 py-2 rounded-lg text-sm bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">{children}</label>
