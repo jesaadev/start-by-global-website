@@ -41,19 +41,22 @@ function shortDate(iso: string): string {
 }
 
 // Fuente única: el listado se deriva de blogPostsData (mismas que las páginas
-// de detalle). El primer artículo (más reciente) se marca como destacado.
-const blogPosts = Object.entries(blogPostsData).map(([slug, p], i) => ({
-  slug,
-  title: p.title,
-  excerpt: p.excerpt,
-  category: CATEGORY_ID[p.category] ?? "tendencias",
-  author: p.author,
-  date: p.date,
-  dateShort: shortDate(p.dateISO),
-  readTime: p.readTime,
-  image: p.image,
-  featured: i === 0,
-}))
+// de detalle), ordenado por fecha descendente. El más reciente queda destacado.
+const blogPosts = Object.entries(blogPostsData)
+  .map(([slug, p]) => ({
+    slug,
+    title: p.title,
+    excerpt: p.excerpt,
+    category: CATEGORY_ID[p.category] ?? "tendencias",
+    author: p.author,
+    date: p.date,
+    dateISO: p.dateISO,
+    dateShort: shortDate(p.dateISO),
+    readTime: p.readTime,
+    image: p.image,
+  }))
+  .sort((a, b) => b.dateISO.localeCompare(a.dateISO))
+  .map((post, i) => ({ ...post, featured: i === 0 }))
 
 export function InsightsContent() {
   const [selectedCategory, setSelectedCategory] = useState("all")
