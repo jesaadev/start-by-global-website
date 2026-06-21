@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 const NAV_ITEMS = [
   { href: "/", label: "Inicio" },
   { href: "/servicios", label: "Servicios" },
+  { href: "/diseno-paginas-web", label: "Diseño Web" },
   { href: "/outsourcing", label: "Outsourcing" },
   { href: "/ia-automatizacion", label: "IA & Automatización" },
   { href: "/publicidad-ads", label: "Publicidad & Ads" },

@@ -22,11 +22,13 @@ import {
   Layers,
   Cpu,
   Megaphone,
+  Code2,
 } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/servicios", label: "Servicios", icon: Briefcase },
+  { href: "/diseno-paginas-web", label: "Diseño Web", icon: Code2, highlight: true, highlightColor: "#e05a2b" },
   { href: "/portafolio", label: "Portafolio", icon: FolderOpen },
   { href: "/nosotros", label: "Nosotros", icon: Users },
   { href: "/insights", label: "Insights", icon: BookOpen },
