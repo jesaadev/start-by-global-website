@@ -17,12 +17,24 @@ export function JsonLd({ settings }: { settings: SiteSettings }) {
 
   const graph: Record<string, unknown>[] = [
     {
-      "@type": "Organization",
+      "@type": ["Organization", "ProfessionalService"],
       "@id": `${base}/#organization`,
       name: organization.name,
       legalName: organization.legalName || organization.name,
       url: base,
       logo: abs(organization.logo),
+      description: seo.description,
+      priceRange: "$$",
+      areaServed: ["DO", "ES", "MX", "US"].map((c) => ({ "@type": "Country", name: c })),
+      knowsAbout: [
+        "Diseño de páginas web",
+        "Desarrollo web",
+        "Publicidad digital",
+        "Google Ads",
+        "Meta Ads",
+        "SEO",
+        "Marketing digital",
+      ],
       ...(organization.email ? { email: organization.email } : {}),
       ...(organization.telephone ? { telephone: organization.telephone } : {}),
       ...(organization.sameAs?.filter(Boolean).length

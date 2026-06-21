@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props) {
   if (!post) return {}
 
   return {
-    title: `${post.title} | Insights - Start By Global`,
+    title: `${post.title} | Insights`,
     description: post.excerpt,
     keywords: post.keywords,
     openGraph: {

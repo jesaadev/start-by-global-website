@@ -13,6 +13,199 @@ export interface BlogPost {
 }
 
 export const blogPostsData: Record<string, BlogPost> = {
+  "cuanto-cuesta-pagina-web-republica-dominicana": {
+    title: "¿Cuánto cuesta una página web en República Dominicana? (Guía 2026)",
+    excerpt:
+      "Precios reales de diseño y desarrollo web en RD según el tipo de proyecto: desde sitios básicos hasta tiendas online. Qué incluye, qué evitar y cómo elegir.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "20 de junio de 2026",
+    dateISO: "2026-06-20",
+    readTime: "7 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+    keywords: [
+      "cuánto cuesta una página web",
+      "precio página web República Dominicana",
+      "diseño de páginas web República Dominicana",
+      "desarrollo web Santo Domingo",
+      "diseño web para empresas",
+    ],
+    content: `
+<p>"¿Cuánto cuesta una página web?" es la primera pregunta de casi todo dueño de negocio en República Dominicana. La respuesta honesta es: <strong>depende del alcance</strong>. Pero podemos darte rangos reales y, sobre todo, explicarte qué los hace subir o bajar para que inviertas bien.</p>
+
+<h2>Rangos de precio según el tipo de web (2026)</h2>
+<ul>
+<li><strong>Sitio básico / landing (desde $200 – $500 USD):</strong> 1 a 3 secciones, ideal para profesionales y pequeños negocios que necesitan presencia y un formulario de contacto.</li>
+<li><strong>Web corporativa (desde $600 – $1,500 USD):</strong> múltiples páginas, diseño a medida, SEO técnico, blog e integraciones. Es el rango que mejor relación valor/precio ofrece a empresas que quieren generar clientes.</li>
+<li><strong>Tienda online / e-commerce (desde $800 – $3,000+ USD):</strong> catálogo, pasarela de pagos, gestión de productos y optimización de conversión.</li>
+<li><strong>Desarrollo a medida (desde $2,500 USD):</strong> sistemas y funcionalidades específicas.</li>
+</ul>
+<p>En <a href="/diseno-paginas-web">Start By Global los proyectos arrancan desde $400</a> e incluyen SEO on-page y optimización de velocidad de serie.</p>
+
+<h2>¿Qué hace subir o bajar el precio?</h2>
+<ul>
+<li><strong>Cantidad de páginas y funcionalidades</strong> (reservas, multilenguaje, integraciones, CRM).</li>
+<li><strong>Diseño a medida vs. plantilla.</strong> Un diseño propio convierte más, pero cuesta más que una plantilla.</li>
+<li><strong>SEO y rendimiento.</strong> Una web rápida y bien estructurada técnicamente vale la inversión: es la que aparece en Google.</li>
+<li><strong>Contenido.</strong> Si necesitas textos, fotografía o branding, súmalo al presupuesto.</li>
+</ul>
+
+<h2>Costos adicionales que debes contemplar</h2>
+<ul>
+<li><strong>Dominio y hosting:</strong> $50 – $200 USD/año (siempre a tu nombre).</li>
+<li><strong>Mantenimiento:</strong> $50 – $150 USD/mes para actualizaciones y seguridad.</li>
+<li><strong>SEO continuo y publicidad:</strong> si quieres acelerar resultados, considera <a href="/publicidad-ads">campañas de Google y Meta Ads</a>.</li>
+</ul>
+
+<h2>El error más caro: elegir solo por precio</h2>
+<p>Una web barata que no convierte es la inversión más cara que existe: <strong>una mala web cuesta clientes; una buena los multiplica</strong>. Antes de decidir, pregunta qué incluye exactamente, si el sitio es tuyo, cómo se mide y qué soporte tendrás.</p>
+
+<h2>En resumen</h2>
+<p>Para la mayoría de empresas en RD, una web corporativa orientada a vender es la mejor decisión de inversión. Si quieres una cifra exacta para tu caso, <a href="/diseno-paginas-web">solicita una cotización gratis</a> y te enviamos una propuesta clara, sin sorpresas.</p>
+`,
+  },
+  "cuanto-cuesta-publicidad-facebook-instagram": {
+    title: "¿Cuánto cuesta la publicidad en Facebook e Instagram? (Guía para empresas)",
+    excerpt:
+      "Cómo se cobra la publicidad en Meta Ads, cuánto invertir al mes, qué cobra una agencia y cómo saber si tu pauta es rentable. Guía práctica para RD y LATAM.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "20 de junio de 2026",
+    dateISO: "2026-06-20",
+    readTime: "8 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    keywords: [
+      "cuánto cuesta la publicidad en Facebook",
+      "precio publicidad Instagram",
+      "Meta Ads precio",
+      "agencia de Meta Ads",
+      "publicidad en redes sociales República Dominicana",
+    ],
+    content: `
+<p>La publicidad en Facebook e Instagram (Meta Ads) no tiene un precio de lista: funciona por <strong>subasta en tiempo real</strong>. Cada vez que hay una oportunidad de mostrar tu anuncio, los anunciantes compiten por ese espacio en milisegundos. Aun así, hay rangos y reglas claras para presupuestar.</p>
+
+<h2>¿Cuánto invertir al mes?</h2>
+<ul>
+<li><strong>Punto de partida:</strong> $5 a $20 USD al día para empezar a recopilar datos.</li>
+<li><strong>Inversión mínima útil:</strong> unos $300/mes te permiten probar, aunque depende mucho del sector y la competencia.</li>
+<li><strong>Para escalar:</strong> a partir de $1,000 – $5,000/mes con creatividades y públicos optimizados.</li>
+</ul>
+
+<h2>Costos por métrica (referencia)</h2>
+<ul>
+<li><strong>CPC (costo por clic):</strong> entre $0.10 y $1.00.</li>
+<li><strong>CPM (mil impresiones):</strong> entre $3 y $8.</li>
+<li><strong>Costo por conversión:</strong> de $5 a $50 según sector y objetivo.</li>
+</ul>
+<p>La segmentación, la ubicación geográfica y la competencia de tu sector influyen directamente en estos números.</p>
+
+<h2>¿Qué cobra una agencia?</h2>
+<p>El honorario típico de una agencia es entre <strong>10% y 20% del gasto mensual en anuncios</strong>. Ejemplo: si inviertes $3,000/mes en pauta, el fee de gestión ronda $300 – $600. En <a href="/publicidad-ads">Start By Global la gestión arranca desde $400/mes</a>, aparte del presupuesto que destines a las plataformas.</p>
+
+<h2>El presupuesto no lo es todo: la rentabilidad sí</h2>
+<p>De nada sirve "gastar" en Ads si el embudo no convierte. Antes de escalar necesitas: una <a href="/diseno-paginas-web">página o landing que convierta</a>, medición correcta (pixel + CAPI) y creatividades probadas. Así dejas de <strong>quemar dinero en Ads</strong> y empiezas a generar clientes.</p>
+
+<h2>¿Cómo saber si tu pauta es rentable?</h2>
+<p>Mira el <strong>ROAS</strong> (retorno por cada dólar invertido) y el <strong>CPA</strong> (costo por cliente). Si tu margen aguanta ese CPA, escalas; si no, se optimiza antes de invertir más.</p>
+
+<h2>En resumen</h2>
+<p>La publicidad en Meta es de las formas más rápidas de conseguir clientes si se hace con estrategia y medición. ¿Quieres saber cuánto deberías invertir en tu caso? <a href="/publicidad-ads">Solicita una auditoría gratuita</a> y te decimos dónde está el dinero.</p>
+`,
+  },
+  "como-elegir-agencia-google-ads-meta-ads": {
+    title: "Cómo elegir una agencia de Google Ads y Meta Ads (sin quemar tu presupuesto)",
+    excerpt:
+      "7 criterios para contratar una agencia de publicidad digital que sí genere clientes: medición, transparencia, propiedad de las cuentas y más.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "6 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80",
+    keywords: [
+      "agencia de google ads",
+      "agencia de meta ads",
+      "cómo elegir agencia de publicidad",
+      "agencia de marketing digital República Dominicana",
+    ],
+    content: `
+<p>Elegir mal la agencia de publicidad es una de las formas más rápidas de <strong>quemar dinero en Ads</strong>. Estos son los criterios que de verdad importan al contratar una agencia de Google Ads o Meta Ads.</p>
+
+<h2>1. Que las cuentas sean tuyas</h2>
+<p>Tu cuenta de Google Ads y tu Business Manager de Meta deben estar a tu nombre, con la agencia como administrador. Si la agencia es "dueña" de tus cuentas, estás atrapado.</p>
+
+<h2>2. Medición seria (pixel + CAPI)</h2>
+<p>Sin medición correcta no hay optimización. Pregunta si instalan el pixel y la <strong>Conversions API (CAPI)</strong>, y cómo atribuyen los resultados. En <a href="/publicidad-ads">Start By Global lanzamos toda campaña con pixel + CAPI</a> para medir conversiones reales.</p>
+
+<h2>3. Transparencia en reportes y honorarios</h2>
+<p>Debes ver claramente cuánto se invierte en pauta y cuánto es el fee de la agencia (suele ser 10–20% del gasto). Nada de cajas negras.</p>
+
+<h2>4. Estrategia antes que "dar play"</h2>
+<p>Una buena agencia empieza con una <strong>auditoría</strong>: públicos, oferta, creatividades y objetivos por plataforma. Desconfía de quien promete resultados sin entender tu negocio.</p>
+
+<h2>5. Creatividades que convierten</h2>
+<p>El 70% del rendimiento de Meta Ads está en la creatividad. Pregunta si producen piezas y hacen pruebas A/B.</p>
+
+<h2>6. El embudo completo, no solo el anuncio</h2>
+<p>El mejor anuncio fracasa si la web no convierte. Asegúrate de que la agencia cuide también tu <a href="/diseno-paginas-web">página o landing de destino</a>.</p>
+
+<h2>7. Foco en rentabilidad (ROAS / CPA)</h2>
+<p>El objetivo no es "tener anuncios": es bajar el CPA y subir el ROAS. Pide que te expliquen cómo lo van a lograr y medir.</p>
+
+<h2>En resumen</h2>
+<p>Contrata por estrategia, medición y transparencia, no por el precio más bajo. ¿Quieres una auditoría honesta de tu cuenta? <a href="/publicidad-ads">Solicítala gratis aquí</a>.</p>
+`,
+  },
+  "web-que-vende-vs-folleto-digital": {
+    title: "Tu web, ¿vende o es un folleto digital? 7 señales de que no convierte",
+    excerpt:
+      "Muchas webs se ven bien pero no generan clientes. Detecta las señales de que tu sitio no convierte y cómo convertirlo en un vendedor 24/7.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "6 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
+    keywords: [
+      "web que convierte",
+      "diseño web orientado a conversión",
+      "rediseño de página web",
+      "diseño de páginas web para empresas",
+    ],
+    content: `
+<p>Una mala web cuesta clientes; una buena los multiplica. El problema es que muchos sitios son <strong>folletos digitales</strong>: bonitos, pero no venden. Estas son 7 señales de que tu web no está convirtiendo.</p>
+
+<h2>1. No tiene un objetivo claro</h2>
+<p>Si tu web no guía al visitante hacia una acción (cotizar, agendar, comprar), solo "informa". Cada página necesita un <strong>CTA</strong> claro.</p>
+
+<h2>2. Carga lenta</h2>
+<p>Cada segundo de más cuesta conversiones y posiciones en Google. La velocidad (Core Web Vitals) es innegociable.</p>
+
+<h2>3. No está pensada para móvil</h2>
+<p>La mayoría de tu tráfico es móvil. Si la experiencia móvil es mala, pierdes la venta.</p>
+
+<h2>4. Mensaje confuso</h2>
+<p>En 5 segundos el visitante debe entender qué haces, para quién y por qué tú. Si no, se va.</p>
+
+<h2>5. Falta prueba social</h2>
+<p>Sin testimonios, casos o logos, no hay confianza. Y sin confianza no hay venta.</p>
+
+<h2>6. No se mide</h2>
+<p>Si no tienes analítica ni pixel, no sabes qué falla. Lo que no se mide, no se mejora.</p>
+
+<h2>7. No aparece en Google</h2>
+<p>Sin SEO técnico ni contenido, tu web es invisible. Una web debe atraer, no solo existir.</p>
+
+<h2>La solución</h2>
+<p>No siempre necesitas empezar de cero: a veces basta un <strong>rediseño orientado a conversión</strong> + SEO + medición. En <a href="/diseno-paginas-web">Start By Global diseñamos (o rediseñamos) webs que venden</a>, desde $400. Y si ya quieres tráfico, lo aceleramos con <a href="/publicidad-ads">publicidad en Google y Meta</a>.</p>
+
+<p>¿Tu web vende o es un folleto? <a href="/diseno-paginas-web">Pide una auditoría gratis</a> y te decimos qué cambiar.</p>
+`,
+  },
   "arquetipos-sitio-web-personalidad-negocio": {
     title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
     excerpt:

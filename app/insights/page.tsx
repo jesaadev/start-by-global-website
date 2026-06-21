@@ -4,7 +4,7 @@ import { blogPostsData } from "./[slug]/blog-data"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Insights & Blog | Start By Global",
+  title: "Insights & Blog",
   description:
     "Tendencias, estrategias y análisis del mundo digital. Marketing, desarrollo web y tecnología para impulsar tu negocio en RD, España y Latinoamérica.",
   keywords: [
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     title: "Insights & Blog | Start By Global",
     description: "Tendencias, estrategias y análisis del mundo digital.",
     type: "website",
-    url: "https://startbyglobal.com/insights",
+    url: "/insights",
   },
-  alternates: { canonical: "https://startbyglobal.com/insights" },
+  alternates: { canonical: "/insights" },
 }
 
 export default function InsightsPage() {

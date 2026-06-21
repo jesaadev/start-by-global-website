@@ -1,13 +1,39 @@
 import type { Metadata } from "next"
+import { pageMetadata } from "@/lib/seo"
+import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo-jsonld"
 import { AdsContent } from "./ads-content"
 
-export const metadata: Metadata = {
-  title: "Publicidad Digital & Ads | Start By Global",
+export const metadata: Metadata = pageMetadata({
+  title: "Agencia de Publicidad Digital: Google Ads & Meta Ads",
   description:
-    "Campañas de Meta Ads, Google Ads, TikTok y LinkedIn que generan clientes, no solo clics. Deja de quemar presupuesto: pauta con estrategia y medición real.",
-  alternates: { canonical: "/publicidad-ads" },
-}
+    "Agencia de publicidad digital en República Dominicana: campañas de Google Ads, Meta (Facebook/Instagram), TikTok y LinkedIn que generan clientes, no solo clics. Medición real con pixel + CAPI.",
+  path: "/publicidad-ads",
+  keywords: [
+    "agencia de google ads",
+    "agencia de meta ads",
+    "publicidad en redes sociales República Dominicana",
+    "agencia de marketing digital",
+    "campañas facebook ads",
+    "publicidad digital Santo Domingo",
+  ],
+})
 
 export default function AdsPage() {
-  return <AdsContent />
+  return (
+    <>
+      <ServiceJsonLd
+        name="Publicidad Digital y Gestión de Ads"
+        serviceType="Publicidad digital / SEM"
+        description="Campañas de Google Ads, Meta (Facebook/Instagram), TikTok y LinkedIn con estrategia y medición real."
+        path="/publicidad-ads"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Inicio", path: "/" },
+          { name: "Publicidad Digital & Ads", path: "/publicidad-ads" },
+        ]}
+      />
+      <AdsContent />
+    </>
+  )
 }

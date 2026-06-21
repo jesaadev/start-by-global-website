@@ -24,6 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
     base = new URL('https://startbyglobal.com')
   }
 
+  // Solo forzamos una imagen OG si el admin fijó una personalizada (no el logo).
+  // Si no, se usa la imagen generada dinámicamente (app/opengraph-image.tsx).
+  const customOg =
+    seo.defaultOgImage && seo.defaultOgImage !== '/logo-black.svg' ? seo.defaultOgImage : null
+
   return {
     metadataBase: base,
     title: { default: seo.titleDefault, template: seo.titleTemplate },
@@ -38,16 +43,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title: seo.titleDefault,
       description: seo.description,
       url: base.toString(),
-      images: seo.defaultOgImage
-        ? [{ url: seo.defaultOgImage, width: 1200, height: 630, alt: seo.siteName }]
-        : [],
+      ...(customOg ? { images: [{ url: customOg, width: 1200, height: 630, alt: seo.siteName }] } : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title: seo.titleDefault,
       description: seo.description,
       ...(seo.twitterHandle ? { site: seo.twitterHandle, creator: seo.twitterHandle } : {}),
-      images: seo.defaultOgImage ? [seo.defaultOgImage] : [],
+      ...(customOg ? { images: [customOg] } : {}),
     },
     robots: seo.indexable
       ? { index: true, follow: true }
