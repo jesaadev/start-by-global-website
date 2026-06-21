@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { AnimateIn } from "@/components/animate-in"
+import { blogPostsData } from "./[slug]/blog-data"
 import {
   TrendingUp,
   Code,
@@ -25,116 +26,34 @@ const categories = [
   { id: "tendencias", label: "Tendencias Tech", icon: TrendingUp },
 ]
 
-const blogPosts = [
-  {
-    slug: "arquetipos-sitio-web-personalidad-negocio",
-    title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
-    excerpt: "¿Por qué algunos sitios web conectan instintivamente y otros se sienten genéricos? Descubre cómo usar los arquetipos para que tu marca sea inolvidable.",
-    category: "tendencias",
-    author: "Jhon Alejandro Esáa",
-    date: "16 de marzo de 2026",
-    dateShort: "16 mar",
-    readTime: "8 min",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-6.avif",
-    featured: false,
-  },
-  {
-    slug: "estructura-web-estrategica-conversion",
-    title: "Cómo Crear una Estructura Web Estratégica que Convierte",
-    excerpt: "No es magia, es arquitectura invisible. Aprende a diseñar la ruta que transforma a un visitante curioso en un cliente fiel.",
-    category: "desarrollo",
-    author: "Jhon Alejandro Esáa",
-    date: "16 de marzo de 2026",
-    dateShort: "16 mar",
-    readTime: "6 min",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-7.avif",
-    featured: false,
-  },
-  {
-    slug: "busqueda-generativa-futuro-google-geo",
-    title: "Búsqueda Generativa: El Futuro de Google, ChatGPT y el GEO",
-    excerpt: "La IA está redefiniendo qué significa «buscar». Descubre cómo el GEO está desplazando al SEO tradicional y qué hacer para que la IA cite tu marca.",
-    category: "tendencias",
-    author: "Jhon Alejandro Esáa",
-    date: "16 de marzo de 2026",
-    dateShort: "16 mar",
-    readTime: "7 min",
-    image: "https://stage.startbyglobal.com/wp-content/uploads/2026/02/image-8.avif",
-    featured: false,
-  },
-  {
-    slug: "ia-marketing-digital-2026",
-    title: "IA en Marketing Digital: 5 Tendencias que Dominarán 2026",
-    excerpt: "La inteligencia artificial está redefiniendo cómo las marcas se conectan con sus audiencias. Descubre las estrategias que liderarán el próximo año.",
-    category: "marketing",
-    author: "María González",
-    date: "15 de febrero de 2026",
-    dateShort: "15 feb",
-    readTime: "8 min",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-    featured: true,
-  },
-  {
-    slug: "next-js-15-novedades",
-    title: "Next.js 15: Las Nuevas Características que Debes Conocer",
-    excerpt: "Exploramos las últimas actualizaciones del framework más popular de React y cómo pueden mejorar tu flujo de desarrollo.",
-    category: "desarrollo",
-    author: "Carlos Méndez",
-    date: "12 de febrero de 2026",
-    dateShort: "12 feb",
-    readTime: "6 min",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
-    featured: false,
-  },
-  {
-    slug: "optimizacion-seo-local",
-    title: "SEO Local: Estrategias Avanzadas para República Dominicana",
-    excerpt: "Posiciona tu negocio en las búsquedas locales con estas tácticas probadas específicas para el mercado dominicano.",
-    category: "marketing",
-    author: "Ana Rodríguez",
-    date: "10 de febrero de 2026",
-    dateShort: "10 feb",
-    readTime: "7 min",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
-    featured: false,
-  },
-  {
-    slug: "typescript-tips-2026",
-    title: "TypeScript: 10 Tips Avanzados para Código Más Robusto",
-    excerpt: "Mejora la calidad de tu código con estas técnicas avanzadas de TypeScript que todo desarrollador debería conocer.",
-    category: "desarrollo",
-    author: "Luis Pérez",
-    date: "8 de febrero de 2026",
-    dateShort: "8 feb",
-    readTime: "10 min",
-    image: "https://images.unsplash.com/photo-1619410283995-43d9134e7656?w=800&q=80",
-    featured: false,
-  },
-  {
-    slug: "futuro-web3-empresas",
-    title: "Web3 y Blockchain: ¿El Futuro de los Negocios Digitales?",
-    excerpt: "Analizamos cómo la descentralización puede impactar tu modelo de negocio y qué oportunidades presenta.",
-    category: "tendencias",
-    author: "Roberto Santos",
-    date: "5 de febrero de 2026",
-    dateShort: "5 feb",
-    readTime: "9 min",
-    image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
-    featured: false,
-  },
-  {
-    slug: "email-marketing-roi",
-    title: "Email Marketing en 2026: Cómo Maximizar tu ROI",
-    excerpt: "El email sigue siendo uno de los canales más rentables. Descubre las estrategias que generan resultados reales.",
-    category: "marketing",
-    author: "Patricia Núñez",
-    date: "3 de febrero de 2026",
-    dateShort: "3 feb",
-    readTime: "5 min",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80",
-    featured: false,
-  },
-]
+// Mapea la categoría (label de blog-data) al id del filtro de categorías.
+const CATEGORY_ID: Record<string, string> = {
+  "Tendencias Tech": "tendencias",
+  "Desarrollo Web": "desarrollo",
+  "Marketing Digital": "marketing",
+}
+
+const MONTHS_SHORT = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+function shortDate(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  return `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`
+}
+
+// Fuente única: el listado se deriva de blogPostsData (mismas que las páginas
+// de detalle). El primer artículo (más reciente) se marca como destacado.
+const blogPosts = Object.entries(blogPostsData).map(([slug, p], i) => ({
+  slug,
+  title: p.title,
+  excerpt: p.excerpt,
+  category: CATEGORY_ID[p.category] ?? "tendencias",
+  author: p.author,
+  date: p.date,
+  dateShort: shortDate(p.dateISO),
+  readTime: p.readTime,
+  image: p.image,
+  featured: i === 0,
+}))
 
 export function InsightsContent() {
   const [selectedCategory, setSelectedCategory] = useState("all")
