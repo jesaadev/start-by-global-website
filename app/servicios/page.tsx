@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { pageMetadata } from "@/lib/seo"
+import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo-jsonld"
 import { ServicesPageContent } from "./services-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -17,5 +18,21 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default function ServiciosPage() {
-  return <ServicesPageContent />
+  return (
+    <>
+      <ServiceJsonLd
+        name="Servicios de marketing digital y desarrollo web"
+        serviceType="Marketing digital / Desarrollo web"
+        description="Desarrollo web, SEO, publicidad digital, branding, analítica y automatización para empresas."
+        path="/servicios"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Inicio", path: "/" },
+          { name: "Servicios", path: "/servicios" },
+        ]}
+      />
+      <ServicesPageContent />
+    </>
+  )
 }

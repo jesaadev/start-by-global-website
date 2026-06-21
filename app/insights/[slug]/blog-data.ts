@@ -114,6 +114,98 @@ export const blogPostsData: Record<string, BlogPost> = {
 <p>La publicidad en Meta es de las formas más rápidas de conseguir clientes si se hace con estrategia y medición. ¿Quieres saber cuánto deberías invertir en tu caso? <a href="/publicidad-ads">Solicita una auditoría gratuita</a> y te decimos dónde está el dinero.</p>
 `,
   },
+  "como-elegir-agencia-google-ads-meta-ads": {
+    title: "Cómo elegir una agencia de Google Ads y Meta Ads (sin quemar tu presupuesto)",
+    excerpt:
+      "7 criterios para contratar una agencia de publicidad digital que sí genere clientes: medición, transparencia, propiedad de las cuentas y más.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "6 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&q=80",
+    keywords: [
+      "agencia de google ads",
+      "agencia de meta ads",
+      "cómo elegir agencia de publicidad",
+      "agencia de marketing digital República Dominicana",
+    ],
+    content: `
+<p>Elegir mal la agencia de publicidad es una de las formas más rápidas de <strong>quemar dinero en Ads</strong>. Estos son los criterios que de verdad importan al contratar una agencia de Google Ads o Meta Ads.</p>
+
+<h2>1. Que las cuentas sean tuyas</h2>
+<p>Tu cuenta de Google Ads y tu Business Manager de Meta deben estar a tu nombre, con la agencia como administrador. Si la agencia es "dueña" de tus cuentas, estás atrapado.</p>
+
+<h2>2. Medición seria (pixel + CAPI)</h2>
+<p>Sin medición correcta no hay optimización. Pregunta si instalan el pixel y la <strong>Conversions API (CAPI)</strong>, y cómo atribuyen los resultados. En <a href="/publicidad-ads">Start By Global lanzamos toda campaña con pixel + CAPI</a> para medir conversiones reales.</p>
+
+<h2>3. Transparencia en reportes y honorarios</h2>
+<p>Debes ver claramente cuánto se invierte en pauta y cuánto es el fee de la agencia (suele ser 10–20% del gasto). Nada de cajas negras.</p>
+
+<h2>4. Estrategia antes que "dar play"</h2>
+<p>Una buena agencia empieza con una <strong>auditoría</strong>: públicos, oferta, creatividades y objetivos por plataforma. Desconfía de quien promete resultados sin entender tu negocio.</p>
+
+<h2>5. Creatividades que convierten</h2>
+<p>El 70% del rendimiento de Meta Ads está en la creatividad. Pregunta si producen piezas y hacen pruebas A/B.</p>
+
+<h2>6. El embudo completo, no solo el anuncio</h2>
+<p>El mejor anuncio fracasa si la web no convierte. Asegúrate de que la agencia cuide también tu <a href="/diseno-paginas-web">página o landing de destino</a>.</p>
+
+<h2>7. Foco en rentabilidad (ROAS / CPA)</h2>
+<p>El objetivo no es "tener anuncios": es bajar el CPA y subir el ROAS. Pide que te expliquen cómo lo van a lograr y medir.</p>
+
+<h2>En resumen</h2>
+<p>Contrata por estrategia, medición y transparencia, no por el precio más bajo. ¿Quieres una auditoría honesta de tu cuenta? <a href="/publicidad-ads">Solicítala gratis aquí</a>.</p>
+`,
+  },
+  "web-que-vende-vs-folleto-digital": {
+    title: "Tu web, ¿vende o es un folleto digital? 7 señales de que no convierte",
+    excerpt:
+      "Muchas webs se ven bien pero no generan clientes. Detecta las señales de que tu sitio no convierte y cómo convertirlo en un vendedor 24/7.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "6 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1200&q=80",
+    keywords: [
+      "web que convierte",
+      "diseño web orientado a conversión",
+      "rediseño de página web",
+      "diseño de páginas web para empresas",
+    ],
+    content: `
+<p>Una mala web cuesta clientes; una buena los multiplica. El problema es que muchos sitios son <strong>folletos digitales</strong>: bonitos, pero no venden. Estas son 7 señales de que tu web no está convirtiendo.</p>
+
+<h2>1. No tiene un objetivo claro</h2>
+<p>Si tu web no guía al visitante hacia una acción (cotizar, agendar, comprar), solo "informa". Cada página necesita un <strong>CTA</strong> claro.</p>
+
+<h2>2. Carga lenta</h2>
+<p>Cada segundo de más cuesta conversiones y posiciones en Google. La velocidad (Core Web Vitals) es innegociable.</p>
+
+<h2>3. No está pensada para móvil</h2>
+<p>La mayoría de tu tráfico es móvil. Si la experiencia móvil es mala, pierdes la venta.</p>
+
+<h2>4. Mensaje confuso</h2>
+<p>En 5 segundos el visitante debe entender qué haces, para quién y por qué tú. Si no, se va.</p>
+
+<h2>5. Falta prueba social</h2>
+<p>Sin testimonios, casos o logos, no hay confianza. Y sin confianza no hay venta.</p>
+
+<h2>6. No se mide</h2>
+<p>Si no tienes analítica ni pixel, no sabes qué falla. Lo que no se mide, no se mejora.</p>
+
+<h2>7. No aparece en Google</h2>
+<p>Sin SEO técnico ni contenido, tu web es invisible. Una web debe atraer, no solo existir.</p>
+
+<h2>La solución</h2>
+<p>No siempre necesitas empezar de cero: a veces basta un <strong>rediseño orientado a conversión</strong> + SEO + medición. En <a href="/diseno-paginas-web">Start By Global diseñamos (o rediseñamos) webs que venden</a>, desde $400. Y si ya quieres tráfico, lo aceleramos con <a href="/publicidad-ads">publicidad en Google y Meta</a>.</p>
+
+<p>¿Tu web vende o es un folleto? <a href="/diseno-paginas-web">Pide una auditoría gratis</a> y te decimos qué cambiar.</p>
+`,
+  },
   "arquetipos-sitio-web-personalidad-negocio": {
     title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
     excerpt:

@@ -139,7 +139,7 @@ const whyUs = [
 
 export function ServicesPageContent() {
   return (
-    <DashboardLayout title="Nuestros Servicios" subtitle="Soluciones integrales de marketing digital para cada necesidad">
+    <DashboardLayout title="Servicios de Desarrollo Web y Marketing Digital" subtitle="Diseño web, SEO, publicidad (Google y Meta Ads), branding, analítica y automatización para empresas">
       {/* Why choose us cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {whyUs.map((item, i) => {
