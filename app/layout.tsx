@@ -6,6 +6,7 @@ import { ChatWidget } from '@/components/chat-widget'
 import { SitePixels } from '@/components/site-pixels'
 import { AttributionTracker } from '@/components/attribution-tracker'
 import { CookieConsent } from '@/components/cookie-consent'
+import { ThemeProvider } from '@/components/theme-provider'
 import { JsonLd } from '@/components/json-ld'
 import { getSiteSettings } from '@/lib/site-settings'
 
@@ -74,15 +75,17 @@ export default async function RootLayout({
   const settings = await getSiteSettings()
 
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
-        {children}
-        <ChatWidget />
-        <JsonLd settings={settings} />
-        <SitePixels pixels={settings.pixels} />
-        <AttributionTracker />
-        <CookieConsent />
-        <SpeedInsights />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+          <ChatWidget />
+          <JsonLd settings={settings} />
+          <SitePixels pixels={settings.pixels} />
+          <AttributionTracker />
+          <CookieConsent />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   )

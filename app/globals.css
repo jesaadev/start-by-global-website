@@ -9,7 +9,46 @@
 }
 
 @layer base {
+  /* Tema claro (por defecto del documento) */
   :root {
+    --background: 0 0% 100%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    /* primary oscurecido en claro: texto y botones cumplen WCAG AA sobre blanco (~5:1) */
+    --primary: 16 90% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 220 16% 95%;
+    --muted-foreground: 215 16% 38%;
+    --accent: 16 90% 42%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 42%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 16 90% 42%;
+    --chart-1: 16 90% 42%;
+    --chart-2: 190 75% 32%;
+    --chart-3: 150 65% 30%;
+    --chart-4: 38 90% 38%;
+    --chart-5: 270 55% 50%;
+    --radius: 0.75rem;
+    --sidebar-background: 210 20% 98%;
+    --sidebar-foreground: 220 20% 25%;
+    --sidebar-primary: 16 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 16% 93%;
+    --sidebar-accent-foreground: 220 25% 20%;
+    --sidebar-border: 220 13% 88%;
+    --sidebar-ring: 16 85% 55%;
+  }
+
+  /* Tema oscuro (marca por defecto del sitio) */
+  .dark {
     --background: 220 20% 7%;
     --foreground: 210 20% 95%;
     --card: 220 18% 10%;
@@ -34,7 +73,6 @@
     --chart-3: 150 60% 45%;
     --chart-4: 45 80% 55%;
     --chart-5: 270 60% 55%;
-    --radius: 0.75rem;
     --sidebar-background: 220 22% 5%;
     --sidebar-foreground: 210 20% 85%;
     --sidebar-primary: 16 85% 55%;
@@ -116,16 +154,16 @@ body {
   min-width: 320px;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar (theme-aware) */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: hsl(220 20% 7%); }
-::-webkit-scrollbar-thumb { background: hsl(220 14% 18%); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: hsl(220 14% 24%); }
+::-webkit-scrollbar-track { background: hsl(var(--secondary)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
 
 /* Selection color */
 ::selection {
-  background: hsl(16 85% 55% / 0.25);
-  color: hsl(210 20% 95%);
+  background: hsl(var(--primary) / 0.25);
+  color: hsl(var(--foreground));
 }
 
 /* Focus ring */

@@ -118,7 +118,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Tu nombre"
-                  className="px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
+                  className="px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                 />
               </div>
 
@@ -145,7 +145,7 @@ export function WhatsAppLink({ children, className, number = WHATSAPP_NUMBER, de
                   value={detail}
                   onChange={(e) => setDetail(e.target.value)}
                   placeholder="Cuéntanos brevemente tu proyecto..."
-                  className="px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
+                  className="px-3 py-2 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
                 />
               </div>
 

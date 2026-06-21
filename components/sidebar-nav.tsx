@@ -4,6 +4,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
   LayoutDashboard,
   Briefcase,
@@ -20,6 +21,7 @@ import {
   BookOpen,
   Layers,
   Cpu,
+  Megaphone,
 } from "lucide-react"
 
 const navItems = [
@@ -30,6 +32,7 @@ const navItems = [
   { href: "/insights", label: "Insights", icon: BookOpen },
   { href: "/outsourcing", label: "Outsourcing", icon: Layers, highlight: true, highlightColor: "#0074D9" },
   { href: "/ia-automatizacion", label: "IA & Automatización", icon: Cpu, highlight: true, highlightColor: "#7B61FF" },
+  { href: "/publicidad-ads", label: "Publicidad & Ads", icon: Megaphone, highlight: true, highlightColor: "#F43F5E" },
   { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
@@ -101,7 +104,7 @@ export function SidebarNav() {
             <img 
               src="/logo-black.svg" 
               alt="Start By Global" 
-              className={cn("shrink-0 transition-all invert", collapsed ? "h-8" : "h-10")}
+              className={cn("shrink-0 transition-all dark:invert", collapsed ? "h-8" : "h-10")}
             />
           </Link>
         </div>
@@ -197,6 +200,12 @@ export function SidebarNav() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Theme toggle */}
+        <div className={cn("px-2 py-3 border-t border-border/50 flex", collapsed ? "justify-center" : "items-center gap-2")}>
+          <ThemeToggle className="w-9 h-9 shrink-0" />
+          {!collapsed && <span className="text-xs text-muted-foreground">Tema claro / oscuro</span>}
         </div>
 
         {/* Collapse toggle (desktop) */}

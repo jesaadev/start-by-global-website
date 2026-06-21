@@ -10,10 +10,10 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
-              <img 
-                src="/logo-black.svg" 
-                alt="Start By Global" 
-                className="h-10"
+              <img
+                src="/logo-black.svg"
+                alt="Start By Global"
+                className="h-10 dark:invert"
               />
             </Link>
           </div>

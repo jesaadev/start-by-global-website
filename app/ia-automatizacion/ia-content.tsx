@@ -271,13 +271,13 @@ export function IaContent() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white font-sans">
+    <div className="min-h-screen bg-background text-foreground font-sans">
 
       {/* ── NAVBAR ──────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-[#0A0A0F]/90 backdrop-blur-xl">
+      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-foreground/5 bg-background/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-7 invert" />
+            <img src="/logo-black.svg" alt="Start By Global" className="h-7 dark:invert" />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -285,7 +285,7 @@ export function IaContent() {
               <a
                 key={l.href}
                 href={l.href}
-                className="text-sm text-white/50 hover:text-white transition-colors animated-underline"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline"
               >
                 {l.label}
               </a>
@@ -295,7 +295,7 @@ export function IaContent() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm text-white/40 hover:text-white/70 transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground/70 transition-colors"
             >
               Volver al sitio
             </Link>
@@ -309,7 +309,7 @@ export function IaContent() {
             <button
               type="button"
               onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-lg bg-white/5 text-white/70"
+              className="md:hidden p-2 rounded-lg bg-foreground/5 text-foreground/70"
               aria-label="Menu"
             >
               {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -318,13 +318,13 @@ export function IaContent() {
         </div>
 
         {mobileNavOpen && (
-          <div className="md:hidden absolute top-16 inset-x-0 bg-[#0A0A0F]/98 border-b border-white/5 px-6 py-4 flex flex-col gap-4">
+          <div className="md:hidden absolute top-16 inset-x-0 bg-background/98 border-b border-foreground/5 px-6 py-4 flex flex-col gap-4">
             {[...navLinks, { href: "#contacto", label: "Agendar Demo" }].map((l) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setMobileNavOpen(false)}
-                className="text-sm text-white/70 hover:text-white py-2 transition-colors"
+                className="text-sm text-foreground/70 hover:text-foreground py-2 transition-colors"
               >
                 {l.label}
               </a>
@@ -373,7 +373,7 @@ export function IaContent() {
             </AnimateIn>
 
             <AnimateIn delay={0.2}>
-              <p className="text-lg text-white/50 leading-relaxed mb-10 max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
                 Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa opere 10x más rápido. Sin cambiar tu equipo — potenciandolo.
               </p>
             </AnimateIn>
@@ -389,7 +389,7 @@ export function IaContent() {
                 </a>
                 <a
                   href="#soluciones"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-white/10 text-white/70 font-semibold text-base hover:bg-white/5 hover:text-white hover:border-white/20 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-foreground/10 text-foreground/70 font-semibold text-base hover:bg-foreground/5 hover:text-foreground hover:border-foreground/20 transition-all"
                 >
                   Ver soluciones
                 </a>
@@ -403,7 +403,7 @@ export function IaContent() {
                   { icon: Shield, label: "Datos 100% seguros" },
                   { icon: TrendingUp, label: "ROI en el primer mes" },
                 ].map((t) => (
-                  <div key={t.label} className="flex items-center gap-2 text-sm text-white/35">
+                  <div key={t.label} className="flex items-center gap-2 text-sm text-foreground/35">
                     <t.icon className="w-4 h-4 text-[#7B61FF]" />
                     {t.label}
                   </div>
@@ -416,16 +416,16 @@ export function IaContent() {
           <AnimateIn delay={0.25}>
             <div className="hidden lg:block">
               <div className="relative p-1 rounded-2xl bg-gradient-to-br from-[#7B61FF]/30 via-[#00C9C8]/10 to-transparent">
-                <div className="rounded-[14px] bg-[#0A0A0F] p-7">
+                <div className="rounded-[14px] bg-background p-7">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <p className="text-xs text-white/30 uppercase tracking-widest mb-1">IA Activa</p>
+                      <p className="text-xs text-foreground/30 uppercase tracking-widest mb-1">IA Activa</p>
                       <p className="font-display text-lg font-bold">Panel de Impacto</p>
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00C9C8]/10 border border-[#00C9C8]/20">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#00C9C8] animate-pulse" />
-                      <span className="text-[10px] text-[#00C9C8] font-semibold">En vivo</span>
+                      <span className="text-[10px] text-[#0E7490] dark:text-[#00C9C8] font-semibold">En vivo</span>
                     </div>
                   </div>
 
@@ -437,10 +437,10 @@ export function IaContent() {
                       { label: "Leads calificados por IA", value: "412", change: "+55%", color: "#0074D9" },
                       { label: "Costo por conversión", value: "$1.20", change: "-41%", color: "#F4A261" },
                     ].map((m) => (
-                      <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                      <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-foreground/[0.03] border border-foreground/5">
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
-                          <span className="text-xs text-white/50">{m.label}</span>
+                          <span className="text-xs text-muted-foreground">{m.label}</span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="font-display font-bold text-sm">{m.value}</span>
@@ -460,7 +460,7 @@ export function IaContent() {
 
                   {/* Mini bar chart */}
                   <div>
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-3">Automatizaciones ejecutadas / semana</p>
+                    <p className="text-[10px] text-foreground/30 uppercase tracking-widest mb-3">Automatizaciones ejecutadas / semana</p>
                     <div className="flex items-end gap-1.5 h-14">
                       {[30, 55, 40, 70, 60, 85, 100].map((h, i) => (
                         <div
@@ -475,7 +475,7 @@ export function IaContent() {
                     </div>
                     <div className="flex justify-between mt-1.5">
                       {["L", "M", "X", "J", "V", "S", "D"].map((d) => (
-                        <span key={d} className="text-[9px] text-white/20 flex-1 text-center">{d}</span>
+                        <span key={d} className="text-[9px] text-foreground/20 flex-1 text-center">{d}</span>
                       ))}
                     </div>
                   </div>
@@ -487,20 +487,20 @@ export function IaContent() {
       </section>
 
       {/* ── NUMBERS STRIP ───────────────────────────── */}
-      <section className="border-y border-white/5 py-12">
+      <section className="border-y border-foreground/5 py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-foreground/5 rounded-2xl overflow-hidden">
             {[
               { value: "+80", suffix: "%", label: "Reducción en tareas manuales", color: "text-[#7B61FF]" },
-              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#00C9C8]" },
+              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#0E7490] dark:text-[#00C9C8]" },
               { value: "10x", suffix: "", label: "Más contenido con el mismo equipo", color: "text-[#0074D9]" },
-              { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#F4A261]" },
+              { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#B45309] dark:text-[#F4A261]" },
             ].map((s) => (
-              <div key={s.label} className="bg-[#0A0A0F] px-6 py-8 text-center">
+              <div key={s.label} className="bg-background px-6 py-8 text-center">
                 <div className={`font-display text-4xl lg:text-5xl font-bold mb-2 ${s.color}`}>
                   {s.value}<span className="text-2xl">{s.suffix}</span>
                 </div>
-                <p className="text-xs text-white/35 leading-relaxed">{s.label}</p>
+                <p className="text-xs text-foreground/35 leading-relaxed">{s.label}</p>
               </div>
             ))}
           </div>
@@ -508,7 +508,7 @@ export function IaContent() {
       </section>
 
       {/* ── PROBLEMA ────────────────────────────────── */}
-      <section className="py-24 border-b border-white/5">
+      <section className="py-24 border-b border-foreground/5">
         <div className="max-w-7xl mx-auto px-6">
           <AnimateIn>
             <div className="max-w-3xl mb-16">
@@ -534,7 +534,7 @@ export function IaContent() {
                     "Perder leads por falta de seguimiento rápido",
                     "Contratar más gente para hacer más de lo mismo",
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-white/50">
+                    <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
                       <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
                         <div className="w-1.5 h-1.5 bg-red-400 rounded-full" />
                       </div>
@@ -556,8 +556,8 @@ export function IaContent() {
                     "Follow-up automático en minutos, no días",
                     "Escala sin contratar — la IA crece contigo",
                   ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-white/70">
-                      <CheckCircle2 className="w-5 h-5 text-[#00C9C8] shrink-0 mt-0.5" />
+                    <li key={item} className="flex items-start gap-3 text-sm text-foreground/70">
+                      <CheckCircle2 className="w-5 h-5 text-[#0E7490] dark:text-[#00C9C8] shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -569,7 +569,7 @@ export function IaContent() {
       </section>
 
       {/* ── SOLUCIONES ──────────────────────────────── */}
-      <section id="soluciones" className="py-24 border-b border-white/5">
+      <section id="soluciones" className="py-24 border-b border-foreground/5">
         <div className="max-w-7xl mx-auto px-6">
           <AnimateIn>
             <div className="mb-16">
@@ -599,7 +599,7 @@ export function IaContent() {
                             <Icon className="w-6 h-6" style={{ color: svc.color }} />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-widest text-white/30">{svc.badge}</p>
+                            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/30">{svc.badge}</p>
                             <h3 className="font-display text-2xl md:text-3xl font-bold">{svc.title}</h3>
                           </div>
                           <span
@@ -610,15 +610,15 @@ export function IaContent() {
                           </span>
                         </div>
 
-                        <p className="text-white/55 leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
+                        <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
 
                         <div className="grid sm:grid-cols-2 gap-8">
                           {/* Use cases */}
                           <div>
-                            <p className="text-xs uppercase tracking-widest text-white/30 mb-3">Casos de Uso</p>
+                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Casos de Uso</p>
                             <ul className="space-y-2">
                               {svc.useCases.map((u) => (
-                                <li key={u} className="flex items-start gap-2 text-xs text-white/55">
+                                <li key={u} className="flex items-start gap-2 text-xs text-muted-foreground">
                                   <div className="w-1 h-1 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: svc.color }} />
                                   {u}
                                 </li>
@@ -628,10 +628,10 @@ export function IaContent() {
 
                           {/* Stack */}
                           <div>
-                            <p className="text-xs uppercase tracking-widest text-white/30 mb-3">Stack</p>
+                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Stack</p>
                             <div className="flex flex-wrap gap-2">
                               {svc.stack.map((s) => (
-                                <span key={s} className="px-2.5 py-1 rounded-md bg-white/5 border border-white/8 text-xs text-white/55 font-mono">
+                                <span key={s} className="px-2.5 py-1 rounded-md bg-foreground/5 border border-foreground/8 text-xs text-muted-foreground font-mono">
                                   {s}
                                 </span>
                               ))}
@@ -649,7 +649,7 @@ export function IaContent() {
                         <p className="font-display font-bold text-sm leading-tight" style={{ color: svc.color }}>
                           {svc.metric}
                         </p>
-                        <p className="text-[10px] text-white/30 mt-1 uppercase tracking-wide">Promedio clientes</p>
+                        <p className="text-[10px] text-foreground/30 mt-1 uppercase tracking-wide">Promedio clientes</p>
                       </div>
                     </div>
                   </div>
@@ -661,7 +661,7 @@ export function IaContent() {
       </section>
 
       {/* ── PROCESO ─────────────────────────────────── */}
-      <section id="proceso" className="py-24 border-b border-white/5">
+      <section id="proceso" className="py-24 border-b border-foreground/5">
         <div className="max-w-7xl mx-auto px-6">
           <AnimateIn>
             <div className="mb-16">
@@ -677,19 +677,19 @@ export function IaContent() {
               const Icon = step.icon
               return (
                 <AnimateIn key={step.num} delay={0.1 * i}>
-                  <div className="relative p-6 rounded-2xl bg-white/[0.025] border border-white/8 group hover:border-[#7B61FF]/30 transition-all duration-300">
+                  <div className="relative p-6 rounded-2xl bg-foreground/[0.025] border border-foreground/8 group hover:border-[#7B61FF]/30 transition-all duration-300">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="w-10 h-10 rounded-xl bg-[#7B61FF]/10 border border-[#7B61FF]/20 flex items-center justify-center">
                         <Icon className="w-5 h-5 text-[#7B61FF]" />
                       </div>
-                      <span className="font-display text-3xl font-bold text-white/8 group-hover:text-[#7B61FF]/20 transition-colors">
+                      <span className="font-display text-3xl font-bold text-foreground/8 group-hover:text-[#7B61FF]/20 transition-colors">
                         {step.num}
                       </span>
                     </div>
                     <h3 className="font-display text-lg font-bold mb-3">{step.title}</h3>
-                    <p className="text-sm text-white/45 leading-relaxed">{step.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                     {i < processSteps.length - 1 && (
-                      <div className="hidden lg:block absolute top-10 -right-3 w-6 h-px bg-white/10" />
+                      <div className="hidden lg:block absolute top-10 -right-3 w-6 h-px bg-foreground/10" />
                     )}
                   </div>
                 </AnimateIn>
@@ -700,7 +700,7 @@ export function IaContent() {
       </section>
 
       {/* ── PLANES ──────────────────────────────────── */}
-      <section id="planes" className="py-24 border-b border-white/5">
+      <section id="planes" className="py-24 border-b border-foreground/5">
         <div className="max-w-7xl mx-auto px-6">
           <AnimateIn>
             <div className="mb-16 text-center">
@@ -718,31 +718,31 @@ export function IaContent() {
                   className={`relative flex flex-col p-7 rounded-2xl border transition-all duration-300 h-full ${
                     plan.popular
                       ? "bg-gradient-to-b from-[#7B61FF]/12 to-transparent border-[#7B61FF]/40"
-                      : "bg-white/[0.025] border-white/8 hover:border-white/15"
+                      : "bg-foreground/[0.025] border-foreground/8 hover:border-foreground/15"
                   }`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#7B61FF] text-xs font-bold uppercase tracking-wide text-white">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#7B61FF] text-xs font-bold uppercase tracking-wide text-foreground">
                       Más popular
                     </div>
                   )}
 
                   <div className="mb-6">
                     <h3 className="font-display text-xl font-bold mb-1">{plan.name}</h3>
-                    <p className="text-sm text-white/40 mb-5">{plan.description}</p>
+                    <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-display text-4xl font-bold" style={{ color: plan.color }}>
                         {plan.price}
                       </span>
                       {plan.period && (
-                        <span className="text-sm text-white/35">/ {plan.period}</span>
+                        <span className="text-sm text-foreground/35">/ {plan.period}</span>
                       )}
                     </div>
                   </div>
 
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm text-white/65">
+                      <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/65">
                         <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: plan.color }} />
                         {f}
                       </li>
@@ -767,7 +767,7 @@ export function IaContent() {
           </div>
 
           <AnimateIn delay={0.3}>
-            <p className="text-center text-xs text-white/25 mt-8">
+            <p className="text-center text-xs text-foreground/25 mt-8">
               Todos los planes incluyen NDA, acceso al panel de monitoreo y soporte por Slack.
             </p>
           </AnimateIn>
@@ -775,10 +775,10 @@ export function IaContent() {
       </section>
 
       {/* ── TECNOLOGIAS ─────────────────────────────── */}
-      <section className="py-16 border-b border-white/5">
+      <section className="py-16 border-b border-foreground/5">
         <div className="max-w-7xl mx-auto px-6">
           <AnimateIn>
-            <p className="text-xs uppercase tracking-widest text-white/25 text-center mb-8">
+            <p className="text-xs uppercase tracking-widest text-foreground/25 text-center mb-8">
               Trabajamos con las mejores plataformas del mercado
             </p>
           </AnimateIn>
@@ -791,7 +791,7 @@ export function IaContent() {
             ].map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/8 text-xs text-white/40 font-mono hover:text-white/70 hover:border-white/15 transition-colors cursor-default"
+                className="px-3 py-1.5 rounded-lg bg-foreground/[0.04] border border-foreground/8 text-xs text-muted-foreground font-mono hover:text-foreground/70 hover:border-foreground/15 transition-colors cursor-default"
               >
                 {tech}
               </span>
@@ -801,7 +801,7 @@ export function IaContent() {
       </section>
 
       {/* ── FAQ ─────────────────────────────────────── */}
-      <section id="faq" className="py-24 border-b border-white/5">
+      <section id="faq" className="py-24 border-b border-foreground/5">
         <div className="max-w-3xl mx-auto px-6">
           <AnimateIn>
             <div className="mb-12 text-center">
@@ -813,19 +813,19 @@ export function IaContent() {
           <div className="space-y-3">
             {faqs.map((faq, i) => (
               <AnimateIn key={i} delay={0.05 * i}>
-                <div className="rounded-xl border border-white/8 overflow-hidden">
+                <div className="rounded-xl border border-foreground/8 overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-white/[0.02] transition-colors"
+                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-foreground/[0.02] transition-colors"
                   >
-                    <span className="text-sm font-medium text-white/80">{faq.q}</span>
+                    <span className="text-sm font-medium text-foreground/80">{faq.q}</span>
                     <ChevronDown
-                      className={`w-4 h-4 text-white/40 shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
                     />
                   </button>
                   {openFaq === i && (
-                    <div className="px-6 pb-5 text-sm text-white/50 leading-relaxed border-t border-white/5 pt-4">
+                    <div className="px-6 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-foreground/5 pt-4">
                       {faq.a}
                     </div>
                   )}
@@ -845,7 +845,7 @@ export function IaContent() {
               <h2 className="font-display text-4xl md:text-5xl font-bold text-balance mb-4">
                 Agenda tu demo gratuita.
               </h2>
-              <p className="text-white/45 text-lg">
+              <p className="text-muted-foreground text-lg">
                 30 minutos para mostrarte exactamente que podemos automatizar en tu empresa — sin compromiso.
               </p>
             </div>
@@ -855,16 +855,16 @@ export function IaContent() {
             {sent ? (
               <div className="p-10 rounded-2xl border border-[#00C9C8]/25 bg-[#00C9C8]/5 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-[#00C9C8]/10 border border-[#00C9C8]/20 flex items-center justify-center mx-auto mb-5">
-                  <CheckCircle2 className="w-7 h-7 text-[#00C9C8]" />
+                  <CheckCircle2 className="w-7 h-7 text-[#0E7490] dark:text-[#00C9C8]" />
                 </div>
                 <h3 className="font-display text-2xl font-bold mb-2">Solicitud recibida</h3>
-                <p className="text-white/50 text-sm mb-6">
+                <p className="text-muted-foreground text-sm mb-6">
                   Te contactaremos en menos de 24 horas para coordinar la demo. Revisa tu bandeja de entrada.
                 </p>
                 <button
                   type="button"
                   onClick={() => setSent(false)}
-                  className="text-sm text-[#7B61FF] hover:text-white transition-colors"
+                  className="text-sm text-[#7B61FF] hover:text-foreground transition-colors"
                 >
                   Enviar otra solicitud
                 </button>
@@ -872,67 +872,67 @@ export function IaContent() {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="p-8 rounded-2xl bg-white/[0.025] border border-white/8 space-y-5"
+                className="p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8 space-y-5"
               >
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-white/40 uppercase tracking-wide">Nombre *</label>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Nombre *</label>
                     <input
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Tu nombre"
-                      className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
+                      className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-white/40 uppercase tracking-wide">Empresa *</label>
+                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Empresa *</label>
                     <input
                       required
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Nombre de tu empresa"
-                      className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
+                      className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Email *</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Email *</label>
                   <input
                     required
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="tu@empresa.com"
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
+                    className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Que proceso quieres automatizar?</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Que proceso quieres automatizar?</label>
                   <select
                     value={formData.process}
                     onChange={(e) => setFormData({ ...formData, process: e.target.value })}
-                    className="px-4 py-3 rounded-xl bg-[#0A0A0F] border border-white/10 text-sm text-white/70 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
+                    className="px-4 py-3 rounded-xl bg-background border border-foreground/10 text-sm text-foreground/70 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
                   >
-                    <option value="">Selecciona una opción...</option>
-                    <option value="Chatbot / Agente IA">Chatbot / Agente IA</option>
-                    <option value="Flujos de automatización">Flujos de automatización</option>
-                    <option value="Análisis de datos / Reportes IA">Análisis de datos / Reportes IA</option>
-                    <option value="Generación de contenido IA">Generación de contenido IA</option>
-                    <option value="Varios / No estoy seguro">Varios / No estoy seguro</option>
+                    <option value="" className="bg-background text-foreground">Selecciona una opción...</option>
+                    <option value="Chatbot / Agente IA" className="bg-background text-foreground">Chatbot / Agente IA</option>
+                    <option value="Flujos de automatización" className="bg-background text-foreground">Flujos de automatización</option>
+                    <option value="Análisis de datos / Reportes IA" className="bg-background text-foreground">Análisis de datos / Reportes IA</option>
+                    <option value="Generación de contenido IA" className="bg-background text-foreground">Generación de contenido IA</option>
+                    <option value="Varios / No estoy seguro" className="bg-background text-foreground">Varios / No estoy seguro</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-white/40 uppercase tracking-wide">Cuéntanos más (opcional)</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Cuéntanos más (opcional)</label>
                   <textarea
                     rows={4}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Describe brevemente tu proceso actual y el problema que quieres resolver..."
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors resize-none"
+                    className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors resize-none"
                   />
                 </div>
 
@@ -949,7 +949,7 @@ export function IaContent() {
                 >
                   {sending ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
                       Enviando...
                     </>
                   ) : (
@@ -960,7 +960,7 @@ export function IaContent() {
                   )}
                 </button>
 
-                <p className="text-center text-xs text-white/20">
+                <p className="text-center text-xs text-foreground/20">
                   Sin spam. Sin compromiso. Solo una conversacion técnica.
                 </p>
               </form>
@@ -970,17 +970,17 @@ export function IaContent() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────── */}
-      <footer className="border-t border-white/5 py-8">
+      <footer className="border-t border-foreground/5 py-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-6 invert opacity-40 hover:opacity-70 transition-opacity" />
+            <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-40 hover:opacity-70 transition-opacity" />
           </Link>
-          <div className="flex items-center gap-6 text-xs text-white/25">
-            <Link href="/outsourcing" className="hover:text-white/50 transition-colors">Outsourcing Web</Link>
-            <Link href="/servicios" className="hover:text-white/50 transition-colors">Servicios</Link>
-            <a href="mailto:info@startbyglobal.com" className="hover:text-white/50 transition-colors">info@startbyglobal.com</a>
+          <div className="flex items-center gap-6 text-xs text-foreground/25">
+            <Link href="/outsourcing" className="hover:text-muted-foreground transition-colors">Outsourcing Web</Link>
+            <Link href="/servicios" className="hover:text-muted-foreground transition-colors">Servicios</Link>
+            <a href="mailto:info@startbyglobal.com" className="hover:text-muted-foreground transition-colors">info@startbyglobal.com</a>
           </div>
-          <p className="text-xs text-white/20">2026 Start By Global</p>
+          <p className="text-xs text-foreground/20">2026 Start By Global</p>
         </div>
       </footer>
     </div>
