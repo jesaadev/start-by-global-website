@@ -261,7 +261,7 @@ export function WebContent() {
                   <option value="Rediseño" className="bg-card text-foreground">Rediseño / optimización</option>
                 </select>
               </div>
-              <textarea rows={3} placeholder="Cuéntanos sobre tu proyecto..." value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
+              <textarea rows={3} aria-label="Mensaje sobre el proyecto" placeholder="Cuéntanos sobre tu proyecto..." value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none" />
               {error && <p className="text-xs text-destructive">{error}</p>}
               <button type="submit" disabled={sending} className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all disabled:opacity-60">
                 {sending ? "Enviando..." : <>Solicitar cotización <Send className="w-4 h-4" /></>}
