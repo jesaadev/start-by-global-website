@@ -13,6 +13,107 @@ export interface BlogPost {
 }
 
 export const blogPostsData: Record<string, BlogPost> = {
+  "cuanto-cuesta-pagina-web-republica-dominicana": {
+    title: "¿Cuánto cuesta una página web en República Dominicana? (Guía 2026)",
+    excerpt:
+      "Precios reales de diseño y desarrollo web en RD según el tipo de proyecto: desde sitios básicos hasta tiendas online. Qué incluye, qué evitar y cómo elegir.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "20 de junio de 2026",
+    dateISO: "2026-06-20",
+    readTime: "7 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+    keywords: [
+      "cuánto cuesta una página web",
+      "precio página web República Dominicana",
+      "diseño de páginas web República Dominicana",
+      "desarrollo web Santo Domingo",
+      "diseño web para empresas",
+    ],
+    content: `
+<p>"¿Cuánto cuesta una página web?" es la primera pregunta de casi todo dueño de negocio en República Dominicana. La respuesta honesta es: <strong>depende del alcance</strong>. Pero podemos darte rangos reales y, sobre todo, explicarte qué los hace subir o bajar para que inviertas bien.</p>
+
+<h2>Rangos de precio según el tipo de web (2026)</h2>
+<ul>
+<li><strong>Sitio básico / landing (desde $200 – $500 USD):</strong> 1 a 3 secciones, ideal para profesionales y pequeños negocios que necesitan presencia y un formulario de contacto.</li>
+<li><strong>Web corporativa (desde $600 – $1,500 USD):</strong> múltiples páginas, diseño a medida, SEO técnico, blog e integraciones. Es el rango que mejor relación valor/precio ofrece a empresas que quieren generar clientes.</li>
+<li><strong>Tienda online / e-commerce (desde $800 – $3,000+ USD):</strong> catálogo, pasarela de pagos, gestión de productos y optimización de conversión.</li>
+<li><strong>Desarrollo a medida (desde $2,500 USD):</strong> sistemas y funcionalidades específicas.</li>
+</ul>
+<p>En <a href="/diseno-paginas-web">Start By Global los proyectos arrancan desde $400</a> e incluyen SEO on-page y optimización de velocidad de serie.</p>
+
+<h2>¿Qué hace subir o bajar el precio?</h2>
+<ul>
+<li><strong>Cantidad de páginas y funcionalidades</strong> (reservas, multilenguaje, integraciones, CRM).</li>
+<li><strong>Diseño a medida vs. plantilla.</strong> Un diseño propio convierte más, pero cuesta más que una plantilla.</li>
+<li><strong>SEO y rendimiento.</strong> Una web rápida y bien estructurada técnicamente vale la inversión: es la que aparece en Google.</li>
+<li><strong>Contenido.</strong> Si necesitas textos, fotografía o branding, súmalo al presupuesto.</li>
+</ul>
+
+<h2>Costos adicionales que debes contemplar</h2>
+<ul>
+<li><strong>Dominio y hosting:</strong> $50 – $200 USD/año (siempre a tu nombre).</li>
+<li><strong>Mantenimiento:</strong> $50 – $150 USD/mes para actualizaciones y seguridad.</li>
+<li><strong>SEO continuo y publicidad:</strong> si quieres acelerar resultados, considera <a href="/publicidad-ads">campañas de Google y Meta Ads</a>.</li>
+</ul>
+
+<h2>El error más caro: elegir solo por precio</h2>
+<p>Una web barata que no convierte es la inversión más cara que existe: <strong>una mala web cuesta clientes; una buena los multiplica</strong>. Antes de decidir, pregunta qué incluye exactamente, si el sitio es tuyo, cómo se mide y qué soporte tendrás.</p>
+
+<h2>En resumen</h2>
+<p>Para la mayoría de empresas en RD, una web corporativa orientada a vender es la mejor decisión de inversión. Si quieres una cifra exacta para tu caso, <a href="/diseno-paginas-web">solicita una cotización gratis</a> y te enviamos una propuesta clara, sin sorpresas.</p>
+`,
+  },
+  "cuanto-cuesta-publicidad-facebook-instagram": {
+    title: "¿Cuánto cuesta la publicidad en Facebook e Instagram? (Guía para empresas)",
+    excerpt:
+      "Cómo se cobra la publicidad en Meta Ads, cuánto invertir al mes, qué cobra una agencia y cómo saber si tu pauta es rentable. Guía práctica para RD y LATAM.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "20 de junio de 2026",
+    dateISO: "2026-06-20",
+    readTime: "8 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
+    keywords: [
+      "cuánto cuesta la publicidad en Facebook",
+      "precio publicidad Instagram",
+      "Meta Ads precio",
+      "agencia de Meta Ads",
+      "publicidad en redes sociales República Dominicana",
+    ],
+    content: `
+<p>La publicidad en Facebook e Instagram (Meta Ads) no tiene un precio de lista: funciona por <strong>subasta en tiempo real</strong>. Cada vez que hay una oportunidad de mostrar tu anuncio, los anunciantes compiten por ese espacio en milisegundos. Aun así, hay rangos y reglas claras para presupuestar.</p>
+
+<h2>¿Cuánto invertir al mes?</h2>
+<ul>
+<li><strong>Punto de partida:</strong> $5 a $20 USD al día para empezar a recopilar datos.</li>
+<li><strong>Inversión mínima útil:</strong> unos $300/mes te permiten probar, aunque depende mucho del sector y la competencia.</li>
+<li><strong>Para escalar:</strong> a partir de $1,000 – $5,000/mes con creatividades y públicos optimizados.</li>
+</ul>
+
+<h2>Costos por métrica (referencia)</h2>
+<ul>
+<li><strong>CPC (costo por clic):</strong> entre $0.10 y $1.00.</li>
+<li><strong>CPM (mil impresiones):</strong> entre $3 y $8.</li>
+<li><strong>Costo por conversión:</strong> de $5 a $50 según sector y objetivo.</li>
+</ul>
+<p>La segmentación, la ubicación geográfica y la competencia de tu sector influyen directamente en estos números.</p>
+
+<h2>¿Qué cobra una agencia?</h2>
+<p>El honorario típico de una agencia es entre <strong>10% y 20% del gasto mensual en anuncios</strong>. Ejemplo: si inviertes $3,000/mes en pauta, el fee de gestión ronda $300 – $600. En <a href="/publicidad-ads">Start By Global la gestión arranca desde $400/mes</a>, aparte del presupuesto que destines a las plataformas.</p>
+
+<h2>El presupuesto no lo es todo: la rentabilidad sí</h2>
+<p>De nada sirve "gastar" en Ads si el embudo no convierte. Antes de escalar necesitas: una <a href="/diseno-paginas-web">página o landing que convierta</a>, medición correcta (pixel + CAPI) y creatividades probadas. Así dejas de <strong>quemar dinero en Ads</strong> y empiezas a generar clientes.</p>
+
+<h2>¿Cómo saber si tu pauta es rentable?</h2>
+<p>Mira el <strong>ROAS</strong> (retorno por cada dólar invertido) y el <strong>CPA</strong> (costo por cliente). Si tu margen aguanta ese CPA, escalas; si no, se optimiza antes de invertir más.</p>
+
+<h2>En resumen</h2>
+<p>La publicidad en Meta es de las formas más rápidas de conseguir clientes si se hace con estrategia y medición. ¿Quieres saber cuánto deberías invertir en tu caso? <a href="/publicidad-ads">Solicita una auditoría gratuita</a> y te decimos dónde está el dinero.</p>
+`,
+  },
   "arquetipos-sitio-web-personalidad-negocio": {
     title: "Arquetipos de Sitio Web: Define la Personalidad de tu Negocio",
     excerpt:
