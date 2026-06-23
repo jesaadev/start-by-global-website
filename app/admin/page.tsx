@@ -7,9 +7,11 @@ import {
   ChevronLeft, ChevronRight, Loader2, CheckCircle2,
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
   Search, Building2, Activity, Megaphone,
+  FileText, Share2, MousePointerClick, Download, Target,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
+import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1265,11 +1267,295 @@ function AttributionTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   )
 }
 
+// ─── Blog / Orgánico Tab ──────────────────────────────────────────────────────
+
+interface ArticleStat {
+  slug: string
+  views: number
+  sessions: number
+  read_complete: number
+  avg_engaged: number
+  cta_clicks: number
+  shares: number
+  conversions: number
+  top_channel: string
+}
+
+interface BlogStats {
+  total_views: number
+  total_cta: number
+  total_shares: number
+  total_conversions: number
+  articles: ArticleStat[]
+  days: number
+}
+
+interface GscRow {
+  query: string
+  clicks: number
+  impressions: number
+  ctr: number
+  position: number
+}
+
+const ARTICLE_TITLES: Record<string, string> = Object.fromEntries(
+  Object.entries(blogPostsData).map(([slug, p]) => [slug, p.title])
+)
+
+function fmtTime(seconds: number): string {
+  if (!seconds) return "0s"
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m ${s}s` : `${s}s`
+}
+
+function BlogTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [stats, setStats] = useState<BlogStats | null>(null)
+  const [gscOn, setGscOn] = useState(false)
+  const [days, setDays] = useState(30)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  // GSC drilldown
+  const [gscSlug, setGscSlug] = useState<string | null>(null)
+  const [gscRows, setGscRows] = useState<GscRow[]>([])
+  const [gscLoading, setGscLoading] = useState(false)
+  const [gscMsg, setGscMsg] = useState("")
+
+  useEffect(() => {
+    let active = true
+    const fetchStats = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const res = await api.get({ resource: "blog", days: String(days) })
+        if (!active) return
+        if (res.data) { setStats(res.data); setGscOn(Boolean(res.gsc)) }
+        else setError(res.error || "No se pudieron cargar los datos.")
+      } catch {
+        if (active) setError("Error de conexión.")
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    fetchStats()
+    return () => { active = false }
+  }, [api, days])
+
+  const openGsc = async (slug: string) => {
+    setGscSlug(slug)
+    setGscRows([])
+    setGscMsg("")
+    setGscLoading(true)
+    try {
+      const res = await api.get({ resource: "gsc", slug, days: String(days) })
+      const d = res.data
+      if (!d || d.configured === false) {
+        setGscMsg("Search Console no está configurado. Añade GSC_SERVICE_ACCOUNT_JSON y GSC_SITE_URL en el entorno.")
+      } else if (d.rows?.length) {
+        setGscRows(d.rows)
+      } else {
+        setGscMsg("Sin datos de keywords para este artículo en el rango seleccionado.")
+      }
+    } catch {
+      setGscMsg("Error al consultar Search Console.")
+    } finally {
+      setGscLoading(false)
+    }
+  }
+
+  const exportCsv = () => {
+    if (!stats) return
+    const header = ["Artículo", "slug", "Vistas", "Sesiones", "Leyeron completo", "Tiempo medio (s)", "CTAs", "Compartidos", "Conversiones", "Canal top"]
+    const lines = stats.articles.map((a) => [
+      `"${(ARTICLE_TITLES[a.slug] ?? a.slug).replace(/"/g, '""')}"`,
+      a.slug, a.views, a.sessions, a.read_complete, a.avg_engaged, a.cta_clicks, a.shares, a.conversions, a.top_channel,
+    ].join(","))
+    const csv = [header.join(","), ...lines].join("\n")
+    const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `blog-organico-${days}d.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground">
+          Rendimiento orgánico de los artículos: vistas, profundidad de lectura, tiempo, CTAs, compartidos y conversiones atribuidas.
+        </p>
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={exportCsv} disabled={!stats?.articles.length}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
+            <Download className="w-3.5 h-3.5" /> CSV
+          </button>
+          <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg">
+            {[7, 30, 90].map((d) => (
+              <button key={d} type="button" onClick={() => setDays(d)}
+                className={cn("px-3 py-1 rounded-md text-xs font-medium transition-all",
+                  days === d ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                {d}d
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : error ? (
+        <div className="glass-card rounded-xl p-6 text-center text-sm text-destructive">{error}</div>
+      ) : stats ? (
+        <>
+          {/* Tarjetas resumen */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Vistas totales", value: stats.total_views, icon: Eye, color: "text-chart-2" },
+              { label: "Clics a CTA", value: stats.total_cta, icon: MousePointerClick, color: "text-primary" },
+              { label: "Compartidos", value: stats.total_shares, icon: Share2, color: "text-chart-4" },
+              { label: "Conversiones", value: stats.total_conversions, icon: TrendingUp, color: "text-chart-3" },
+            ].map((c) => {
+              const Icon = c.icon
+              return (
+                <div key={c.label} className="glass-card rounded-xl p-4 flex items-center gap-3">
+                  <div className={cn("flex items-center justify-center w-10 h-10 rounded-lg bg-secondary/60", c.color)}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-display text-xl font-bold text-foreground">{c.value}</p>
+                    <p className="text-[10px] text-muted-foreground">{c.label}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Tabla por artículo */}
+          <div className="glass-card rounded-xl overflow-x-auto">
+            <table className="w-full text-sm min-w-[820px]">
+              <thead>
+                <tr className="border-b border-border/50 bg-secondary/30">
+                  {["Artículo", "Vistas", "Sesiones", "Leído", "T. medio", "CTA", "Comp.", "Conv.", "Canal", ""].map((h) => (
+                    <th key={h} className="px-3 py-3 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {stats.articles.length === 0 ? (
+                  <tr><td colSpan={10} className="px-4 py-6 text-center text-xs text-muted-foreground italic">Aún no hay datos de tráfico orgánico.</td></tr>
+                ) : stats.articles.map((a) => {
+                  const readRate = a.views ? Math.round((a.read_complete / a.views) * 100) : 0
+                  const meta = CHANNEL_META[a.top_channel] ?? null
+                  return (
+                    <tr key={a.slug} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                      <td className="px-3 py-2.5 max-w-[260px]">
+                        <p className="text-xs font-medium text-foreground truncate">{ARTICLE_TITLES[a.slug] ?? a.slug}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">/{a.slug}</p>
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-foreground">{a.views}</td>
+                      <td className="px-3 py-2.5 text-xs text-muted-foreground">{a.sessions}</td>
+                      <td className="px-3 py-2.5 text-xs">
+                        <span className={cn(readRate >= 50 ? "text-chart-3" : readRate >= 25 ? "text-chart-4" : "text-muted-foreground")}>
+                          {readRate}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{fmtTime(a.avg_engaged)}</td>
+                      <td className="px-3 py-2.5 text-xs text-foreground">{a.cta_clicks}</td>
+                      <td className="px-3 py-2.5 text-xs text-foreground">{a.shares}</td>
+                      <td className="px-3 py-2.5 text-xs">
+                        <span className={cn("font-semibold", a.conversions > 0 ? "text-chart-3" : "text-muted-foreground")}>{a.conversions}</span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {meta
+                          ? <span className="inline-flex items-center gap-1.5 text-xs text-foreground"><span className={cn("w-2 h-2 rounded-full", meta.color)} />{meta.label}</span>
+                          : <span className="text-xs text-muted-foreground">{a.top_channel}</span>}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <button type="button" onClick={() => openGsc(a.slug)} title="Keywords (Search Console)"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                          <Search className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {!gscOn && (
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <Target className="w-3.5 h-3.5" />
+              Search Console no configurado — añade <code className="text-foreground">GSC_SERVICE_ACCOUNT_JSON</code> y <code className="text-foreground">GSC_SITE_URL</code> para ver keywords y posiciones.
+            </p>
+          )}
+        </>
+      ) : null}
+
+      {/* GSC keyword modal */}
+      {gscSlug && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 pt-16 overflow-y-auto"
+          onClick={() => setGscSlug(null)}>
+          <div className="w-full max-w-2xl glass-card rounded-2xl p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-foreground flex items-center gap-2"><Search className="w-4 h-4 text-primary" /> Keywords en Google</h3>
+                <p className="text-xs text-muted-foreground truncate">{ARTICLE_TITLES[gscSlug] ?? gscSlug}</p>
+              </div>
+              <button type="button" onClick={() => setGscSlug(null)}>
+                <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+              </button>
+            </div>
+
+            {gscLoading ? (
+              <div className="flex items-center justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+            ) : gscMsg ? (
+              <p className="text-sm text-muted-foreground text-center py-6">{gscMsg}</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border/50 bg-secondary/30">
+                      {["Consulta", "Pos.", "Clics", "Impr.", "CTR"].map((h) => (
+                        <th key={h} className="px-3 py-2 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gscRows.map((r, i) => (
+                      <tr key={i} className="border-b border-border/30">
+                        <td className="px-3 py-2 text-xs text-foreground max-w-[260px] truncate">{r.query}</td>
+                        <td className="px-3 py-2 text-xs">
+                          <span className={cn("font-semibold", r.position <= 3 ? "text-chart-3" : r.position <= 10 ? "text-chart-4" : "text-muted-foreground")}>
+                            {r.position.toFixed(1)}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-foreground">{r.clicks}</td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">{r.impressions}</td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">{(r.ctr * 100).toFixed(1)}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "blog">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -1295,6 +1581,7 @@ export default function AdminDashboard() {
     { id: "overrides" as const, label: "Prompt Overrides", icon: Settings },
     { id: "seo" as const, label: "SEO & Métricas", icon: Search },
     { id: "attribution" as const, label: "Atribución", icon: Megaphone },
+    { id: "blog" as const, label: "Blog / Orgánico", icon: FileText },
   ]
 
   return (
@@ -1384,6 +1671,7 @@ export default function AdminDashboard() {
         {activeTab === "overrides" && <OverridesTab api={api} />}
         {activeTab === "seo" && <SeoTab api={api} />}
         {activeTab === "attribution" && <AttributionTab api={api} />}
+        {activeTab === "blog" && <BlogTab api={api} />}
       </main>
     </div>
   )

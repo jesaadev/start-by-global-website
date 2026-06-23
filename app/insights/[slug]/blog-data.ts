@@ -13,6 +13,281 @@ export interface BlogPost {
 }
 
 export const blogPostsData: Record<string, BlogPost> = {
+  "guia-meta-ads-facebook-instagram": {
+    title: "Meta Ads: cómo hacer publicidad en Facebook e Instagram que vende",
+    excerpt:
+      "Guía práctica de Meta Ads para empresas: objetivos, públicos, creatividades y medición (pixel + CAPI) para conseguir clientes en Facebook e Instagram, no solo likes.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "22 de junio de 2026",
+    dateISO: "2026-06-22",
+    readTime: "8 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&q=80",
+    keywords: [
+      "meta ads",
+      "publicidad en facebook",
+      "publicidad en instagram",
+      "facebook ads para empresas",
+      "agencia de meta ads",
+    ],
+    content: `
+<p>Meta Ads (la plataforma de publicidad de Facebook e Instagram) es de las formas más rápidas de conseguir clientes… o de quemar presupuesto si no se hace con estrategia. Esta guía te explica cómo hacer publicidad en Facebook e Instagram que de verdad vende.</p>
+
+<h2>1. Empieza por el objetivo correcto</h2>
+<p>El objetivo de campaña le dice a Meta a quién mostrar tus anuncios. Para conseguir clientes, usa objetivos de <strong>conversión o clientes potenciales</strong>, no de "interacción" o "alcance" (que generan likes, no ventas).</p>
+
+<h2>2. El público: ni muy amplio ni muy pequeño</h2>
+<ul>
+<li><strong>Prospección:</strong> públicos por intereses, comportamientos y similares (lookalike) de tus clientes.</li>
+<li><strong>Retargeting:</strong> a quienes visitaron tu web o interactuaron pero no compraron. Es el dinero más fácil.</li>
+</ul>
+
+<h2>3. La creatividad lo es casi todo</h2>
+<p>El 70% del rendimiento está en el anuncio: video corto nativo, primer segundo potente, beneficio claro y un CTA directo. Haz <strong>pruebas A/B</strong> de varias piezas y deja ganar a los datos.</p>
+
+<h2>4. Mide bien o no optimizas</h2>
+<p>Sin medición no hay mejora. Instala el <strong>Pixel de Meta</strong> y la <strong>Conversions API (CAPI)</strong> para registrar conversiones reales aunque el usuario bloquee cookies. Mira el <strong>ROAS</strong> y el <strong>CPA</strong>, no los likes.</p>
+
+<h2>5. El anuncio manda tráfico… ¿a dónde?</h2>
+<p>El mejor anuncio fracasa si la página de destino no convierte. Asegúrate de tener una <a href="/diseno-paginas-web">web o landing rápida y orientada a conversión</a>.</p>
+
+<h2>¿Cuánto invertir?</h2>
+<p>Puedes empezar con $5–$20/día y escalar lo que sea rentable. Te lo detallamos en <a href="/insights/cuanto-cuesta-publicidad-facebook-instagram">esta guía de precios de Meta Ads</a>.</p>
+
+<h2>En resumen</h2>
+<p>Meta Ads funciona cuando hay estrategia, creatividad y medición. ¿Quieres que auditemos tu cuenta y te digamos dónde está el dinero? <a href="/publicidad-ads">Solicita una auditoría gratuita</a>.</p>
+`,
+  },
+  "tiktok-ads-para-empresas": {
+    title: "TikTok Ads para empresas: cómo anunciar y conseguir clientes en TikTok",
+    excerpt:
+      "Cómo funciona la publicidad en TikTok Ads, qué formatos convierten, cuánto invertir y cómo medir resultados para que tu empresa gane clientes en TikTok.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "22 de junio de 2026",
+    dateISO: "2026-06-22",
+    readTime: "7 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?w=1200&q=80",
+    keywords: [
+      "tiktok ads",
+      "publicidad en tiktok",
+      "cómo anunciar en tiktok",
+      "tiktok ads para empresas",
+      "agencia de tiktok ads",
+    ],
+    content: `
+<p>TikTok dejó de ser "solo para bailar": es un canal de adquisición con CPMs competitivos y un alcance brutal. Si lo trabajas bien, TikTok Ads puede traerte clientes a un costo menor que otras plataformas. Aquí te explicamos cómo.</p>
+
+<h2>¿Por qué TikTok Ads?</h2>
+<ul>
+<li><strong>Alcance y descubrimiento:</strong> el algoritmo muestra tu contenido a públicos nuevos, no solo a tus seguidores.</li>
+<li><strong>CPA bajo</strong> cuando la creatividad es nativa.</li>
+<li>Funciona para e-commerce, servicios y captación de leads.</li>
+</ul>
+
+<h2>La regla de oro: contenido nativo</h2>
+<p>El anuncio que "parece anuncio" muere. En TikTok gana el contenido que <strong>parece orgánico</strong>: vertical, con audio de tendencia, ritmo rápido y un gancho en el primer segundo. Crea varias variantes y deja que el algoritmo encuentre la ganadora.</p>
+
+<h2>Formatos que convierten</h2>
+<ul>
+<li><strong>In-Feed Ads:</strong> aparecen en el "Para ti"; ideales para conversión.</li>
+<li><strong>Spark Ads:</strong> impulsan publicaciones orgánicas que ya funcionan.</li>
+<li><strong>UGC:</strong> contenido estilo creador, el que mejor convierte.</li>
+</ul>
+
+<h2>Medición y presupuesto</h2>
+<p>Instala el <strong>pixel de TikTok</strong> y define eventos de conversión. Empieza con un presupuesto de prueba, identifica las creatividades ganadoras y escala. Igual que en Meta, lo que importa es el <strong>CPA y el ROAS</strong>.</p>
+
+<h2>No olvides el destino</h2>
+<p>Manda el tráfico a una <a href="/diseno-paginas-web">landing rápida y optimizada para móvil</a>; en TikTok casi todo el tráfico es móvil y cada segundo cuenta.</p>
+
+<h2>En resumen</h2>
+<p>TikTok Ads es una oportunidad enorme si dominas la creatividad nativa y mides bien. ¿Quieres lanzar (o arreglar) tus campañas? <a href="/publicidad-ads">Hablemos de tu estrategia de Ads</a>.</p>
+`,
+  },
+  "google-ads-para-principiantes": {
+    title: "Google Ads para principiantes: cómo aparecer primero y atraer clientes",
+    excerpt:
+      "Qué es Google Ads, cómo funcionan las campañas de Búsqueda, Display y Performance Max, cuánto cuesta y cómo evitar gastar de más. Guía para empresas.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "22 de junio de 2026",
+    dateISO: "2026-06-22",
+    readTime: "8 min",
+    category: "Marketing Digital",
+    image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1200&q=80",
+    keywords: [
+      "google ads",
+      "cómo anunciarse en google",
+      "campañas SEM",
+      "google ads para empresas",
+      "agencia de google ads",
+    ],
+    content: `
+<p>Google Ads te permite aparecer justo cuando alguien busca lo que vendes. Es publicidad de <strong>intención</strong>: capturas demanda que ya existe. Aquí tienes lo esencial para empezar sin quemar tu presupuesto.</p>
+
+<h2>Tipos de campaña (y cuándo usar cada una)</h2>
+<ul>
+<li><strong>Búsqueda (SEM):</strong> anuncios de texto en los resultados de Google. La de mayor intención: la persona ya está buscando.</li>
+<li><strong>Performance Max:</strong> usa IA para mostrar tus anuncios en toda la red de Google. Potente, pero necesita buena medición.</li>
+<li><strong>Display y YouTube:</strong> para visibilidad y remarketing.</li>
+</ul>
+
+<h2>Las palabras clave correctas</h2>
+<p>Apuesta por keywords con intención de compra ("contratar", "precio", "cerca de mí") y usa <strong>palabras clave negativas</strong> para no pagar por búsquedas irrelevantes. Esto solo ya ahorra mucho dinero.</p>
+
+<h2>Calidad = menos costo</h2>
+<p>Google premia la relevancia con el <strong>Nivel de calidad</strong>: anuncios y página de destino alineados con la búsqueda bajan tu costo por clic. Por eso tu <a href="/diseno-paginas-web">landing debe cargar rápido y responder a la intención</a>.</p>
+
+<h2>¿Cuánto cuesta?</h2>
+<p>Funciona por subasta: pagas por clic (CPC). Define un presupuesto diario, mide el costo por cliente (CPA) y escala lo rentable. Una agencia suele cobrar 10–20% de la inversión.</p>
+
+<h2>El error de principiante</h2>
+<p>Darle "play" sin medición ni estrategia. Configura conversiones desde el día 1 y revisa términos de búsqueda cada semana.</p>
+
+<h2>En resumen</h2>
+<p>Google Ads es de los canales más rentables para captar demanda activa. ¿Quieres que revisemos tu cuenta o la montemos bien desde cero? <a href="/publicidad-ads">Solicita una auditoría gratuita</a>.</p>
+`,
+  },
+  "como-posicionar-pagina-web-google-seo": {
+    title: "Cómo posicionar tu página web en Google: guía de SEO 2026",
+    excerpt:
+      "SEO para principiantes: los pilares para posicionar tu web en Google en 2026 — keywords, SEO técnico, contenido y autoridad. Pasos accionables para empresas.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "22 de junio de 2026",
+    dateISO: "2026-06-22",
+    readTime: "9 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=1200&q=80",
+    keywords: [
+      "cómo posicionar mi página web en google",
+      "SEO 2026",
+      "posicionamiento web",
+      "SEO para empresas",
+      "diseño web orientado a SEO",
+    ],
+    content: `
+<p>Tener una web no sirve de nada si nadie la encuentra. El SEO (posicionamiento en buscadores) es lo que hace que aparezcas en Google cuando tu cliente busca. Estos son los pilares para posicionar tu web en 2026.</p>
+
+<h2>1. Investiga las palabras clave</h2>
+<p>Antes de escribir, descubre qué busca tu cliente y con qué intención. Prioriza keywords con intención de compra y términos locales (ej. "diseño web República Dominicana").</p>
+
+<h2>2. SEO técnico: la base invisible</h2>
+<ul>
+<li><strong>Velocidad (Core Web Vitals):</strong> una web lenta no posiciona ni convierte.</li>
+<li><strong>Mobile-first:</strong> Google indexa la versión móvil.</li>
+<li><strong>Estructura y datos estructurados</strong> (schema) para que Google entienda tu contenido.</li>
+</ul>
+<p>Si tu sitio falla aquí, el resto cuesta el doble. Por eso construimos <a href="/diseno-paginas-web">webs optimizadas para SEO desde el día 1</a>.</p>
+
+<h2>3. Contenido que responde (SEO on-page)</h2>
+<p>Cada página debe apuntar a una intención: un H1 claro, encabezados, contenido útil y enlaces internos. El blog (como este) atrae búsquedas informativas y las dirige a tus páginas de servicio.</p>
+
+<h2>4. Autoridad (enlaces y reseñas)</h2>
+<p>Los enlaces de otros sitios y las reseñas en Google refuerzan tu credibilidad ante el algoritmo. Trabaja tu <strong>Perfil de Empresa de Google</strong> y consigue menciones de calidad.</p>
+
+<h2>SEO vs Ads: ¿cuál elegir?</h2>
+<p>El SEO da resultados sostenibles a mediano plazo; los <a href="/publicidad-ads">Ads</a> traen tráfico inmediato. Lo ideal es combinarlos: Ads para vender hoy, SEO para no depender de pagar siempre.</p>
+
+<h2>En resumen</h2>
+<p>Posicionar tu web es un proceso de base técnica + contenido + autoridad. ¿Quieres una web pensada para rankear o una auditoría SEO de la que ya tienes? <a href="/diseno-paginas-web">Hablemos</a>.</p>
+`,
+  },
+  "seo-local-republica-dominicana": {
+    title: "SEO local en República Dominicana: aparece en Google Maps y capta clientes",
+    excerpt:
+      "Cómo posicionar tu negocio en las búsquedas locales y en Google Maps en RD: Perfil de Empresa de Google, reseñas, NAP y contenido local. Guía práctica.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "7 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80",
+    keywords: [
+      "SEO local República Dominicana",
+      "aparecer en google maps",
+      "posicionamiento local",
+      "perfil de empresa de google",
+      "SEO Santo Domingo",
+    ],
+    content: `
+<p>Cuando alguien busca "cerca de mí" o un servicio en tu ciudad, el SEO local decide si te encuentra a ti o a tu competencia. Para negocios en República Dominicana, es una de las palancas de mayor retorno. Así se trabaja.</p>
+
+<h2>1. Optimiza tu Perfil de Empresa de Google</h2>
+<p>Es la pieza central del SEO local. Completa todo: categoría correcta, servicios, horarios, fotos reales y publicaciones. Un perfil completo aparece más y convierte más.</p>
+
+<h2>2. Consigue reseñas (y respóndelas)</h2>
+<p>Las reseñas son señal de confianza para Google y para el cliente. Pide reseñas a clientes satisfechos de forma sistemática y responde a todas, buenas y malas.</p>
+
+<h2>3. NAP consistente</h2>
+<p>Tu <strong>Nombre, Dirección y Teléfono (NAP)</strong> deben ser idénticos en tu web, Google y directorios. Las inconsistencias confunden al algoritmo y te restan posiciones.</p>
+
+<h2>4. Contenido y páginas locales</h2>
+<p>Crea páginas y contenido que mencionen tu ciudad/zona y los servicios. Una <a href="/diseno-paginas-web">web bien estructurada y rápida</a> potencia todo el SEO local.</p>
+
+<h2>5. Directorios y citaciones</h2>
+<p>Estar listado en directorios relevantes de RD refuerza tu autoridad local. Suma menciones de calidad poco a poco.</p>
+
+<h2>¿Y si quiero resultados ya?</h2>
+<p>Mientras el SEO local madura, puedes captar demanda inmediata con <a href="/publicidad-ads">campañas de Google y Meta segmentadas por ubicación</a>.</p>
+
+<h2>En resumen</h2>
+<p>El SEO local se gana con un perfil impecable, reseñas, NAP consistente y contenido. ¿Quieres que lo montemos por ti? <a href="/diseno-paginas-web">Escríbenos</a>.</p>
+`,
+  },
+  "como-crear-tienda-online-republica-dominicana": {
+    title: "Cómo crear una tienda online en República Dominicana (que de verdad venda)",
+    excerpt:
+      "Guía para crear un e-commerce en RD: qué plataforma elegir, pasarelas de pago, costos y los elementos que hacen que una tienda online convierta. Paso a paso.",
+    author: "Jhon Alejandro Esáa",
+    authorRole: "Founder & Lead Developer",
+    date: "21 de junio de 2026",
+    dateISO: "2026-06-21",
+    readTime: "8 min",
+    category: "Desarrollo Web",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+    keywords: [
+      "crear tienda online",
+      "diseño de tienda online República Dominicana",
+      "e-commerce República Dominicana",
+      "tienda online woocommerce shopify",
+      "vender por internet RD",
+    ],
+    content: `
+<p>Vender por internet en República Dominicana nunca fue tan accesible, pero montar una tienda que <strong>convierta</strong> (y no solo que "esté online") requiere decisiones correctas. Esta guía te lleva paso a paso.</p>
+
+<h2>1. Elige la plataforma adecuada</h2>
+<ul>
+<li><strong>WooCommerce (WordPress):</strong> flexible y económico, ideal si quieres control total.</li>
+<li><strong>Shopify:</strong> rápido de montar y mantener, con costo mensual.</li>
+</ul>
+<p>La elección depende de tu catálogo, presupuesto y planes de crecimiento. Te asesoramos en la <a href="/diseno-paginas-web">creación de tu tienda online</a>.</p>
+
+<h2>2. Pasarelas de pago en RD</h2>
+<p>Define cómo cobrarás: tarjetas (pasarela local o internacional), transferencia y pago contra entrega. Cuantas más opciones relevantes ofrezcas, menos carritos abandonados.</p>
+
+<h2>3. Los elementos que hacen vender</h2>
+<ul>
+<li>Fichas de producto claras, con buenas fotos y beneficios.</li>
+<li>Proceso de compra corto (menos pasos = más ventas).</li>
+<li>Confianza: reseñas, políticas claras y seguridad (SSL).</li>
+<li><strong>Velocidad móvil:</strong> la mayoría comprará desde el teléfono.</li>
+</ul>
+
+<h2>4. Costos a contemplar</h2>
+<p>Además del desarrollo, considera dominio, hosting, comisiones de pasarela y mantenimiento. Revisa los rangos en nuestra <a href="/insights/cuanto-cuesta-pagina-web-republica-dominicana">guía de cuánto cuesta una página web en RD</a>.</p>
+
+<h2>5. Atrae tráfico desde el día 1</h2>
+<p>Una tienda sin visitas no vende. Combina SEO con <a href="/publicidad-ads">campañas de Meta y Google Ads</a> para llenar tu tienda de clientes potenciales.</p>
+
+<h2>En resumen</h2>
+<p>Una buena tienda online es plataforma correcta + pagos + conversión + tráfico. ¿Quieres lanzar la tuya? <a href="/diseno-paginas-web">Pide tu cotización gratis</a>.</p>
+`,
+  },
   "cuanto-cuesta-pagina-web-republica-dominicana": {
     title: "¿Cuánto cuesta una página web en República Dominicana? (Guía 2026)",
     excerpt:

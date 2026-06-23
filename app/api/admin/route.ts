@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { supabaseAdmin } from "@/lib/supabase"
 import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
 import { getAttributionStats } from "@/lib/lead-events"
+import { getBlogStats } from "@/lib/blog-events"
+import { getArticleQueries, gscConfigured } from "@/lib/gsc"
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
@@ -76,6 +78,20 @@ export async function GET(request: Request) {
     if (resource === "attribution") {
       const days = parseInt(searchParams.get("days") ?? "30")
       const data = await getAttributionStats(Number.isFinite(days) ? days : 30)
+      return NextResponse.json({ data })
+    }
+
+    if (resource === "blog") {
+      const days = parseInt(searchParams.get("days") ?? "30")
+      const data = await getBlogStats(Number.isFinite(days) ? days : 30)
+      return NextResponse.json({ data, gsc: gscConfigured() })
+    }
+
+    if (resource === "gsc") {
+      const slug = searchParams.get("slug")
+      if (!slug) return NextResponse.json({ error: "slug requerido." }, { status: 400 })
+      const days = parseInt(searchParams.get("days") ?? "28")
+      const data = await getArticleQueries(`/insights/${slug}`, Number.isFinite(days) ? days : 28)
       return NextResponse.json({ data })
     }
 
