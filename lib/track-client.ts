@@ -4,6 +4,7 @@
 
 import { getStoredAttribution, getMetaCookies, type Attribution } from "@/lib/attribution"
 import { getConsent } from "@/lib/consent"
+import { getSourceArticle } from "@/lib/blog-track-client"
 
 function newEventId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID()
@@ -31,6 +32,7 @@ export interface LeadTrackingPayload {
   page_url: string
   nav_variant?: string
   segment?: string
+  source_article?: string
 }
 
 /**
@@ -46,8 +48,9 @@ export function fireLead(
 ): LeadTrackingPayload {
   const page_url = typeof window !== "undefined" ? window.location.href : ""
   const nav_variant = getNavVariant()
+  const source_article = getSourceArticle()
   if (!getConsent().marketing) {
-    return { source_type: sourceType, attribution: null, page_url, nav_variant, segment }
+    return { source_type: sourceType, attribution: null, page_url, nav_variant, segment, source_article }
   }
   const eventId = newEventId()
   fbqTrack("Lead", eventId)
@@ -61,6 +64,7 @@ export function fireLead(
     page_url,
     nav_variant,
     segment,
+    source_article,
   }
 }
 
@@ -89,6 +93,7 @@ export function fireContact(segment?: string): void {
       eventSourceUrl: window.location.href,
       nav_variant: getNavVariant(),
       segment,
+      source_article: getSourceArticle(),
     }),
   }).catch(() => {})
 }
@@ -112,6 +117,7 @@ export function fireWhatsAppLead(info: { name?: string; service?: string; segmen
     attribution: marketing ? getStoredAttribution() : null,
     nav_variant: getNavVariant(),
     segment: info.segment || null,
+    source_article: getSourceArticle() || null,
   }
 
   if (marketing) {

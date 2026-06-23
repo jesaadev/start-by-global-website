@@ -8,13 +8,11 @@ import {
   Calendar,
   Clock,
   User,
-  Twitter,
-  Linkedin,
-  Link as LinkIcon,
   ChevronRight,
   Tag,
 } from "lucide-react"
 import { blogPostsData } from "./blog-data"
+import { ShareButtons } from "@/components/blog/share-buttons"
 
 const categoryColors: Record<string, string> = {
   "Marketing Digital": "bg-chart-1/10 text-chart-1 border-chart-1/20",
@@ -248,26 +246,8 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
           </p>
 
           {/* Share */}
-          <div className="flex items-center gap-3 pt-1 border-t border-border/50">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
-              Compartir
-            </span>
-            <div className="flex items-center gap-2">
-              {[
-                { icon: Twitter,  label: "Twitter"  },
-                { icon: Linkedin, label: "LinkedIn" },
-                { icon: LinkIcon, label: "Copiar enlace" },
-              ].map(({ icon: Icon, label }) => (
-                <button
-                  key={label}
-                  type="button"
-                  aria-label={label}
-                  className="p-2 rounded-lg bg-card hover:bg-secondary border border-border/50 text-muted-foreground hover:text-foreground transition-all"
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                </button>
-              ))}
-            </div>
+          <div className="pt-1 border-t border-border/50">
+            <ShareButtons title={post.title} />
           </div>
         </div>
       </AnimateIn>

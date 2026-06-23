@@ -18,6 +18,7 @@ interface CapiBody {
   eventSourceUrl?: string
   nav_variant?: string | null
   segment?: string | null
+  source_article?: string | null
 }
 
 export async function POST(request: Request) {
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
         capi_status: status,
         nav_variant: body.nav_variant,
         segment: body.segment,
+        source_article: body.source_article,
       })
     }
 

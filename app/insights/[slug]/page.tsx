@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { BlogPostContent } from "./blog-post-content"
+import { ArticleTracker } from "@/components/blog/article-tracker"
 import { blogPostsData } from "./blog-data"
 import { notFound } from "next/navigation"
 
@@ -82,6 +83,7 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ArticleTracker slug={slug} />
       <DashboardLayout>
         <BlogPostContent slug={slug} />
       </DashboardLayout>
