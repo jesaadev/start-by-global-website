@@ -45,16 +45,24 @@ export function ArticleTracker({ slug }: { slug: string }) {
       else flushEngaged()
     }
 
+    // Throttle con requestAnimationFrame: las lecturas de layout se hacen una
+    // vez por frame para evitar reflows sincrónicos (jank) al hacer scroll.
+    let ticking = false
     const onScroll = () => {
-      const el = document.documentElement
-      const max = el.scrollHeight - el.clientHeight
-      const pct = max > 0 ? Math.min(100, Math.round((el.scrollTop / max) * 100)) : 100
-      for (const m of [25, 50, 75, 100]) {
-        if (pct >= m && !milestones.current.has(m)) {
-          milestones.current.add(m)
-          trackBlogEvent(slug, m === 100 ? "read_complete" : "scroll", { value: m })
+      if (ticking) return
+      ticking = true
+      window.requestAnimationFrame(() => {
+        const el = document.documentElement
+        const max = el.scrollHeight - el.clientHeight
+        const pct = max > 0 ? Math.min(100, Math.round((el.scrollTop / max) * 100)) : 100
+        for (const m of [25, 50, 75, 100]) {
+          if (pct >= m && !milestones.current.has(m)) {
+            milestones.current.add(m)
+            trackBlogEvent(slug, m === 100 ? "read_complete" : "scroll", { value: m })
+          }
         }
-      }
+        ticking = false
+      })
     }
 
     const onClick = (e: MouseEvent) => {

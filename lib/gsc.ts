@@ -39,7 +39,15 @@ function loadServiceAccount(): ServiceAccount | null {
   }
 }
 
+// Cache del access token en memoria durante su vida (~1h) para evitar
+// pedir uno nuevo en cada consulta y no chocar con los límites de OAuth.
+let cachedToken: string | null = null
+let tokenExpiry = 0
+
 async function getAccessToken(sa: ServiceAccount): Promise<string | null> {
+  if (cachedToken && Date.now() < tokenExpiry - 10000) {
+    return cachedToken
+  }
   const now = Math.floor(Date.now() / 1000)
   const header = Buffer.from(JSON.stringify({ alg: "RS256", typ: "JWT" })).toString("base64url")
   const claim = Buffer.from(
@@ -76,7 +84,11 @@ async function getAccessToken(sa: ServiceAccount): Promise<string | null> {
       console.error("[GSC] token error", res.status, await res.text().catch(() => ""))
       return null
     }
-    const j = (await res.json()) as { access_token?: string }
+    const j = (await res.json()) as { access_token?: string; expires_in?: number }
+    if (j.access_token) {
+      cachedToken = j.access_token
+      tokenExpiry = Date.now() + (j.expires_in ?? 3600) * 1000
+    }
     return j.access_token ?? null
   } catch (e) {
     console.error("[GSC] token exception:", e)

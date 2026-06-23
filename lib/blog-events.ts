@@ -79,7 +79,7 @@ export async function getBlogStats(days = 30): Promise<BlogStats> {
   const rows = (events ?? []) as BlogRow[]
 
   // Conversiones por artículo (desde lead_events.source_article).
-  const conv: Record<string, number> = {}
+  const conv: Record<string, number> = Object.create(null)
   for (const l of (leads ?? []) as { source_article: string | null }[]) {
     if (l.source_article) conv[l.source_article] = (conv[l.source_article] ?? 0) + 1
   }
@@ -98,7 +98,7 @@ export async function getBlogStats(days = 30): Promise<BlogStats> {
   const get = (slug: string): Acc => {
     let a = map.get(slug)
     if (!a) {
-      a = { views: 0, sessions: new Set(), read_complete: 0, engagedSum: 0, engagedCount: 0, cta_clicks: 0, shares: 0, channels: {} }
+      a = { views: 0, sessions: new Set(), read_complete: 0, engagedSum: 0, engagedCount: 0, cta_clicks: 0, shares: 0, channels: Object.create(null) }
       map.set(slug, a)
     }
     return a
