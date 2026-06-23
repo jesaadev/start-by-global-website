@@ -1366,10 +1366,11 @@ function BlogTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
 
   const exportCsv = () => {
     if (!stats) return
-    const header = ["Artículo", "slug", "Vistas", "Sesiones", "Leyeron completo", "Tiempo medio (s)", "CTAs", "Compartidos", "Conversiones", "Canal top"]
+    const header = ["Artículo", "slug", "Vistas", "Sesiones", "Leyeron completo", "Tiempo medio (s)", "CTAs", "Compartidos", "Conversiones", "Tasa conversión %", "Canal top"]
     const lines = stats.articles.map((a) => [
       `"${(ARTICLE_TITLES[a.slug] ?? a.slug).replace(/"/g, '""')}"`,
-      a.slug, a.views, a.sessions, a.read_complete, a.avg_engaged, a.cta_clicks, a.shares, a.conversions, a.top_channel,
+      a.slug, a.views, a.sessions, a.read_complete, a.avg_engaged, a.cta_clicks, a.shares, a.conversions,
+      a.sessions ? ((a.conversions / a.sessions) * 100).toFixed(1) : "0", a.top_channel,
     ].join(","))
     const csv = [header.join(","), ...lines].join("\n")
     const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8" })
@@ -1440,16 +1441,17 @@ function BlogTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             <table className="w-full text-sm min-w-[820px]">
               <thead>
                 <tr className="border-b border-border/50 bg-secondary/30">
-                  {["Artículo", "Vistas", "Sesiones", "Leído", "T. medio", "CTA", "Comp.", "Conv.", "Canal", ""].map((h) => (
+                  {["Artículo", "Vistas", "Sesiones", "Leído", "T. medio", "CTA", "Comp.", "Conv.", "CR", "Canal", ""].map((h) => (
                     <th key={h} className="px-3 py-3 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {stats.articles.length === 0 ? (
-                  <tr><td colSpan={10} className="px-4 py-6 text-center text-xs text-muted-foreground italic">Aún no hay datos de tráfico orgánico.</td></tr>
+                  <tr><td colSpan={11} className="px-4 py-6 text-center text-xs text-muted-foreground italic">Aún no hay datos de tráfico orgánico.</td></tr>
                 ) : stats.articles.map((a) => {
                   const readRate = a.views ? Math.round((a.read_complete / a.views) * 100) : 0
+                  const convRate = a.sessions ? (a.conversions / a.sessions) * 100 : 0
                   const meta = CHANNEL_META[a.top_channel] ?? null
                   return (
                     <tr key={a.slug} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
@@ -1469,6 +1471,11 @@ function BlogTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                       <td className="px-3 py-2.5 text-xs text-foreground">{a.shares}</td>
                       <td className="px-3 py-2.5 text-xs">
                         <span className={cn("font-semibold", a.conversions > 0 ? "text-chart-3" : "text-muted-foreground")}>{a.conversions}</span>
+                      </td>
+                      <td className="px-3 py-2.5 text-xs">
+                        <span className={cn(convRate >= 2 ? "text-chart-3 font-semibold" : convRate > 0 ? "text-chart-4" : "text-muted-foreground")}>
+                          {convRate.toFixed(1)}%
+                        </span>
                       </td>
                       <td className="px-3 py-2.5">
                         {meta

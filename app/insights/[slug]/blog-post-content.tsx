@@ -20,6 +20,32 @@ const categoryColors: Record<string, string> = {
   "Tendencias Tech":   "bg-chart-4/10 text-chart-4 border-chart-4/20",
 }
 
+// CTA contextual: cada categoría empuja a la money page más afín.
+const categoryCta: Record<string, { href: string; label: string }> = {
+  "Marketing Digital": { href: "/publicidad-ads", label: "Solicita una auditoría de Ads gratis" },
+  "Desarrollo Web":    { href: "/diseno-paginas-web", label: "Solicita tu propuesta de web" },
+  "Tendencias Tech":   { href: "/contacto", label: "Agenda una consultoría gratuita" },
+}
+const defaultCta = { href: "/contacto", label: "Agenda una consultoría gratuita" }
+
+/**
+ * Artículos relacionados para enlazado interno (clúster). Prioriza la misma
+ * categoría —que es lo que Google premia como clúster temático— y completa
+ * con otros recientes si faltan.
+ */
+function getRelatedPosts(slug: string, category: string, n = 3) {
+  return Object.entries(blogPostsData)
+    .filter(([s]) => s !== slug)
+    .map(([s, p]) => ({ slug: s, ...p }))
+    .sort((a, b) => {
+      const aSame = a.category === category
+      const bSame = b.category === category
+      if (aSame !== bSame) return aSame ? -1 : 1
+      return b.dateISO.localeCompare(a.dateISO)
+    })
+    .slice(0, n)
+}
+
 interface BlogPostContentProps {
   slug: string
 }
@@ -195,6 +221,8 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
 
   const colorClass =
     categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
+  const cta = categoryCta[post.category] ?? defaultCta
+  const related = getRelatedPosts(slug, post.category)
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -296,6 +324,41 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
         </div>
       </AnimateIn>
 
+      {/* Artículos relacionados (enlazado interno de clúster) */}
+      {related.length > 0 && (
+        <AnimateIn delay={0.45}>
+          <section aria-labelledby="related-heading" className="space-y-4">
+            <h2 id="related-heading" className="font-display text-xl sm:text-2xl font-bold tracking-tight">
+              Sigue leyendo
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {related.map((r) => {
+                const rColor = categoryColors[r.category] ?? "bg-muted text-muted-foreground border-border"
+                return (
+                  <Link
+                    key={r.slug}
+                    href={`/insights/${r.slug}`}
+                    className="group glass-card rounded-2xl p-5 flex flex-col gap-3 hover:border-primary/30 transition-all"
+                  >
+                    <span className={`inline-flex w-fit items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${rColor}`}>
+                      <Tag className="w-3 h-3" />
+                      {r.category}
+                    </span>
+                    <h3 className="font-display text-base font-bold leading-snug text-balance group-hover:text-primary transition-colors">
+                      {r.title}
+                    </h3>
+                    <span className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock className="w-3.5 h-3.5" />
+                      {r.readTime} de lectura
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        </AnimateIn>
+      )}
+
       {/* CTA */}
       <AnimateIn delay={0.5}>
         <div
@@ -318,10 +381,10 @@ export function BlogPostContent({ slug }: BlogPostContentProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
               <Link
-                href="/contacto"
+                href={cta.href}
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
               >
-                Agenda una Consultoría Gratuita
+                {cta.label}
                 <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
