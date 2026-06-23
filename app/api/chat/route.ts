@@ -109,31 +109,53 @@ export async function POST(request: Request) {
     const model = "gemini-2.5-flash-lite"
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
-    const response = await fetch(apiUrl, {
+    const requestBody = JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: messages,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: complexity === "complex" ? 800 : 400,
+        topP: 0.9,
+      },
+      safetySettings: [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+      ],
+    })
+
+    // Un 429 (cuota/ráfaga) suele ser transitorio: reintentamos una vez con un
+    // pequeño backoff antes de degradar con elegancia.
+    let response = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: messages,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: complexity === "complex" ? 800 : 400,
-          topP: 0.9,
-        },
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        ],
-      }),
+      body: requestBody,
     })
+    if (response.status === 429) {
+      await new Promise((r) => setTimeout(r, 700))
+      response = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: requestBody,
+      })
+    }
 
     if (!response.ok) {
       const errBody = await response.json().catch(() => null)
       console.error("[Chat] Gemini error:", response.status, errBody)
-      return NextResponse.json(
-        { error: "Error al procesar tu mensaje.", details: errBody },
-        { status: 502 }
-      )
+
+      // Degradación elegante: en vez de un error seco que pierde el lead,
+      // derivamos a un humano (WhatsApp/email) y marcamos alta intención para
+      // que la UI muestre el CTA de WhatsApp.
+      return NextResponse.json({
+        text:
+          "Justo ahora tengo mucha demanda y no puedo responderte al instante 🙏. " +
+          "Para no hacerte esperar, escríbenos por WhatsApp y te atendemos enseguida, " +
+          "o déjanos tu email y un especialista te contacta. ¿Te parece?",
+        model: "fallback",
+        intent: "high",
+        degraded: true,
+        shouldAskEmail: true,
+      })
     }
 
     const data = await response.json()
