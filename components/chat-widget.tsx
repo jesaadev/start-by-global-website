@@ -422,8 +422,9 @@ function ChatWidgetInner() {
         chatHistory.current.push({ role: "model", parts: [{ text: data.text }] })
         setMessages((prev) => [...prev, modelMsg])
 
-        // Pedir email después del 3er mensaje
-        if (newCount >= 3 && !emailAsked && !capturedEmail) {
+        // Pedir email tras el 3er mensaje, o cuando el servidor lo indique
+        // (p. ej. en la respuesta de degradación elegante ante un fallo de IA).
+        if ((data.shouldAskEmail || newCount >= 3) && !emailAsked && !capturedEmail) {
           setEmailAsked(true)
           setTimeout(() => setPhase("ask-email"), 600)
         }

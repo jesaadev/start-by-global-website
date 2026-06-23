@@ -124,24 +124,29 @@ export async function POST(request: Request) {
     })
 
     // Un 429 (cuota/ráfaga) suele ser transitorio: reintentamos una vez con un
-    // pequeño backoff antes de degradar con elegancia.
-    let response = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: requestBody,
-    })
-    if (response.status === 429) {
-      await new Promise((r) => setTimeout(r, 700))
-      response = await fetch(apiUrl, {
+    // pequeño backoff. Capturamos también fallos de red (DNS, timeout) para que
+    // caigan en la degradación elegante en vez de en un 500 que pierde el lead.
+    const callGemini = () =>
+      fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: requestBody,
       })
+
+    let response: Response | null = null
+    try {
+      response = await callGemini()
+      if (response.status === 429) {
+        await new Promise((r) => setTimeout(r, 700))
+        response = await callGemini()
+      }
+    } catch (fetchError) {
+      console.error("[Chat] Gemini fetch failed:", fetchError)
     }
 
-    if (!response.ok) {
-      const errBody = await response.json().catch(() => null)
-      console.error("[Chat] Gemini error:", response.status, errBody)
+    if (!response || !response.ok) {
+      const errBody = response ? await response.json().catch(() => null) : null
+      console.error("[Chat] Gemini error:", response?.status ?? "network", errBody)
 
       // Degradación elegante: en vez de un error seco que pierde el lead,
       // derivamos a un humano (WhatsApp/email) y marcamos alta intención para
