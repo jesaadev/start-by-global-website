@@ -34,13 +34,16 @@ const defaultCta = { href: "/contacto", label: "Agenda una consultoría gratuita
  * con otros recientes si faltan.
  */
 function getRelatedPosts(slug: string, category: string, n = 3) {
-  const others = Object.entries(blogPostsData)
+  return Object.entries(blogPostsData)
     .filter(([s]) => s !== slug)
     .map(([s, p]) => ({ slug: s, ...p }))
-    .sort((a, b) => b.dateISO.localeCompare(a.dateISO))
-  const same = others.filter((p) => p.category === category)
-  const rest = others.filter((p) => p.category !== category)
-  return [...same, ...rest].slice(0, n)
+    .sort((a, b) => {
+      const aSame = a.category === category
+      const bSame = b.category === category
+      if (aSame !== bSame) return aSame ? -1 : 1
+      return b.dateISO.localeCompare(a.dateISO)
+    })
+    .slice(0, n)
 }
 
 interface BlogPostContentProps {

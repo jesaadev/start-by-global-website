@@ -13,8 +13,11 @@ as $$
   delete from public.blog_events where created_at < now() - interval '180 days';
 $$;
 
--- Programa la limpieza diaria a las 03:15 UTC. cron.schedule hace upsert por
--- nombre, así que reaplicar la migración no duplica el job.
+-- Programa la limpieza diaria a las 03:15 UTC. Desprogramamos primero cualquier
+-- job con el mismo nombre para que reaplicar la migración sea idempotente y no
+-- deje duplicados ejecutándose en paralelo.
+select cron.unschedule(jobid) from cron.job where jobname = 'cleanup-blog-events';
+
 select cron.schedule(
   'cleanup-blog-events',
   '15 3 * * *',
