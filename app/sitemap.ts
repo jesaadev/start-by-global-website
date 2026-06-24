@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { getSiteSettings, safeBaseUrl } from "@/lib/site-settings"
-import { blogPostsData } from "@/app/insights/[slug]/blog-data"
+import { getAllPublished } from "@/lib/blog-posts"
 
 export const revalidate = 300
 
@@ -33,12 +33,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r.priority,
   }))
 
-  const blogEntries: MetadataRoute.Sitemap = Object.entries(blogPostsData).map(([slug, post]) => ({
-    url: `${base}/insights/${slug}`,
-    lastModified: post.dateISO ? new Date(post.dateISO) : now,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }))
+  const posts = await getAllPublished()
+  const blogEntries: MetadataRoute.Sitemap = posts.map((post) => {
+    const lastIso = post.lastModifiedISO || post.dateISO
+    return {
+      url: `${base}/insights/${post.slug}`,
+      lastModified: lastIso ? new Date(lastIso) : now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    }
+  })
 
   return [...staticEntries, ...blogEntries]
 }

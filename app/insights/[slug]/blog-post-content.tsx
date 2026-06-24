@@ -11,7 +11,7 @@ import {
   ChevronRight,
   Tag,
 } from "lucide-react"
-import { blogPostsData } from "./blog-data"
+import type { BlogPostView, RelatedPost } from "@/lib/blog-posts"
 import { ShareButtons } from "@/components/blog/share-buttons"
 
 const categoryColors: Record<string, string> = {
@@ -28,26 +28,9 @@ const categoryCta: Record<string, { href: string; label: string }> = {
 }
 const defaultCta = { href: "/contacto", label: "Agenda una consultoría gratuita" }
 
-/**
- * Artículos relacionados para enlazado interno (clúster). Prioriza la misma
- * categoría —que es lo que Google premia como clúster temático— y completa
- * con otros recientes si faltan.
- */
-function getRelatedPosts(slug: string, category: string, n = 3) {
-  return Object.entries(blogPostsData)
-    .filter(([s]) => s !== slug)
-    .map(([s, p]) => ({ slug: s, ...p }))
-    .sort((a, b) => {
-      const aSame = a.category === category
-      const bSame = b.category === category
-      if (aSame !== bSame) return aSame ? -1 : 1
-      return b.dateISO.localeCompare(a.dateISO)
-    })
-    .slice(0, n)
-}
-
 interface BlogPostContentProps {
-  slug: string
+  post: BlogPostView
+  related: RelatedPost[]
 }
 
 // ---------------------------------------------------------------------------
@@ -194,35 +177,10 @@ function InlineHtml({ html }: { html: string }) {
 
 // ---------------------------------------------------------------------------
 
-export function BlogPostContent({ slug }: BlogPostContentProps) {
-  const post = blogPostsData[slug]
-
-  if (!post) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <AnimateIn>
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <h1 className="font-display text-3xl font-bold mb-4">Artículo no encontrado</h1>
-            <p className="text-muted-foreground mb-6">
-              El artículo que buscas no existe o ha sido movido.
-            </p>
-            <Link
-              href="/insights"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Volver a Insights
-            </Link>
-          </div>
-        </AnimateIn>
-      </div>
-    )
-  }
-
+export function BlogPostContent({ post, related }: BlogPostContentProps) {
   const colorClass =
     categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
   const cta = categoryCta[post.category] ?? defaultCta
-  const related = getRelatedPosts(slug, post.category)
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

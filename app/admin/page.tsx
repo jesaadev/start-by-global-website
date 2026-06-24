@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
+import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1558,11 +1559,305 @@ function BlogTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   )
 }
 
+// ─── Contenido / Blog Tab ─────────────────────────────────────────────────────
+
+interface AdminPost {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  author: string
+  author_role: string
+  category: string
+  image: string
+  read_time: string
+  date_iso: string | null
+  last_modified_iso: string | null
+  keywords: string[]
+  primary_keyword: string | null
+  content: string
+  status: "draft" | "published" | "archived"
+  origin: "manual" | "ai_generated" | "ai_improved"
+  updated_at: string
+}
+
+const POST_CATEGORIES = ["Marketing Digital", "Desarrollo Web", "Tendencias Tech"]
+
+const STATUS_META: Record<string, { label: string; cls: string }> = {
+  draft: { label: "Borrador", cls: "text-chart-4 bg-chart-4/10" },
+  published: { label: "Publicado", cls: "text-chart-3 bg-chart-3/10" },
+  archived: { label: "Archivado", cls: "text-muted-foreground bg-secondary/60" },
+}
+
+const ORIGIN_META: Record<string, string> = {
+  manual: "Manual",
+  ai_generated: "IA · nuevo",
+  ai_improved: "IA · mejora",
+}
+
+const emptyPostForm = {
+  slug: "", title: "", excerpt: "", author: "Jhon Alejandro Esáa",
+  author_role: "Founder & Lead Developer", category: "Marketing Digital",
+  image: "", read_time: "6 min", date_iso: "", keywords: "", primary_keyword: "", content: "",
+}
+
+function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [posts, setPosts] = useState<AdminPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState<AdminPost | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [form, setForm] = useState(emptyPostForm)
+  const [saving, setSaving] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+  const [preview, setPreview] = useState(false)
+  const [error, setError] = useState("")
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const res = await api.get({ resource: "posts" })
+    setPosts(res.data ?? [])
+    setLoading(false)
+  }, [api])
+
+  useEffect(() => { load() }, [load])
+
+  // Canibalización: primary_keywords compartidos por 2+ posts publicados.
+  const dupKeywords = useMemo(() => {
+    const counts: Record<string, number> = {}
+    posts.filter((p) => p.status === "published" && p.primary_keyword && p.primary_keyword.trim()).forEach((p) => {
+      const k = (p.primary_keyword as string).toLowerCase().trim()
+      counts[k] = (counts[k] ?? 0) + 1
+    })
+    return new Set(Object.entries(counts).filter(([, c]) => c > 1).map(([k]) => k))
+  }, [posts])
+
+  const startCreate = () => { setForm(emptyPostForm); setCreating(true); setEditing(null); setPreview(false); setError("") }
+  const startEdit = (p: AdminPost) => {
+    setEditing(p); setCreating(false); setPreview(false); setError("")
+    setForm({
+      slug: p.slug, title: p.title, excerpt: p.excerpt, author: p.author,
+      author_role: p.author_role, category: p.category, image: p.image,
+      read_time: p.read_time, date_iso: p.date_iso ?? "",
+      keywords: (p.keywords ?? []).join(", "), primary_keyword: p.primary_keyword ?? "", content: p.content,
+    })
+  }
+  const closeEditor = () => { setCreating(false); setEditing(null); setPreview(false) }
+
+  const save = async () => {
+    setSaving(true); setError("")
+    // Normaliza el slug: minúsculas, sin acentos ni caracteres inválidos.
+    const slug = form.slug
+      .toLowerCase().trim()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/\s+/g, "-").replace(/[^a-z0-9-_]/g, "").replace(/-+/g, "-")
+    const payload = { ...form, slug, keywords: form.keywords.split(",").map((s) => s.trim()).filter(Boolean) }
+    try {
+      const res = editing
+        ? await api.patch({ resource: "post", id: editing.id, ...payload })
+        : await api.post({ resource: "post", ...payload, status: "draft" })
+      if (res.error || !res.data) throw new Error(res.error || "Error")
+      await load(); closeEditor()
+    } catch {
+      setError("No se pudo guardar (¿slug duplicado o datos inválidos?).")
+    }
+    setSaving(false)
+  }
+
+  const doAction = async (p: AdminPost, action: "publish" | "archive") => {
+    await api.patch({ resource: "post", id: p.id, action })
+    await load()
+  }
+  const del = async (p: AdminPost) => {
+    if (!confirm(`¿Eliminar "${p.title}"? Esta acción no se puede deshacer.`)) return
+    await api.del({ resource: "post", id: p.id })
+    await load()
+  }
+  const seed = async () => {
+    if (!confirm("Importar los artículos del código a la BD. No sobreescribe los ya existentes. ¿Continuar?")) return
+    setSeeding(true)
+    await api.post({ resource: "seed-blog" })
+    await load()
+    setSeeding(false)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground">
+          Artículos del blog (fuente de verdad en BD). Borrador → publicar; los cambios se reflejan en el sitio al instante.
+        </p>
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={seed} disabled={seeding}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
+            {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Importar del código
+          </button>
+          <button type="button" onClick={startCreate}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all">
+            <Plus className="w-4 h-4" /> Nuevo artículo
+          </button>
+        </div>
+      </div>
+
+      {dupKeywords.size > 0 && (
+        <div className="glass-card rounded-xl p-3 border border-destructive/30 text-xs text-destructive">
+          ⚠ Canibalización: {dupKeywords.size} palabra(s) clave principal(es) compartidas por más de un artículo publicado ({[...dupKeywords].join(", ")}). Conviene unificar o diferenciar.
+        </div>
+      )}
+
+      {/* Editor */}
+      {(creating || editing) && (
+        <div className="glass-card rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-sm text-foreground">{editing ? "Editar artículo" : "Nuevo artículo"}</h3>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setPreview((v) => !v)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <Eye className="w-3.5 h-3.5" /> {preview ? "Editor" : "Vista previa"}
+              </button>
+              <button type="button" onClick={closeEditor}><X className="w-4 h-4 text-muted-foreground hover:text-foreground" /></button>
+            </div>
+          </div>
+
+          {preview ? (
+            <div className="rounded-lg bg-background/60 border border-border/50 p-5 max-h-[60vh] overflow-y-auto">
+              <h1 className="font-display text-2xl font-bold mb-3">{form.title || "Sin título"}</h1>
+              <div className="text-sm text-muted-foreground leading-relaxed [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-5 [&_h2]:mb-2 [&_a]:text-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:text-foreground"
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitizado con sanitizeArticleHtml
+                dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(form.content) }} />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <FieldLabel>Título</FieldLabel>
+                  <input className={fieldInputCls} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                </div>
+                <div>
+                  <FieldLabel>Slug (URL)</FieldLabel>
+                  <input className={fieldInputCls} value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="mi-articulo" />
+                </div>
+                <div>
+                  <FieldLabel>Categoría</FieldLabel>
+                  <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className={fieldInputCls}>
+                    {POST_CATEGORIES.map((c) => <option key={c} value={c} className="bg-card text-foreground">{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <FieldLabel>Palabra clave principal</FieldLabel>
+                  <input className={cn(fieldInputCls, form.primary_keyword && dupKeywords.has(form.primary_keyword.toLowerCase().trim()) && "border-destructive/60")}
+                    value={form.primary_keyword} onChange={(e) => setForm({ ...form, primary_keyword: e.target.value })} placeholder="ej: meta ads" />
+                </div>
+                <div>
+                  <FieldLabel>Tiempo de lectura</FieldLabel>
+                  <input className={fieldInputCls} value={form.read_time} onChange={(e) => setForm({ ...form, read_time: e.target.value })} placeholder="6 min" />
+                </div>
+                <div>
+                  <FieldLabel>Fecha (YYYY-MM-DD)</FieldLabel>
+                  <input className={fieldInputCls} value={form.date_iso} onChange={(e) => setForm({ ...form, date_iso: e.target.value })} placeholder="2026-06-23" />
+                </div>
+                <div>
+                  <FieldLabel>Imagen (URL)</FieldLabel>
+                  <input className={fieldInputCls} value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                </div>
+                <div className="sm:col-span-2">
+                  <FieldLabel>Keywords (separadas por coma)</FieldLabel>
+                  <input className={fieldInputCls} value={form.keywords} onChange={(e) => setForm({ ...form, keywords: e.target.value })} />
+                </div>
+                <div className="sm:col-span-2">
+                  <FieldLabel>Extracto</FieldLabel>
+                  <textarea rows={2} className={cn(fieldInputCls, "resize-none")} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <FieldLabel>Contenido (HTML: h2, h3, p, ul, ol, li, blockquote, strong, em, a, code)</FieldLabel>
+                <textarea rows={14} className={cn(fieldInputCls, "resize-y font-mono text-xs leading-relaxed")} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+              </div>
+            </>
+          )}
+
+          <div className="flex items-center justify-end gap-3">
+            {error && <span className="text-xs text-destructive">{error}</span>}
+            <button type="button" onClick={closeEditor}
+              className="px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors">Cancelar</button>
+            <button type="button" onClick={save} disabled={saving || !form.title || !form.slug}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Guardar borrador
+            </button>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+      ) : posts.length === 0 ? (
+        <div className="glass-card rounded-xl p-8 text-center space-y-3">
+          <p className="text-sm text-muted-foreground">No hay artículos en la BD todavía.</p>
+          <button type="button" onClick={seed} disabled={seeding}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+            {seeding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Importar los del código
+          </button>
+        </div>
+      ) : (
+        <div className="glass-card rounded-xl overflow-x-auto">
+          <table className="w-full text-sm min-w-[760px]">
+            <thead>
+              <tr className="border-b border-border/50 bg-secondary/30">
+                {["Artículo", "Estado", "Categoría", "Keyword principal", "Origen", "Actualizado", ""].map((h) => (
+                  <th key={h} className="px-3 py-3 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {posts.map((p) => {
+                const st = STATUS_META[p.status] ?? STATUS_META.draft
+                const dup = p.status === "published" && p.primary_keyword && dupKeywords.has(p.primary_keyword.toLowerCase().trim())
+                return (
+                  <tr key={p.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                    <td className="px-3 py-2.5 max-w-[280px]">
+                      <p className="text-xs font-medium text-foreground truncate">{p.title}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">/insights/{p.slug}</p>
+                    </td>
+                    <td className="px-3 py-2.5"><span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full", st.cls)}>{st.label}</span></td>
+                    <td className="px-3 py-2.5 text-xs text-muted-foreground">{p.category}</td>
+                    <td className="px-3 py-2.5 text-xs">
+                      <span className={cn(dup ? "text-destructive font-medium" : "text-muted-foreground")}>{p.primary_keyword ?? "—"}</span>
+                    </td>
+                    <td className="px-3 py-2.5 text-[11px] text-muted-foreground">{ORIGIN_META[p.origin] ?? p.origin}</td>
+                    <td className="px-3 py-2.5 text-[11px] text-muted-foreground whitespace-nowrap">
+                      {new Date(p.updated_at).toLocaleDateString("es-DO", { day: "2-digit", month: "short" })}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <div className="flex items-center gap-1">
+                        <button type="button" onClick={() => startEdit(p)} title="Editar"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                        {p.status !== "published" ? (
+                          <button type="button" onClick={() => doAction(p, "publish")} title="Publicar"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-chart-3 hover:bg-chart-3/10 transition-colors"><ToggleRight className="w-4 h-4" /></button>
+                        ) : (
+                          <button type="button" onClick={() => doAction(p, "archive")} title="Archivar"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"><ToggleLeft className="w-4 h-4" /></button>
+                        )}
+                        <button type="button" onClick={() => del(p)} title="Eliminar"
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "blog">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "blog" | "content">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -1589,6 +1884,7 @@ export default function AdminDashboard() {
     { id: "seo" as const, label: "SEO & Métricas", icon: Search },
     { id: "attribution" as const, label: "Atribución", icon: Megaphone },
     { id: "blog" as const, label: "Blog / Orgánico", icon: FileText },
+    { id: "content" as const, label: "Contenido", icon: Pencil },
   ]
 
   return (
@@ -1679,6 +1975,7 @@ export default function AdminDashboard() {
         {activeTab === "seo" && <SeoTab api={api} />}
         {activeTab === "attribution" && <AttributionTab api={api} />}
         {activeTab === "blog" && <BlogTab api={api} />}
+        {activeTab === "content" && <ContentTab api={api} />}
       </main>
     </div>
   )

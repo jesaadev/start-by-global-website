@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { AnimateIn } from "@/components/animate-in"
-import { blogPostsData } from "./[slug]/blog-data"
+import type { BlogPostView } from "@/lib/blog-posts"
 import {
   TrendingUp,
   Code,
@@ -40,27 +40,32 @@ function shortDate(iso: string): string {
   return `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`
 }
 
-// Fuente única: el listado se deriva de blogPostsData (mismas que las páginas
-// de detalle), ordenado por fecha descendente. El más reciente queda destacado.
-const blogPosts = Object.entries(blogPostsData)
-  .map(([slug, p]) => ({
-    slug,
-    title: p.title,
-    excerpt: p.excerpt,
-    category: CATEGORY_ID[p.category] ?? "tendencias",
-    author: p.author,
-    date: p.date,
-    dateISO: p.dateISO,
-    dateShort: shortDate(p.dateISO),
-    readTime: p.readTime,
-    image: p.image,
-  }))
-  .sort((a, b) => b.dateISO.localeCompare(a.dateISO))
-  .map((post, i) => ({ ...post, featured: i === 0 }))
-
-export function InsightsContent() {
+export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+
+  // Fuente única: el listado se deriva de los posts publicados (mismos que las
+  // páginas de detalle), ordenado por fecha descendente. El más reciente queda
+  // destacado.
+  const blogPosts = useMemo(
+    () =>
+      posts
+        .map((p) => ({
+          slug: p.slug,
+          title: p.title,
+          excerpt: p.excerpt,
+          category: CATEGORY_ID[p.category] ?? "tendencias",
+          author: p.author,
+          date: p.date,
+          dateISO: p.dateISO,
+          dateShort: shortDate(p.dateISO),
+          readTime: p.readTime,
+          image: p.image,
+        }))
+        .sort((a, b) => b.dateISO.localeCompare(a.dateISO))
+        .map((post, i) => ({ ...post, featured: i === 0 })),
+    [posts]
+  )
 
   const filteredPosts = blogPosts.filter((post) => {
     const matchesCategory = selectedCategory === "all" || post.category === selectedCategory

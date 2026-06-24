@@ -1,8 +1,14 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { BlogPostContent } from "./blog-post-content"
 import { ArticleTracker } from "@/components/blog/article-tracker"
-import { blogPostsData } from "./blog-data"
+import { getPublishedSlugs, getPublishedPostBySlug, getRelatedPublished } from "@/lib/blog-posts"
 import { notFound } from "next/navigation"
+
+// ISR: las páginas se sirven estáticas y se regeneran cada hora; al publicar o
+// editar desde el admin se revalidan on-demand (revalidatePath).
+export const revalidate = 3600
+
+const BASE = "https://startbyglobal.com"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -10,7 +16,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
-  const post = blogPostsData[slug]
+  const post = await getPublishedPostBySlug(slug)
   if (!post) return {}
 
   return {
@@ -22,6 +28,7 @@ export async function generateMetadata({ params }: Props) {
       description: post.excerpt,
       type: "article",
       publishedTime: post.dateISO,
+      modifiedTime: post.lastModifiedISO,
       authors: [post.author],
       images: [{ url: post.image, width: 1200, height: 630, alt: post.title }],
     },
@@ -32,19 +39,22 @@ export async function generateMetadata({ params }: Props) {
       images: [post.image],
     },
     alternates: {
-      canonical: `https://startbyglobal.com/insights/${slug}`,
+      canonical: `${BASE}/insights/${slug}`,
     },
   }
 }
 
 export async function generateStaticParams() {
-  return Object.keys(blogPostsData).map((slug) => ({ slug }))
+  const slugs = await getPublishedSlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
-  const post = blogPostsData[slug]
+  const post = await getPublishedPostBySlug(slug)
   if (!post) notFound()
+
+  const related = await getRelatedPublished(slug, post.category)
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -53,28 +63,28 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.excerpt,
     image: post.image,
     datePublished: post.dateISO,
-    dateModified: post.dateISO,
+    dateModified: post.lastModifiedISO || post.dateISO,
     author: {
       "@type": "Person",
       name: post.author,
-      url: "https://startbyglobal.com/nosotros",
+      url: `${BASE}/nosotros`,
     },
     publisher: {
       "@type": "Organization",
       name: "Start By Global",
       logo: {
         "@type": "ImageObject",
-        url: "https://startbyglobal.com/logo-black.svg",
+        url: `${BASE}/logo-black.svg`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://startbyglobal.com/insights/${slug}`,
+      "@id": `${BASE}/insights/${slug}`,
     },
     keywords: post.keywords?.join(", "),
     articleSection: post.category,
     inLanguage: "es",
-    url: `https://startbyglobal.com/insights/${slug}`,
+    url: `${BASE}/insights/${slug}`,
   }
 
   return (
@@ -85,7 +95,7 @@ export default async function BlogPostPage({ params }: Props) {
       />
       <ArticleTracker slug={slug} />
       <DashboardLayout>
-        <BlogPostContent slug={slug} />
+        <BlogPostContent post={post} related={related} />
       </DashboardLayout>
     </>
   )
