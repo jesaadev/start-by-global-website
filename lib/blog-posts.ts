@@ -91,14 +91,21 @@ function viewFromTs(slug: string, p: (typeof blogPostsData)[string]): BlogPostVi
   }
 }
 
+// Una vez que la tabla tiene ≥1 publicado, ese estado no vuelve a false en la
+// vida de la instancia: cacheamos el "true" para ahorrar viajes a la BD en 404s.
+let hasPublishedCache = false
+
 /** ¿La tabla ya tiene artículos publicados? (decide si usar BD o fallback TS). */
 async function tableHasPublished(): Promise<boolean> {
+  if (hasPublishedCache) return true
   const { count, error } = await supabaseAdmin
     .from("blog_posts")
     .select("id", { count: "exact", head: true })
     .eq("status", "published")
   if (error) return false
-  return (count ?? 0) > 0
+  const hasAny = (count ?? 0) > 0
+  if (hasAny) hasPublishedCache = true
+  return hasAny
 }
 
 function toView(r: BlogPostRow): BlogPostView {

@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
+import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1623,7 +1624,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   // Canibalización: primary_keywords compartidos por 2+ posts publicados.
   const dupKeywords = useMemo(() => {
     const counts: Record<string, number> = {}
-    posts.filter((p) => p.status === "published" && p.primary_keyword).forEach((p) => {
+    posts.filter((p) => p.status === "published" && p.primary_keyword && p.primary_keyword.trim()).forEach((p) => {
       const k = (p.primary_keyword as string).toLowerCase().trim()
       counts[k] = (counts[k] ?? 0) + 1
     })
@@ -1644,7 +1645,12 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
 
   const save = async () => {
     setSaving(true); setError("")
-    const payload = { ...form, keywords: form.keywords.split(",").map((s) => s.trim()).filter(Boolean) }
+    // Normaliza el slug: minúsculas, sin acentos ni caracteres inválidos.
+    const slug = form.slug
+      .toLowerCase().trim()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/\s+/g, "-").replace(/[^a-z0-9-_]/g, "").replace(/-+/g, "-")
+    const payload = { ...form, slug, keywords: form.keywords.split(",").map((s) => s.trim()).filter(Boolean) }
     try {
       const res = editing
         ? await api.patch({ resource: "post", id: editing.id, ...payload })
@@ -1716,8 +1722,8 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             <div className="rounded-lg bg-background/60 border border-border/50 p-5 max-h-[60vh] overflow-y-auto">
               <h1 className="font-display text-2xl font-bold mb-3">{form.title || "Sin título"}</h1>
               <div className="text-sm text-muted-foreground leading-relaxed [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mt-5 [&_h2]:mb-2 [&_a]:text-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:text-foreground"
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: vista previa de contenido propio del admin
-                dangerouslySetInnerHTML={{ __html: form.content }} />
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: sanitizado con sanitizeArticleHtml
+                dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(form.content) }} />
             </div>
           ) : (
             <>

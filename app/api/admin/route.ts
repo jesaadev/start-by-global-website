@@ -19,10 +19,15 @@ const POST_FIELDS = [
   "origin", "improves_post_id", "published_at",
 ] as const
 
+// Columnas opcionales DATE/UUID: una cadena vacía rompe el INSERT/UPDATE en
+// Postgres, así que las normalizamos a null.
+const NULLABLE_EMPTY = new Set(["date_iso", "last_modified_iso", "published_at", "improves_post_id", "primary_keyword"])
+
 function pickPostFields(obj: Record<string, unknown>): Partial<BlogPostRow> {
   const out: Record<string, unknown> = {}
   for (const k of POST_FIELDS) {
-    if (obj[k] !== undefined) out[k] = obj[k]
+    if (obj[k] === undefined) continue
+    out[k] = obj[k] === "" && NULLABLE_EMPTY.has(k) ? null : obj[k]
   }
   if (typeof out.content === "string") out.content = sanitizeArticleHtml(out.content)
   return out as Partial<BlogPostRow>
