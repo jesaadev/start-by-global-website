@@ -1,7 +1,12 @@
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { InsightsContent } from "./insights-content"
-import { blogPostsData } from "./[slug]/blog-data"
+import { getAllPublished } from "@/lib/blog-posts"
 import type { Metadata } from "next"
+
+// ISR: el listado se regenera cada hora y on-demand al publicar/editar.
+export const revalidate = 3600
+
+const BASE = "https://startbyglobal.com"
 
 export const metadata: Metadata = {
   title: "Insights & Blog",
@@ -24,35 +29,30 @@ export const metadata: Metadata = {
   alternates: { canonical: "/insights" },
 }
 
-export default function InsightsPage() {
-  const articles = Object.entries(blogPostsData).map(([slug, post]) => ({
-    "@type": "ListItem",
-    position: Object.keys(blogPostsData).indexOf(slug) + 1,
-    url: `https://startbyglobal.com/insights/${slug}`,
-    name: post.title,
-  }))
+export default async function InsightsPage() {
+  const posts = await getAllPublished()
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Start By Global Insights",
     description: "Blog de marketing digital, desarrollo web y tecnología",
-    url: "https://startbyglobal.com/insights",
+    url: `${BASE}/insights`,
     publisher: {
       "@type": "Organization",
       name: "Start By Global",
-      url: "https://startbyglobal.com",
+      url: BASE,
       logo: {
         "@type": "ImageObject",
-        url: "https://startbyglobal.com/logo-black.svg",
+        url: `${BASE}/logo-black.svg`,
       },
     },
     inLanguage: "es",
-    blogPost: Object.entries(blogPostsData).map(([slug, post]) => ({
+    blogPost: posts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
-      url: `https://startbyglobal.com/insights/${slug}`,
+      url: `${BASE}/insights/${post.slug}`,
       datePublished: post.dateISO,
       author: { "@type": "Person", name: post.author },
       image: post.image,
@@ -67,7 +67,7 @@ export default function InsightsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <DashboardLayout>
-        <InsightsContent />
+        <InsightsContent posts={posts} />
       </DashboardLayout>
     </>
   )

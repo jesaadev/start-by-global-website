@@ -1,9 +1,38 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { supabaseAdmin } from "@/lib/supabase"
 import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
 import { getAttributionStats } from "@/lib/lead-events"
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries, gscConfigured } from "@/lib/gsc"
+import {
+  listPosts, getPostById, createPost, updatePost, publishPost, archivePost, deletePost,
+  type BlogPostRow,
+} from "@/lib/blog-posts"
+import { sanitizeArticleHtml } from "@/lib/sanitize-html"
+import { blogPostsData } from "@/app/insights/[slug]/blog-data"
+
+// Columnas escribibles de blog_posts vía API (allowlist).
+const POST_FIELDS = [
+  "slug", "title", "excerpt", "author", "author_role", "category", "image", "read_time",
+  "date_iso", "last_modified_iso", "keywords", "primary_keyword", "content", "status",
+  "origin", "improves_post_id", "published_at",
+] as const
+
+function pickPostFields(obj: Record<string, unknown>): Partial<BlogPostRow> {
+  const out: Record<string, unknown> = {}
+  for (const k of POST_FIELDS) {
+    if (obj[k] !== undefined) out[k] = obj[k]
+  }
+  if (typeof out.content === "string") out.content = sanitizeArticleHtml(out.content)
+  return out as Partial<BlogPostRow>
+}
+
+function revalidateBlog(slug?: string) {
+  revalidatePath("/insights")
+  revalidatePath("/sitemap.xml")
+  if (slug) revalidatePath(`/insights/${slug}`)
+}
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
@@ -95,6 +124,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ data })
     }
 
+    if (resource === "posts") {
+      const status = searchParams.get("status") as BlogPostRow["status"] | null
+      const data = await listPosts(status ? { status } : undefined)
+      return NextResponse.json({ data })
+    }
+
+    if (resource === "post") {
+      const id = searchParams.get("id")
+      if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
+      const data = await getPostById(id)
+      return NextResponse.json({ data })
+    }
+
     if (resource === "overrides") {
       const { data, error } = await supabaseAdmin
         .from("prompt_overrides")
@@ -151,6 +193,24 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ data: saved })
     }
 
+    if (resource === "post") {
+      if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
+      const action = updates.action as string | undefined
+      let row: BlogPostRow | null
+      if (action === "publish") {
+        row = await publishPost(id)
+      } else if (action === "archive") {
+        row = await archivePost(id)
+      } else {
+        const patch = pickPostFields(updates)
+        // Editar el contenido de un publicado actualiza la fecha de modificación.
+        if (typeof patch.content === "string") patch.last_modified_iso = new Date().toISOString().slice(0, 10)
+        row = await updatePost(id, patch)
+      }
+      if (row) revalidateBlog(row.slug)
+      return NextResponse.json({ data: row })
+    }
+
     if (resource === "insight") {
       const { data, error } = await supabaseAdmin
         .from("sales_insights")
@@ -204,6 +264,45 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { resource, ...payload } = body
 
+    if (resource === "post") {
+      const fields = pickPostFields(payload)
+      if (!fields.slug || !fields.title) {
+        return NextResponse.json({ error: "slug y title son obligatorios." }, { status: 400 })
+      }
+      const row = await createPost({ ...fields, slug: fields.slug, title: fields.title })
+      if (row?.status === "published") revalidateBlog(row.slug)
+      return NextResponse.json({ data: row })
+    }
+
+    // Seed idempotente: migra los artículos del archivo TS a la BD. No
+    // sobreescribe los ya existentes (ignoreDuplicates), así es seguro re-correr.
+    if (resource === "seed-blog") {
+      const rows = Object.entries(blogPostsData).map(([slug, p]) => ({
+        slug,
+        title: p.title,
+        excerpt: p.excerpt,
+        author: p.author,
+        author_role: p.authorRole,
+        category: p.category,
+        image: p.image,
+        read_time: p.readTime,
+        date_iso: p.dateISO || null,
+        last_modified_iso: p.dateISO || null,
+        keywords: p.keywords ?? [],
+        primary_keyword: p.keywords?.[0] ?? null,
+        content: sanitizeArticleHtml(p.content),
+        status: "published",
+        origin: "manual",
+        published_at: p.dateISO ? new Date(p.dateISO).toISOString() : new Date().toISOString(),
+      }))
+      const { error } = await supabaseAdmin
+        .from("blog_posts")
+        .upsert(rows, { onConflict: "slug", ignoreDuplicates: true })
+      if (error) throw error
+      revalidateBlog()
+      return NextResponse.json({ seeded: rows.length })
+    }
+
     if (resource === "insight") {
       const { data, error } = await supabaseAdmin
         .from("sales_insights")
@@ -242,6 +341,14 @@ export async function DELETE(request: Request) {
   try {
     const body = await request.json()
     const { resource, id } = body
+
+    if (resource === "post") {
+      if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
+      const existing = await getPostById(id)
+      await deletePost(id)
+      if (existing) revalidateBlog(existing.slug)
+      return NextResponse.json({ success: true })
+    }
 
     const table = resource === "insight" ? "sales_insights"
       : resource === "override" ? "prompt_overrides"
