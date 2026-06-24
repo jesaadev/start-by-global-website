@@ -11,6 +11,8 @@ import {
 } from "@/lib/blog-posts"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
+import { improveArticle, applyImprovement } from "@/lib/content-routines"
+import { claudeConfigured } from "@/lib/claude"
 
 // Columnas escribibles de blog_posts vía API (allowlist).
 const POST_FIELDS = [
@@ -132,7 +134,7 @@ export async function GET(request: Request) {
     if (resource === "posts") {
       const status = searchParams.get("status") as BlogPostRow["status"] | null
       const data = await listPosts(status ? { status } : undefined)
-      return NextResponse.json({ data })
+      return NextResponse.json({ data, claude: claudeConfigured() })
     }
 
     if (resource === "post") {
@@ -201,6 +203,11 @@ export async function PATCH(request: Request) {
     if (resource === "post") {
       if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
       const action = updates.action as string | undefined
+      if (action === "apply-improvement") {
+        const applied = await applyImprovement(id)
+        if (applied) revalidateBlog(applied.slug)
+        return NextResponse.json({ data: applied })
+      }
       let row: BlogPostRow | null
       if (action === "publish") {
         row = await publishPost(id)
@@ -277,6 +284,25 @@ export async function POST(request: Request) {
       const row = await createPost({ ...fields, slug: fields.slug, title: fields.title })
       if (row?.status === "published") revalidateBlog(row.slug)
       return NextResponse.json({ data: row })
+    }
+
+    // Genera un borrador de mejora con IA para un artículo publicado.
+    if (resource === "improve-article") {
+      const slug = payload.slug as string | undefined
+      if (!slug) return NextResponse.json({ error: "slug requerido." }, { status: 400 })
+      try {
+        const outcome = await improveArticle(slug)
+        revalidateBlog()
+        return NextResponse.json({
+          data: outcome.draft,
+          summary: outcome.summary,
+          added_sections: outcome.added_sections,
+          internal_links_added: outcome.internal_links_added,
+        })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Error al generar la mejora."
+        return NextResponse.json({ error: message }, { status: 502 })
+      }
     }
 
     // Seed idempotente: migra los artículos del archivo TS a la BD. No

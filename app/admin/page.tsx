@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, Loader2, CheckCircle2,
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
   Search, Building2, Activity, Megaphone,
-  FileText, Share2, MousePointerClick, Download, Target,
+  FileText, Share2, MousePointerClick, Download, Target, Sparkles, Wand2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
@@ -1578,6 +1578,7 @@ interface AdminPost {
   content: string
   status: "draft" | "published" | "archived"
   origin: "manual" | "ai_generated" | "ai_improved"
+  improves_post_id: string | null
   updated_at: string
 }
 
@@ -1611,11 +1612,15 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [seeding, setSeeding] = useState(false)
   const [preview, setPreview] = useState(false)
   const [error, setError] = useState("")
+  const [claudeOn, setClaudeOn] = useState(false)
+  const [improving, setImproving] = useState<string | null>(null)
+  const [notice, setNotice] = useState("")
 
   const load = useCallback(async () => {
     setLoading(true)
     const res = await api.get({ resource: "posts" })
     setPosts(res.data ?? [])
+    setClaudeOn(Boolean(res.claude))
     setLoading(false)
   }, [api])
 
@@ -1679,6 +1684,20 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     await load()
     setSeeding(false)
   }
+  const improve = async (p: AdminPost) => {
+    setImproving(p.slug); setNotice(""); setError("")
+    const res = await api.post({ resource: "improve-article", slug: p.slug })
+    setImproving(null)
+    if (res.error || !res.data) { setError(res.error || "No se pudo generar la mejora.") ; return }
+    setNotice(`Borrador de mejora creado para "${p.title}": ${res.summary ?? ""} Revísalo y pulsa "Aplicar mejora".`)
+    await load()
+  }
+  const applyImprovementAction = async (p: AdminPost) => {
+    if (!confirm(`Aplicar esta mejora al artículo publicado? Reemplazará el contenido en vivo.`)) return
+    await api.patch({ resource: "post", id: p.id, action: "apply-improvement" })
+    setNotice("Mejora aplicada al artículo publicado.")
+    await load()
+  }
 
   return (
     <div className="space-y-4">
@@ -1701,6 +1720,26 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
       {dupKeywords.size > 0 && (
         <div className="glass-card rounded-xl p-3 border border-destructive/30 text-xs text-destructive">
           ⚠ Canibalización: {dupKeywords.size} palabra(s) clave principal(es) compartidas por más de un artículo publicado ({[...dupKeywords].join(", ")}). Conviene unificar o diferenciar.
+        </div>
+      )}
+
+      {!claudeOn && (
+        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5" />
+          IA de contenido no configurada — añade <code className="text-foreground">ANTHROPIC_API_KEY</code> en el entorno para mejorar artículos con IA.
+        </p>
+      )}
+
+      {notice && (
+        <div className="glass-card rounded-xl p-3 border border-chart-3/30 text-xs text-chart-3 flex items-start justify-between gap-3">
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice("")}><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
+      {error && !creating && !editing && (
+        <div className="glass-card rounded-xl p-3 border border-destructive/30 text-xs text-destructive flex items-start justify-between gap-3">
+          <span>{error}</span>
+          <button type="button" onClick={() => setError("")}><X className="w-3.5 h-3.5" /></button>
         </div>
       )}
 
@@ -1831,12 +1870,22 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                       <div className="flex items-center gap-1">
                         <button type="button" onClick={() => startEdit(p)} title="Editar"
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
-                        {p.status !== "published" ? (
+                        {p.origin === "ai_improved" ? (
+                          <button type="button" onClick={() => applyImprovementAction(p)} title="Aplicar mejora al artículo publicado"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-chart-3 hover:bg-chart-3/10 transition-colors"><Wand2 className="w-4 h-4" /></button>
+                        ) : p.status === "published" ? (
+                          <>
+                            <button type="button" onClick={() => improve(p)} disabled={!claudeOn || improving === p.slug}
+                              title={claudeOn ? "Mejorar con IA" : "Configura ANTHROPIC_API_KEY"}
+                              className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-30 transition-colors">
+                              {improving === p.slug ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                            </button>
+                            <button type="button" onClick={() => doAction(p, "archive")} title="Archivar"
+                              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"><ToggleLeft className="w-4 h-4" /></button>
+                          </>
+                        ) : (
                           <button type="button" onClick={() => doAction(p, "publish")} title="Publicar"
                             className="p-1.5 rounded-lg text-muted-foreground hover:text-chart-3 hover:bg-chart-3/10 transition-colors"><ToggleRight className="w-4 h-4" /></button>
-                        ) : (
-                          <button type="button" onClick={() => doAction(p, "archive")} title="Archivar"
-                            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"><ToggleLeft className="w-4 h-4" /></button>
                         )}
                         <button type="button" onClick={() => del(p)} title="Eliminar"
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>

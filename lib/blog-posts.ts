@@ -215,6 +215,15 @@ export async function getPostById(id: string): Promise<BlogPostRow | null> {
   return (data as BlogPostRow) ?? null
 }
 
+export async function getRowBySlug(slug: string): Promise<BlogPostRow | null> {
+  const { data, error } = await supabaseAdmin.from("blog_posts").select("*").eq("slug", slug).maybeSingle()
+  if (error) {
+    console.error("[blog_posts] getRowBySlug error:", error)
+    return null
+  }
+  return (data as BlogPostRow) ?? null
+}
+
 export type BlogPostInput = Partial<Omit<BlogPostRow, "id" | "created_at" | "updated_at">> & {
   slug: string
   title: string
