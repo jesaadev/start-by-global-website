@@ -93,28 +93,51 @@ async function geminiText(system: string, prompt: string, maxTokens: number): Pr
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) throw new Error("GEMINI_API_KEY no está configurada")
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: system }] },
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: maxTokens,
-        responseMimeType: "application/json",
-      },
-    }),
-  })
+
+  const call = (jsonMode: boolean): Promise<Response> =>
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: system }] },
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: maxTokens,
+          // Desactiva el "thinking" del 2.5-flash (activo por defecto): respuesta
+          // directa, más rápida y fiable para JSON; evita 5xx en generaciones largas.
+          thinkingConfig: { thinkingBudget: 0 },
+          ...(jsonMode ? { responseMimeType: "application/json" } : {}),
+        },
+      }),
+    }).catch((err) => new Response(err instanceof Error ? err.message : "Network Error", { status: 500 }))
+
+  // Intento + reintento ante errores transitorios (429/5xx); como último
+  // recurso, sin modo-JSON (parseJsonLoose tolera el JSON dentro de texto).
+  let res = await call(true)
+  if (res.status === 429 || res.status >= 500) {
+    await new Promise((r) => setTimeout(r, 800))
+    res = await call(true)
+  }
+  if (res.status >= 500) {
+    res = await call(false)
+  }
+
   if (!res.ok) {
     const body = await res.text().catch(() => "")
-    throw new Error(`Gemini ${res.status}: ${body.slice(0, 300)}`)
+    console.error("[AI] Gemini error", res.status, body.slice(0, 500))
+    throw new Error(`Gemini ${res.status}: ${body.slice(0, 200)}`)
   }
-  const data = (await res.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>
+  const data = (await res.json().catch(() => ({}))) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>
+    promptFeedback?: { blockReason?: string }
   }
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? ""
-  if (!text) throw new Error("Gemini no devolvió contenido (¿bloqueado por seguridad o cuota?).")
+  if (!text) {
+    const reason = data?.candidates?.[0]?.finishReason || data?.promptFeedback?.blockReason || "desconocido"
+    console.error("[AI] Gemini sin contenido, finishReason:", reason)
+    throw new Error(`Gemini no devolvió contenido (motivo: ${reason}).`)
+  }
   return text
 }
 
