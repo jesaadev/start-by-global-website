@@ -50,7 +50,10 @@ function escapeAttr(s: string): string {
 
 /** Devuelve un href seguro o null si no se permite. */
 function safeHref(attrs: string): string | null {
-  const m = attrs.match(/(?:\s|^)href\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i)
+  // Ancla href a un límite que NO sea carácter de nombre de atributo (-, _,
+  // alfanum): así excluye data-href/lazy-href pero sí captura el href real
+  // aunque venga sin espacio (p. ej. `data-x="y"href="/z"`).
+  const m = attrs.match(/(?:^|[^a-zA-Z0-9_-])href\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i)
   if (!m) return null
   const raw = (m[2] ?? m[3] ?? m[4] ?? "").trim()
   if (!raw) return null
