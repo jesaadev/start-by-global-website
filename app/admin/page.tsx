@@ -1623,7 +1623,8 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [seeding, setSeeding] = useState(false)
   const [preview, setPreview] = useState(false)
   const [error, setError] = useState("")
-  const [claudeOn, setClaudeOn] = useState(false)
+  const [providers, setProviders] = useState<string[]>([])
+  const [activeProvider, setActiveProvider] = useState<string>("")
   const [improving, setImproving] = useState<string | null>(null)
   const [notice, setNotice] = useState("")
   const [topics, setTopics] = useState<ProposedTopic[]>([])
@@ -1634,9 +1635,20 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setLoading(true)
     const res = await api.get({ resource: "posts" })
     setPosts(res.data ?? [])
-    setClaudeOn(Boolean(res.claude))
+    setProviders(res.ai?.providers ?? [])
+    setActiveProvider(res.ai?.active ?? "")
     setLoading(false)
   }, [api])
+
+  const aiOn = providers.length > 0
+  const PROVIDER_LABEL: Record<string, string> = { claude: "Claude", gemini: "Gemini" }
+  const setProvider = async (p: string) => {
+    setActiveProvider(p)
+    const res = await api.patch({ resource: "ai-provider", provider: p })
+    if (res.error) { setError(res.error); return }
+    setNotice(`Motor de IA cambiado a ${PROVIDER_LABEL[p] ?? p}.`)
+    await load()
+  }
 
   useEffect(() => { load() }, [load])
 
@@ -1746,8 +1758,19 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
             {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Importar del código
           </button>
-          <button type="button" onClick={propose} disabled={!claudeOn || proposing}
-            title={claudeOn ? "Proponer temas con IA" : "Configura ANTHROPIC_API_KEY"}
+          {aiOn && (
+            <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <select value={activeProvider} onChange={(e) => setProvider(e.target.value)}
+                className="px-2 py-1 rounded-lg bg-secondary/50 border border-border/50 text-xs text-foreground focus:outline-none focus:border-primary/50">
+                {providers.map((p) => (
+                  <option key={p} value={p} className="bg-card text-foreground">{PROVIDER_LABEL[p] ?? p}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button type="button" onClick={propose} disabled={!aiOn || proposing}
+            title={aiOn ? "Proponer temas con IA" : "Configura ANTHROPIC_API_KEY o GEMINI_API_KEY"}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-40 transition-colors">
             {proposing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Lightbulb className="w-3.5 h-3.5" />} Proponer temas
           </button>
@@ -1764,10 +1787,10 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
         </div>
       )}
 
-      {!claudeOn && (
+      {!aiOn && (
         <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5" />
-          IA de contenido no configurada — añade <code className="text-foreground">ANTHROPIC_API_KEY</code> en el entorno para mejorar artículos con IA.
+          IA de contenido no configurada — añade <code className="text-foreground">ANTHROPIC_API_KEY</code> (Claude) o <code className="text-foreground">GEMINI_API_KEY</code> (Gemini) en el entorno.
         </p>
       )}
 
@@ -1951,8 +1974,8 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                             className="p-1.5 rounded-lg text-muted-foreground hover:text-chart-3 hover:bg-chart-3/10 transition-colors"><Wand2 className="w-4 h-4" /></button>
                         ) : p.status === "published" ? (
                           <>
-                            <button type="button" onClick={() => improve(p)} disabled={!claudeOn || improving === p.slug}
-                              title={claudeOn ? "Mejorar con IA" : "Configura ANTHROPIC_API_KEY"}
+                            <button type="button" onClick={() => improve(p)} disabled={!aiOn || improving === p.slug}
+                              title={aiOn ? "Mejorar con IA" : "Configura ANTHROPIC_API_KEY o GEMINI_API_KEY"}
                               className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-30 transition-colors">
                               {improving === p.slug ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                             </button>

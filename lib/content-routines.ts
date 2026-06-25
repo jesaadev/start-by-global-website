@@ -5,7 +5,7 @@ import {
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries } from "@/lib/gsc"
 import { buildContentMap, contentMapToPrompt } from "@/lib/content-map"
-import { claudeConfigured, claudeJson } from "@/lib/claude"
+import { anyProviderConfigured, aiJson } from "@/lib/ai"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 
 const IMPROVE_SYSTEM = `Eres un editor SEO senior de Start By Global, una agencia de marketing y desarrollo web. Mejoras y amplías artículos existentes para reforzar su posicionamiento orgánico, manteniendo la voz de marca (cercana, profesional, orientada a resultados) y en español.
@@ -38,8 +38,8 @@ const DRAFT_SUFFIX = "--mejora-ia"
 
 /** Genera un borrador de mejora (no toca el artículo en vivo) para un slug publicado. */
 export async function improveArticle(slug: string): Promise<ImproveOutcome> {
-  if (!claudeConfigured()) {
-    throw new Error("ANTHROPIC_API_KEY no está configurada: no se puede generar la mejora.")
+  if (!anyProviderConfigured()) {
+    throw new Error("No hay proveedor de IA configurado (ANTHROPIC_API_KEY o GEMINI_API_KEY): no se puede generar la mejora.")
   }
 
   const row = await getRowBySlug(slug)
@@ -92,7 +92,7 @@ Devuelve un JSON con esta forma exacta:
   "keywords": ["keyword1", "keyword2", "..."]
 }`
 
-  const result = await claudeJson<ImproveResult>({ system: IMPROVE_SYSTEM, prompt, maxTokens: 8000 })
+  const result = await aiJson<ImproveResult>({ system: IMPROVE_SYSTEM, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
   }
@@ -209,8 +209,8 @@ function slugify(input: string): string {
 
 /** Claude propone temas nuevos no canibalizadores a partir del mapa de contenido. */
 export async function proposeTopics(count = 5): Promise<ProposedTopic[]> {
-  if (!claudeConfigured()) {
-    throw new Error("ANTHROPIC_API_KEY no está configurada: no se pueden proponer temas.")
+  if (!anyProviderConfigured()) {
+    throw new Error("No hay proveedor de IA configurado (ANTHROPIC_API_KEY o GEMINI_API_KEY): no se pueden proponer temas.")
   }
   const map = await buildContentMap()
   const used = await getUsedPrimaryKeywords()
@@ -239,7 +239,7 @@ Devuelve un JSON con esta forma exacta:
   ]
 }`
 
-  const res = await claudeJson<{ topics: ProposedTopic[] }>({ system: PROPOSE_SYSTEM, prompt, maxTokens: 3000 })
+  const res = await aiJson<{ topics: ProposedTopic[] }>({ system: PROPOSE_SYSTEM, prompt, maxTokens: 3000 })
   const topics = Array.isArray(res?.topics) ? res.topics : []
   const usedSet = new Set(used)
   return topics.filter((t) => t?.primary_keyword && !usedSet.has(t.primary_keyword.toLowerCase().trim()))
@@ -255,8 +255,8 @@ interface GenerateResult {
 
 /** Genera un artículo completo (borrador ai_generated) a partir de un tema. */
 export async function generateArticle(topic: ProposedTopic): Promise<BlogPostRow> {
-  if (!claudeConfigured()) {
-    throw new Error("ANTHROPIC_API_KEY no está configurada: no se puede generar el artículo.")
+  if (!anyProviderConfigured()) {
+    throw new Error("No hay proveedor de IA configurado (ANTHROPIC_API_KEY o GEMINI_API_KEY): no se puede generar el artículo.")
   }
   const primary = (topic.primary_keyword || "").trim()
   if (!primary) throw new Error("El tema no tiene palabra clave principal.")
@@ -292,7 +292,7 @@ Devuelve un JSON con esta forma exacta:
   "read_time": "X min"
 }`
 
-  const result = await claudeJson<GenerateResult>({ system: GENERATE_SYSTEM, prompt, maxTokens: 8000 })
+  const result = await aiJson<GenerateResult>({ system: GENERATE_SYSTEM, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
   }

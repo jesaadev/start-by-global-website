@@ -12,7 +12,7 @@ import {
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 import { improveArticle, applyImprovement, proposeTopics, generateArticle, type ProposedTopic } from "@/lib/content-routines"
-import { claudeConfigured } from "@/lib/claude"
+import { configuredProviders, getActiveProvider, type AiProvider } from "@/lib/ai"
 
 // Columnas escribibles de blog_posts vía API (allowlist).
 const POST_FIELDS = [
@@ -134,7 +134,8 @@ export async function GET(request: Request) {
     if (resource === "posts") {
       const status = searchParams.get("status") as BlogPostRow["status"] | null
       const data = await listPosts(status ? { status } : undefined)
-      return NextResponse.json({ data, claude: claudeConfigured() })
+      const ai = { providers: configuredProviders(), active: await getActiveProvider() }
+      return NextResponse.json({ data, ai })
     }
 
     if (resource === "post") {
@@ -198,6 +199,18 @@ export async function PATCH(request: Request) {
     if (resource === "seo") {
       const saved = await saveSiteSettings(updates.data)
       return NextResponse.json({ data: saved })
+    }
+
+    // Cambiar el proveedor de IA activo (claude | gemini) sin tocar el resto
+    // de settings: leemos los actuales y solo sustituimos ai.provider.
+    if (resource === "ai-provider") {
+      const provider = updates.provider as AiProvider
+      if (provider !== "claude" && provider !== "gemini") {
+        return NextResponse.json({ error: "Proveedor no válido." }, { status: 400 })
+      }
+      const current = await readSiteSettings()
+      const saved = await saveSiteSettings({ ...current, ai: { provider } })
+      return NextResponse.json({ data: { provider: saved.ai.provider } })
     }
 
     if (resource === "post") {

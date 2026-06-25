@@ -39,10 +39,16 @@ export interface PixelSettings {
   googleSiteVerification: string
 }
 
+export interface AiSettings {
+  // Proveedor activo para las rutinas de contenido (mejorar/proponer/generar).
+  provider: "claude" | "gemini"
+}
+
 export interface SiteSettings {
   seo: SeoSettings
   organization: OrganizationSettings
   pixels: PixelSettings
+  ai: AiSettings
 }
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
@@ -84,6 +90,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     tiktokPixelId: "",
     googleSiteVerification: "",
   },
+  ai: {
+    provider: "claude",
+  },
 }
 
 // ─── Merge ──────────────────────────────────────────────────────────────────
@@ -96,6 +105,7 @@ export function mergeSettings(partial: unknown): SiteSettings {
     seo: { ...DEFAULT_SETTINGS.seo, ...(p.seo ?? {}) },
     organization: { ...DEFAULT_SETTINGS.organization, ...(p.organization ?? {}) },
     pixels: { ...DEFAULT_SETTINGS.pixels, ...(p.pixels ?? {}) },
+    ai: { ...DEFAULT_SETTINGS.ai, ...(p.ai ?? {}) },
   }
 }
 
