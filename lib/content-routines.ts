@@ -1,5 +1,6 @@
 import {
-  getRowBySlug, getPostById, createPost, updatePost, deletePost, type BlogPostRow,
+  getRowBySlug, getPostById, createPost, updatePost, deletePost,
+  getUsedPrimaryKeywords, type BlogPostRow,
 } from "@/lib/blog-posts"
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries } from "@/lib/gsc"
@@ -155,4 +156,175 @@ export async function applyImprovement(draftId: string): Promise<{ slug: string 
   })
   await deletePost(draft.id)
   return { slug: target.slug }
+}
+
+// ─── Fase 4: crear artículos nuevos ──────────────────────────────────────────
+
+const POST_CATEGORIES = ["Marketing Digital", "Desarrollo Web", "Tendencias Tech"]
+
+// CTA contextual por categoría (alineado con blog-post-content.tsx).
+const CATEGORY_CTA: Record<string, string> = {
+  "Marketing Digital": "/publicidad-ads",
+  "Desarrollo Web": "/diseno-paginas-web",
+  "Tendencias Tech": "/contacto",
+}
+
+// Imagen por defecto para borradores generados (el admin la puede cambiar).
+const DEFAULT_ARTICLE_IMAGE = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80"
+
+const PROPOSE_SYSTEM = `Eres un estratega de contenidos SEO de Start By Global, una agencia de marketing y desarrollo web que opera en República Dominicana, España y Latinoamérica. Propones temas de artículos nuevos que amplíen la cobertura orgánica en cuatro verticales: diseño y desarrollo web, publicidad (Google/Meta/TikTok Ads), marketing digital y automatización/IA.
+
+Reglas:
+- Español. Orientado a captar clientes (intención comercial/transaccional o informativa cercana a la conversión), con palabras clave técnicas y de conversión reales del sector.
+- NO propongas temas que solapen (canibalicen) los artículos o keywords ya existentes que se te entregan. Cada tema debe tener una keyword principal distinta y un ángulo propio.
+- La categoría debe ser exactamente una de: "Marketing Digital", "Desarrollo Web", "Tendencias Tech".`
+
+const GENERATE_SYSTEM = `Eres un redactor SEO senior de Start By Global (agencia de marketing y desarrollo web en RD, España y LatAm). Escribes artículos completos, útiles y orientados a captar clientes, en español, con la voz de marca (cercana, profesional, orientada a resultados).
+
+Reglas de contenido:
+- Usa SOLO este subset de HTML: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <em>, <a>, <code>. Nada de <script>, <style>, <img>, ni atributos salvo href en <a>.
+- 1200-1800 palabras, con introducción, estructura H2/H3 clara, ejemplos concretos y una sección de preguntas frecuentes.
+- Añade enlaces internos relevantes (href relativos) usando el mapa de contenido entregado; no inventes URLs que no estén en el mapa o en las money pages conocidas (/diseno-paginas-web, /publicidad-ads, /servicios, /contacto, /ia-automatizacion).
+- Incluye al final un CTA claro hacia la money page indicada.
+- E-E-A-T: aporta valor real, no relleno; evita promesas exageradas.`
+
+export interface ProposedTopic {
+  working_title: string
+  slug: string
+  primary_keyword: string
+  secondary_keywords: string[]
+  category: string
+  search_intent: string
+  why_not_cannibalizing: string
+  suggested_internal_links: string[]
+}
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase().trim()
+    .normalize("NFD").replace(new RegExp("[\\u0300-\\u036f]", "g"), "")
+    .replace(/\s+/g, "-").replace(/[^a-z0-9-_]/g, "").replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+}
+
+/** Claude propone temas nuevos no canibalizadores a partir del mapa de contenido. */
+export async function proposeTopics(count = 5): Promise<ProposedTopic[]> {
+  if (!claudeConfigured()) {
+    throw new Error("ANTHROPIC_API_KEY no está configurada: no se pueden proponer temas.")
+  }
+  const map = await buildContentMap()
+  const used = await getUsedPrimaryKeywords()
+
+  const prompt = `Propón ${count} temas de artículos nuevos.
+
+MAPA DE CONTENIDO ACTUAL (no repitas estos temas ni sus keywords):
+${contentMapToPrompt(map)}
+
+KEYWORDS PRINCIPALES YA OCUPADAS (no las repitas):
+${used.length ? used.join(", ") : "(ninguna)"}
+
+Devuelve un JSON con esta forma exacta:
+{
+  "topics": [
+    {
+      "working_title": "título de trabajo",
+      "slug": "slug-sugerido-en-kebab-case",
+      "primary_keyword": "keyword principal única",
+      "secondary_keywords": ["kw2", "kw3"],
+      "category": "Marketing Digital | Desarrollo Web | Tendencias Tech",
+      "search_intent": "informacional | comercial | transaccional",
+      "why_not_cannibalizing": "por qué no solapa con lo existente",
+      "suggested_internal_links": ["/insights/...", "/diseno-paginas-web"]
+    }
+  ]
+}`
+
+  const res = await claudeJson<{ topics: ProposedTopic[] }>({ system: PROPOSE_SYSTEM, prompt, maxTokens: 3000 })
+  const topics = Array.isArray(res?.topics) ? res.topics : []
+  const usedSet = new Set(used)
+  return topics.filter((t) => t?.primary_keyword && !usedSet.has(t.primary_keyword.toLowerCase().trim()))
+}
+
+interface GenerateResult {
+  title: string
+  excerpt: string
+  content: string
+  keywords?: string[]
+  read_time?: string
+}
+
+/** Genera un artículo completo (borrador ai_generated) a partir de un tema. */
+export async function generateArticle(topic: ProposedTopic): Promise<BlogPostRow> {
+  if (!claudeConfigured()) {
+    throw new Error("ANTHROPIC_API_KEY no está configurada: no se puede generar el artículo.")
+  }
+  const primary = (topic.primary_keyword || "").trim()
+  if (!primary) throw new Error("El tema no tiene palabra clave principal.")
+
+  // Chequeo final anti-canibalización.
+  const used = await getUsedPrimaryKeywords()
+  if (used.includes(primary.toLowerCase())) {
+    throw new Error("Ese tema canibaliza un artículo publicado (misma keyword principal).")
+  }
+
+  const category = POST_CATEGORIES.includes(topic.category) ? topic.category : "Marketing Digital"
+  const cta = CATEGORY_CTA[category] ?? "/contacto"
+  const map = await buildContentMap()
+
+  const prompt = `Escribe el artículo completo para este tema.
+
+TÍTULO DE TRABAJO: ${topic.working_title}
+KEYWORD PRINCIPAL: ${primary}
+KEYWORDS SECUNDARIAS: ${(topic.secondary_keywords || []).join(", ") || "—"}
+CATEGORÍA: ${category}
+INTENCIÓN DE BÚSQUEDA: ${topic.search_intent || "—"}
+CTA FINAL (money page): ${cta}
+
+MAPA DE CONTENIDO (para enlaces internos):
+${contentMapToPrompt(map)}
+
+Devuelve un JSON con esta forma exacta:
+{
+  "title": "título SEO final",
+  "excerpt": "extracto de 1-2 frases",
+  "content": "<artículo completo en el subset HTML permitido>",
+  "keywords": ["keyword1", "keyword2", "..."],
+  "read_time": "X min"
+}`
+
+  const result = await claudeJson<GenerateResult>({ system: GENERATE_SYSTEM, prompt, maxTokens: 8000 })
+  if (!result || typeof result !== "object") {
+    throw new Error("La respuesta de la IA no tiene el formato esperado.")
+  }
+  const content = sanitizeArticleHtml(result.content || "")
+  if (!content) throw new Error("El artículo generado quedó vacío tras sanitizar.")
+
+  // Slug único.
+  let slug = slugify(topic.slug || result.title || topic.working_title)
+  if (!slug) slug = `articulo-${Date.now().toString(36)}`
+  if (await getRowBySlug(slug)) slug = `${slug}-${Date.now().toString(36).slice(-4)}`
+
+  const keywords = result.keywords?.length
+    ? result.keywords
+    : [primary, ...(topic.secondary_keywords || [])]
+
+  const draft = await createPost({
+    slug,
+    title: result.title?.trim() || topic.working_title,
+    excerpt: result.excerpt?.trim() || "",
+    author: "Jhon Alejandro Esáa",
+    author_role: "Founder & Lead Developer",
+    category,
+    image: DEFAULT_ARTICLE_IMAGE,
+    read_time: result.read_time?.trim() || "7 min",
+    date_iso: new Date().toISOString().slice(0, 10),
+    keywords,
+    primary_keyword: primary,
+    content,
+    status: "draft",
+    origin: "ai_generated",
+  })
+
+  if (!draft) throw new Error("No se pudo guardar el borrador generado.")
+  return draft
 }
