@@ -34,11 +34,12 @@ function decodeEntities(s: string): string {
   return s
     .replace(/&#x([0-9a-f]+);?/gi, (_, h) => {
       const n = parseInt(h, 16)
-      return Number.isFinite(n) ? String.fromCodePoint(n) : ""
+      // Rango Unicode válido: fuera de él String.fromCodePoint lanza RangeError.
+      return n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : ""
     })
     .replace(/&#(\d+);?/g, (_, d) => {
       const n = parseInt(d, 10)
-      return Number.isFinite(n) ? String.fromCodePoint(n) : ""
+      return n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : ""
     })
     .replace(/&([a-z0-9#]+);/gi, (m, name) => NAMED_ENTITIES[name.toLowerCase()] ?? m)
 }
@@ -49,7 +50,7 @@ function escapeAttr(s: string): string {
 
 /** Devuelve un href seguro o null si no se permite. */
 function safeHref(attrs: string): string | null {
-  const m = attrs.match(/\bhref\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i)
+  const m = attrs.match(/(?:\s|^)href\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i)
   if (!m) return null
   const raw = (m[2] ?? m[3] ?? m[4] ?? "").trim()
   if (!raw) return null
