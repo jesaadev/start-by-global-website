@@ -1582,6 +1582,17 @@ interface AdminPost {
   updated_at: string
 }
 
+interface ProposedTopic {
+  working_title: string
+  slug: string
+  primary_keyword: string
+  secondary_keywords: string[]
+  category: string
+  search_intent: string
+  why_not_cannibalizing: string
+  suggested_internal_links: string[]
+}
+
 const POST_CATEGORIES = ["Marketing Digital", "Desarrollo Web", "Tendencias Tech"]
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
@@ -1615,6 +1626,9 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [claudeOn, setClaudeOn] = useState(false)
   const [improving, setImproving] = useState<string | null>(null)
   const [notice, setNotice] = useState("")
+  const [topics, setTopics] = useState<ProposedTopic[]>([])
+  const [proposing, setProposing] = useState(false)
+  const [generating, setGenerating] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -1703,6 +1717,23 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setNotice("Mejora aplicada al artículo publicado.")
     await load()
   }
+  const propose = async () => {
+    setProposing(true); setNotice(""); setError("")
+    const res = await api.post({ resource: "propose-topics", count: 5 })
+    setProposing(false)
+    if (res.error) { setError(res.error); return }
+    setTopics(res.topics ?? [])
+    if (!(res.topics?.length)) setNotice("La IA no propuso temas nuevos (la cobertura actual ya parece amplia).")
+  }
+  const generate = async (t: ProposedTopic) => {
+    setGenerating(t.primary_keyword); setNotice(""); setError("")
+    const res = await api.post({ resource: "generate-article", topic: t })
+    setGenerating(null)
+    if (res.error || !res.data) { setError(res.error || "No se pudo generar el artículo."); return }
+    setNotice(`Borrador creado: "${res.data.title}". Revísalo abajo, ajusta la imagen y publícalo.`)
+    setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))
+    await load()
+  }
 
   return (
     <div className="space-y-4">
@@ -1714,6 +1745,11 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
           <button type="button" onClick={seed} disabled={seeding}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
             {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Importar del código
+          </button>
+          <button type="button" onClick={propose} disabled={!claudeOn || proposing}
+            title={claudeOn ? "Proponer temas con IA" : "Configura ANTHROPIC_API_KEY"}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-40 transition-colors">
+            {proposing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Lightbulb className="w-3.5 h-3.5" />} Proponer temas
           </button>
           <button type="button" onClick={startCreate}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all">
@@ -1745,6 +1781,41 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
         <div className="glass-card rounded-xl p-3 border border-destructive/30 text-xs text-destructive flex items-start justify-between gap-3">
           <span>{error}</span>
           <button type="button" onClick={() => setError("")}><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
+
+      {/* Temas propuestos por IA */}
+      {topics.length > 0 && (
+        <div className="glass-card rounded-xl p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5 text-primary" /> Temas propuestos ({topics.length})
+            </p>
+            <button type="button" onClick={() => setTopics([])} className="text-[11px] text-muted-foreground hover:text-foreground">Descartar todos</button>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {topics.map((t) => (
+              <div key={t.primary_keyword} className="rounded-lg border border-border/50 bg-background/40 p-3 flex flex-col gap-2">
+                <p className="text-sm font-medium text-foreground leading-snug">{t.working_title}</p>
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-secondary/60 text-muted-foreground">{t.category}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary">{t.primary_keyword}</span>
+                  {t.search_intent && <span className="px-1.5 py-0.5 rounded bg-secondary/60 text-muted-foreground">{t.search_intent}</span>}
+                </div>
+                {t.why_not_cannibalizing && (
+                  <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{t.why_not_cannibalizing}</p>
+                )}
+                <div className="flex items-center gap-2 mt-auto pt-1">
+                  <button type="button" onClick={() => generate(t)} disabled={generating === t.primary_keyword}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+                    {generating === t.primary_keyword ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />} Generar borrador
+                  </button>
+                  <button type="button" onClick={() => setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))}
+                    className="text-[11px] text-muted-foreground hover:text-destructive">Descartar</button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

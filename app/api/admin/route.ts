@@ -11,7 +11,7 @@ import {
 } from "@/lib/blog-posts"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
-import { improveArticle, applyImprovement } from "@/lib/content-routines"
+import { improveArticle, applyImprovement, proposeTopics, generateArticle, type ProposedTopic } from "@/lib/content-routines"
 import { claudeConfigured } from "@/lib/claude"
 
 // Columnas escribibles de blog_posts vía API (allowlist).
@@ -306,6 +306,34 @@ export async function POST(request: Request) {
         })
       } catch (e) {
         const message = e instanceof Error ? e.message : "Error al generar la mejora."
+        return NextResponse.json({ error: message }, { status: 502 })
+      }
+    }
+
+    // Claude propone temas nuevos no canibalizadores.
+    if (resource === "propose-topics") {
+      try {
+        const count = Number(payload.count) || 5
+        const topics = await proposeTopics(count)
+        return NextResponse.json({ topics })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Error al proponer temas."
+        return NextResponse.json({ error: message }, { status: 502 })
+      }
+    }
+
+    // Genera un artículo completo (borrador) a partir de un tema propuesto.
+    if (resource === "generate-article") {
+      try {
+        const topic = payload.topic as ProposedTopic | undefined
+        if (!topic?.primary_keyword) {
+          return NextResponse.json({ error: "tema inválido." }, { status: 400 })
+        }
+        const draft = await generateArticle(topic)
+        revalidateBlog()
+        return NextResponse.json({ data: draft })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Error al generar el artículo."
         return NextResponse.json({ error: message }, { status: 502 })
       }
     }
