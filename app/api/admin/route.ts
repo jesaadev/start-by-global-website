@@ -204,9 +204,14 @@ export async function PATCH(request: Request) {
       if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
       const action = updates.action as string | undefined
       if (action === "apply-improvement") {
-        const applied = await applyImprovement(id)
-        if (applied) revalidateBlog(applied.slug)
-        return NextResponse.json({ data: applied })
+        try {
+          const applied = await applyImprovement(id)
+          if (applied) revalidateBlog(applied.slug)
+          return NextResponse.json({ data: applied })
+        } catch (e) {
+          const message = e instanceof Error ? e.message : "Error al aplicar la mejora."
+          return NextResponse.json({ error: message }, { status: 400 })
+        }
       }
       let row: BlogPostRow | null
       if (action === "publish") {

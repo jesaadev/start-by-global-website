@@ -1694,7 +1694,12 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   }
   const applyImprovementAction = async (p: AdminPost) => {
     if (!confirm(`Aplicar esta mejora al artículo publicado? Reemplazará el contenido en vivo.`)) return
-    await api.patch({ resource: "post", id: p.id, action: "apply-improvement" })
+    setNotice(""); setError("")
+    const res = await api.patch({ resource: "post", id: p.id, action: "apply-improvement" })
+    if (res.error || !res.data) {
+      setError(res.error || "No se pudo aplicar la mejora.")
+      return
+    }
     setNotice("Mejora aplicada al artículo publicado.")
     await load()
   }

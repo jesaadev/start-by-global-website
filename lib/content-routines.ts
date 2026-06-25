@@ -92,6 +92,9 @@ Devuelve un JSON con esta forma exacta:
 }`
 
   const result = await claudeJson<ImproveResult>({ system: IMPROVE_SYSTEM, prompt, maxTokens: 8000 })
+  if (!result || typeof result !== "object") {
+    throw new Error("La respuesta de la IA no tiene el formato esperado.")
+  }
   const content = sanitizeArticleHtml(result.content || "")
   if (!content) throw new Error("La mejora generada quedó vacía tras sanitizar.")
 
@@ -137,11 +140,17 @@ export async function applyImprovement(draftId: string): Promise<{ slug: string 
   const target = await getPostById(draft.improves_post_id)
   if (!target) throw new Error("El artículo de origen ya no existe.")
 
+  // Copiamos todos los campos editables del borrador (el admin pudo ajustarlos)
+  // excepto el slug del publicado, que no cambia.
   await updatePost(target.id, {
     title: draft.title,
     excerpt: draft.excerpt,
     content: draft.content,
     keywords: draft.keywords,
+    primary_keyword: draft.primary_keyword,
+    category: draft.category,
+    read_time: draft.read_time,
+    image: draft.image,
     last_modified_iso: new Date().toISOString().slice(0, 10),
   })
   await deletePost(draft.id)

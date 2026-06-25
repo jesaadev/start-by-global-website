@@ -40,7 +40,11 @@ function parseJsonLoose<T>(text: string): T {
   const first = trimmed.indexOf("{")
   const last = trimmed.lastIndexOf("}")
   if (first !== -1 && last > first) {
-    return JSON.parse(trimmed.slice(first, last + 1)) as T
+    try {
+      return JSON.parse(trimmed.slice(first, last + 1)) as T
+    } catch {
+      /* sigue */
+    }
   }
   throw new Error("Respuesta del modelo no es JSON válido")
 }
