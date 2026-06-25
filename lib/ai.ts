@@ -110,7 +110,7 @@ async function geminiText(system: string, prompt: string, maxTokens: number): Pr
           ...(jsonMode ? { responseMimeType: "application/json" } : {}),
         },
       }),
-    })
+    }).catch((err) => new Response(err instanceof Error ? err.message : "Network Error", { status: 500 }))
 
   // Intento + reintento ante errores transitorios (429/5xx); como último
   // recurso, sin modo-JSON (parseJsonLoose tolera el JSON dentro de texto).
@@ -128,7 +128,7 @@ async function geminiText(system: string, prompt: string, maxTokens: number): Pr
     console.error("[AI] Gemini error", res.status, body.slice(0, 500))
     throw new Error(`Gemini ${res.status}: ${body.slice(0, 200)}`)
   }
-  const data = (await res.json()) as {
+  const data = (await res.json().catch(() => ({}))) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>
     promptFeedback?: { blockReason?: string }
   }
