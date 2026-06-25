@@ -1705,18 +1705,28 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   }
   const seed = async () => {
     if (!confirm("Importar los artículos del código a la BD. No sobreescribe los ya existentes. ¿Continuar?")) return
-    setSeeding(true)
-    await api.post({ resource: "seed-blog" })
-    await load()
-    setSeeding(false)
+    setSeeding(true); setError("")
+    try {
+      await api.post({ resource: "seed-blog" })
+      await load()
+    } catch {
+      setError("Error de red o del servidor al importar.")
+    } finally {
+      setSeeding(false)
+    }
   }
   const improve = async (p: AdminPost) => {
     setImproving(p.slug); setNotice(""); setError("")
-    const res = await api.post({ resource: "improve-article", slug: p.slug })
-    setImproving(null)
-    if (res.error || !res.data) { setError(res.error || "No se pudo generar la mejora.") ; return }
-    setNotice(`Borrador de mejora creado para "${p.title}": ${res.summary ?? ""} Revísalo y pulsa "Aplicar mejora".`)
-    await load()
+    try {
+      const res = await api.post({ resource: "improve-article", slug: p.slug })
+      if (res.error || !res.data) { setError(res.error || "No se pudo generar la mejora."); return }
+      setNotice(`Borrador de mejora creado para "${p.title}": ${res.summary ?? ""} Revísalo y pulsa "Aplicar mejora".`)
+      await load()
+    } catch {
+      setError("Error de red o del servidor al generar la mejora.")
+    } finally {
+      setImproving(null)
+    }
   }
   const applyImprovementAction = async (p: AdminPost) => {
     if (!confirm(`Aplicar esta mejora al artículo publicado? Reemplazará el contenido en vivo.`)) return
@@ -1731,20 +1741,30 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   }
   const propose = async () => {
     setProposing(true); setNotice(""); setError("")
-    const res = await api.post({ resource: "propose-topics", count: 5 })
-    setProposing(false)
-    if (res.error) { setError(res.error); return }
-    setTopics(res.topics ?? [])
-    if (!(res.topics?.length)) setNotice("La IA no propuso temas nuevos (la cobertura actual ya parece amplia).")
+    try {
+      const res = await api.post({ resource: "propose-topics", count: 5 })
+      if (res.error) { setError(res.error); return }
+      setTopics(res.topics ?? [])
+      if (!(res.topics?.length)) setNotice("La IA no propuso temas nuevos (la cobertura actual ya parece amplia).")
+    } catch {
+      setError("Error de red o del servidor al proponer temas.")
+    } finally {
+      setProposing(false)
+    }
   }
   const generate = async (t: ProposedTopic) => {
     setGenerating(t.primary_keyword); setNotice(""); setError("")
-    const res = await api.post({ resource: "generate-article", topic: t })
-    setGenerating(null)
-    if (res.error || !res.data) { setError(res.error || "No se pudo generar el artículo."); return }
-    setNotice(`Borrador creado: "${res.data.title}". Revísalo abajo, ajusta la imagen y publícalo.`)
-    setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))
-    await load()
+    try {
+      const res = await api.post({ resource: "generate-article", topic: t })
+      if (res.error || !res.data) { setError(res.error || "No se pudo generar el artículo."); return }
+      setNotice(`Borrador creado: "${res.data.title}". Revísalo abajo, ajusta la imagen y publícalo.`)
+      setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))
+      await load()
+    } catch {
+      setError("Error de red o del servidor al generar el artículo.")
+    } finally {
+      setGenerating(null)
+    }
   }
 
   return (
