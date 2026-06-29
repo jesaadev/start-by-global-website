@@ -19,6 +19,10 @@ export async function GET(request: Request) {
   try {
     const result = await runCreateRoutine()
     console.log("[cron/content-create]", JSON.stringify(result))
+    // Devolvemos no-2xx ante fallos para que el monitor de crons los detecte.
+    if (result.error) {
+      return NextResponse.json({ ok: false, ...result }, { status: 500 })
+    }
     return NextResponse.json({ ok: true, ...result })
   } catch (e) {
     console.error("[cron/content-create] error:", e)

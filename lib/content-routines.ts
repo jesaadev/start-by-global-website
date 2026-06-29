@@ -344,7 +344,9 @@ export async function runImproveRoutine(limit = 1): Promise<ImproveRoutineResult
 
   const all = await listPosts()
   const pendingTargets = new Set(
-    all.filter((p) => p.origin === "ai_improved" && p.improves_post_id).map((p) => p.improves_post_id)
+    all
+      .filter((p) => p.origin === "ai_improved" && p.improves_post_id !== null)
+      .map((p) => p.improves_post_id as string)
   )
   const candidates = all
     .filter((p) => p.status === "published" && !pendingTargets.has(p.id))

@@ -20,6 +20,11 @@ export async function GET(request: Request) {
   try {
     const result = await runImproveRoutine(1)
     console.log("[cron/content-improve]", JSON.stringify(result))
+    // No-2xx ante errores reales o falta de proveedor; un salto normal por
+    // no haber candidatos sigue siendo 200 (no es un fallo).
+    if (result.errors.length > 0 || result.skipped === "sin proveedor de IA") {
+      return NextResponse.json({ ok: false, ...result }, { status: 500 })
+    }
     return NextResponse.json({ ok: true, ...result })
   } catch (e) {
     console.error("[cron/content-improve] error:", e)
