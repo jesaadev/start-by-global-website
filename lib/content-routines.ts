@@ -1,6 +1,6 @@
 import {
   getRowBySlug, getPostById, createPost, updatePost, deletePost,
-  getUsedPrimaryKeywords, type BlogPostRow,
+  getUsedPrimaryKeywords, listPosts, type BlogPostRow,
 } from "@/lib/blog-posts"
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries } from "@/lib/gsc"
@@ -327,4 +327,67 @@ Devuelve un JSON con esta forma exacta:
 
   if (!draft) throw new Error("No se pudo guardar el borrador generado.")
   return draft
+}
+
+// ─── Rutinas programadas (crons) ─────────────────────────────────────────────
+// Generan SOLO borradores: el gate de aprobación humana en el admin se mantiene.
+
+export interface ImproveRoutineResult {
+  improved: string[]
+  errors: string[]
+  skipped?: string
+}
+
+/** Mejora los N artículos publicados más antiguos que no tengan ya una mejora pendiente. */
+export async function runImproveRoutine(limit = 1): Promise<ImproveRoutineResult> {
+  if (!anyProviderConfigured()) return { improved: [], errors: [], skipped: "sin proveedor de IA" }
+
+  const all = await listPosts()
+  const pendingTargets = new Set(
+    all.filter((p) => p.origin === "ai_improved" && p.improves_post_id).map((p) => p.improves_post_id)
+  )
+  const candidates = all
+    .filter((p) => p.status === "published" && !pendingTargets.has(p.id))
+    .sort((a, b) =>
+      (a.last_modified_iso || a.date_iso || "").localeCompare(b.last_modified_iso || b.date_iso || "")
+    )
+    .slice(0, limit)
+
+  if (!candidates.length) return { improved: [], errors: [], skipped: "no hay candidatos sin mejora pendiente" }
+
+  const improved: string[] = []
+  const errors: string[] = []
+  for (const c of candidates) {
+    try {
+      await improveArticle(c.slug)
+      improved.push(c.slug)
+    } catch (e) {
+      errors.push(`${c.slug}: ${e instanceof Error ? e.message : String(e)}`)
+    }
+  }
+  return { improved, errors }
+}
+
+export interface CreateRoutineResult {
+  created: string | null
+  error?: string
+}
+
+/** Propone temas y genera 1 borrador del primer tema viable (no canibalizador). */
+export async function runCreateRoutine(): Promise<CreateRoutineResult> {
+  if (!anyProviderConfigured()) return { created: null, error: "sin proveedor de IA" }
+
+  const topics = await proposeTopics(3)
+  if (!topics.length) return { created: null, error: "la IA no propuso temas nuevos" }
+
+  let lastError = ""
+  for (const t of topics) {
+    try {
+      const draft = await generateArticle(t)
+      return { created: draft.slug }
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e)
+    }
+  }
+  return { created: null, error: `no se pudo generar ningún tema (${lastError})` }
 }

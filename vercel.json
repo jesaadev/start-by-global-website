@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/content-improve", "schedule": "0 6 * * 1" },
+    { "path": "/api/cron/content-create", "schedule": "0 6 * * 4" }
+  ]
+}
