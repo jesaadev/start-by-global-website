@@ -10,6 +10,7 @@ import {
   User,
   ChevronRight,
   Tag,
+  BookOpen,
 } from "lucide-react"
 import type { BlogPostView, RelatedPost } from "@/lib/blog-posts"
 import { ShareButtons } from "@/components/blog/share-buttons"
@@ -60,7 +61,7 @@ function ArticleBody({ html }: { html: string }) {
       const between = html.slice(lastIndex, match.index).trim()
       if (between) {
         segments.push(
-          <p key={key++} className="text-muted-foreground leading-[1.9] text-[1.0625rem]">
+          <p key={key++} className="text-muted-foreground leading-[1.95] text-[1.0625rem] my-6">
             <InlineHtml html={between} />
           </p>
         )
@@ -72,7 +73,7 @@ function ArticleBody({ html }: { html: string }) {
       segments.push(
         <h2
           key={key++}
-          className="font-display text-2xl sm:text-[1.75rem] font-bold text-foreground mt-12 mb-5 pb-3 border-b border-border/40 leading-snug tracking-tight"
+          className="font-display text-2xl sm:text-[1.75rem] font-bold text-foreground mt-16 mb-7 pb-3 border-b border-border/40 leading-snug tracking-tight"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: safe – controlled content
           dangerouslySetInnerHTML={{ __html: inner }}
         />
@@ -81,23 +82,40 @@ function ArticleBody({ html }: { html: string }) {
       segments.push(
         <h3
           key={key++}
-          className="font-display text-lg sm:text-xl font-semibold text-foreground mt-8 mb-3 leading-snug"
+          className="font-display text-lg sm:text-xl font-semibold text-foreground mt-11 mb-4 leading-snug"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: safe – controlled content
           dangerouslySetInnerHTML={{ __html: inner }}
         />
       )
     } else if (tag === "p") {
-      segments.push(
-        <p key={key++} className="text-muted-foreground leading-[1.9] text-[1.0625rem] mb-1">
-          <InlineHtml html={inner} />
-        </p>
-      )
+      // Párrafo que recomienda otro artículo del blog (enlace a /insights/…):
+      // se muestra como callout diferenciado del texto de lectura.
+      const isReadNext = /href\s*=\s*["']\/insights\//i.test(inner)
+      if (isReadNext) {
+        segments.push(
+          <aside key={key++} className="my-8 flex items-start gap-3.5 rounded-xl border border-primary/25 bg-primary/[0.06] px-5 py-4">
+            <BookOpen className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <span className="block text-[11px] font-semibold uppercase tracking-widest text-primary mb-1">Leer también</span>
+              <p className="text-foreground/90 leading-relaxed text-[0.975rem]">
+                <InlineHtml html={inner} />
+              </p>
+            </div>
+          </aside>
+        )
+      } else {
+        segments.push(
+          <p key={key++} className="text-muted-foreground leading-[1.95] text-[1.0625rem] my-6">
+            <InlineHtml html={inner} />
+          </p>
+        )
+      }
     } else if (tag === "blockquote") {
       const text = inner.replace(/<[^>]+>/g, "").trim()
       segments.push(
         <blockquote
           key={key++}
-          className="my-8 pl-5 pr-4 py-4 border-l-4 border-primary/70 bg-primary/5 rounded-r-xl text-foreground font-medium text-lg sm:text-xl leading-relaxed italic"
+          className="my-10 pl-5 pr-4 py-5 border-l-4 border-primary/70 bg-primary/5 rounded-r-xl text-foreground font-medium text-lg sm:text-xl leading-relaxed italic"
         >
           {text}
         </blockquote>
@@ -105,7 +123,7 @@ function ArticleBody({ html }: { html: string }) {
     } else if (tag === "ul") {
       const items = extractListItems(inner)
       segments.push(
-        <ul key={key++} className="mt-4 mb-6 space-y-2.5 pl-1">
+        <ul key={key++} className="my-7 space-y-3 pl-1">
           {items.map((item, i) => (
             <li key={i} className="flex items-start gap-3 text-muted-foreground leading-relaxed text-[1.0625rem]">
               <span className="mt-[0.35rem] w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
@@ -117,7 +135,7 @@ function ArticleBody({ html }: { html: string }) {
     } else if (tag === "ol") {
       const items = extractListItems(inner)
       segments.push(
-        <ol key={key++} className="mt-4 mb-6 space-y-3 pl-1">
+        <ol key={key++} className="my-7 space-y-3.5 pl-1">
           {items.map((item, i) => (
             <li key={i} className="flex items-start gap-3 text-muted-foreground leading-relaxed text-[1.0625rem]">
               <span className="mt-0.5 flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 font-display">
@@ -131,7 +149,7 @@ function ArticleBody({ html }: { html: string }) {
     }
   }
 
-  return <div className="space-y-2">{segments}</div>
+  return <div className="[&>:first-child]:mt-0">{segments}</div>
 }
 
 /** Extracts <li> inner HTML strings from a list block */

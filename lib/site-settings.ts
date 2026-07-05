@@ -53,7 +53,17 @@ export interface AiSettings {
   // Proveedor activo para las rutinas de contenido (mejorar/proponer/generar).
   provider: "claude" | "gemini"
   schedule: AiScheduleSettings
+  // Directrices de estilo/SEO editables que se añaden al prompt base de cada
+  // rutina (además de las reglas fijas de formato HTML).
+  improvePrompt: string
+  createPrompt: string
 }
+
+export const DEFAULT_IMPROVE_PROMPT =
+  "Aplica las mejores prácticas de SEO y contenido orgánico. Escribe original y específico: ejemplos concretos, datos y casos del mercado hispano (RD, España, LatAm). Refuerza E-E-A-T. Evita muletillas y clichés típicos de IA como \"En conclusión\", \"En resumen\", \"En el mundo actual\", \"En la era digital\" o cierres genéricos vacíos; termina con algo útil (pasos accionables, checklist o preguntas frecuentes). Cuando recomiendes otro artículo del blog, ponlo en un párrafo propio con el enlace a /insights/… (se mostrará como bloque destacado)."
+
+export const DEFAULT_CREATE_PROMPT =
+  "Aplica las mejores prácticas de SEO y contenido orgánico: intención de búsqueda clara, encabezados escaneables, ejemplos concretos y datos del mercado hispano (RD, España, LatAm), y enlaces internos naturales. Escribe original y con voz propia; evita clichés de IA como \"En conclusión\", \"En resumen\", \"En el mundo actual\", \"En la era digital\" y los cierres genéricos. Termina con una sección práctica (pasos, checklist o FAQ), no con una conclusión de relleno. Cuando recomiendes otro artículo del blog, ponlo en un párrafo propio con el enlace a /insights/…."
 
 export interface SiteSettings {
   seo: SeoSettings
@@ -109,6 +119,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       createDays: [4], // jueves
       createCount: 1,
     },
+    improvePrompt: DEFAULT_IMPROVE_PROMPT,
+    createPrompt: DEFAULT_CREATE_PROMPT,
   },
 }
 

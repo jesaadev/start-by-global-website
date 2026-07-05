@@ -1644,6 +1644,9 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [generating, setGenerating] = useState<string | null>(null)
   const [schedule, setSchedule] = useState<AiSchedule | null>(null)
   const [savingSched, setSavingSched] = useState(false)
+  const [improvePrompt, setImprovePrompt] = useState("")
+  const [createPrompt, setCreatePrompt] = useState("")
+  const [savingPrompts, setSavingPrompts] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -1652,6 +1655,8 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setProviders(res.ai?.providers ?? [])
     setActiveProvider(res.ai?.active ?? "")
     setSchedule(res.ai?.schedule ?? null)
+    setImprovePrompt(res.ai?.improvePrompt ?? "")
+    setCreatePrompt(res.ai?.createPrompt ?? "")
     setLoading(false)
   }, [api])
 
@@ -1684,6 +1689,19 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
       setError("Error de red al guardar la programación.")
     } finally {
       setSavingSched(false)
+    }
+  }
+  const savePrompts = async () => {
+    setSavingPrompts(true); setError(""); setNotice("")
+    try {
+      const res = await api.patch({ resource: "ai-prompts", improvePrompt, createPrompt })
+      if (res.error || !res.data) { setError(res.error || "No se pudieron guardar los prompts."); return }
+      setImprovePrompt(res.data.improvePrompt); setCreatePrompt(res.data.createPrompt)
+      setNotice("Prompts guardados.")
+    } catch {
+      setError("Error de red al guardar los prompts.")
+    } finally {
+      setSavingPrompts(false)
     }
   }
 
@@ -1890,6 +1908,38 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             </button>
           </div>
         </div>
+      )}
+
+      {aiOn && (
+        <details className="glass-card rounded-xl p-4 group">
+          <summary className="cursor-pointer text-xs font-semibold text-foreground flex items-center gap-2 select-none">
+            <Pencil className="w-3.5 h-3.5 text-primary" /> Prompts de IA (estilo y SEO)
+            <span className="text-[11px] font-normal text-muted-foreground ml-1">— clic para editar</span>
+          </summary>
+          <div className="mt-3 space-y-4">
+            <p className="text-[11px] text-muted-foreground">
+              Directrices que se añaden al prompt base de cada rutina (las reglas de formato HTML son fijas). Deja vacío para usar solo el prompt base.
+            </p>
+            <div>
+              <FieldLabel>Prompt de mejora</FieldLabel>
+              <textarea rows={4} value={improvePrompt} onChange={(e) => setImprovePrompt(e.target.value)}
+                className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
+                placeholder="Estrategia de contenido/SEO para mejorar artículos…" />
+            </div>
+            <div>
+              <FieldLabel>Prompt de creación</FieldLabel>
+              <textarea rows={4} value={createPrompt} onChange={(e) => setCreatePrompt(e.target.value)}
+                className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
+                placeholder="Estrategia de contenido/SEO para crear artículos nuevos…" />
+            </div>
+            <div className="flex justify-end">
+              <button type="button" onClick={savePrompts} disabled={savingPrompts}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+                {savingPrompts ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Guardar prompts
+              </button>
+            </div>
+          </div>
+        </details>
       )}
 
       {notice && (

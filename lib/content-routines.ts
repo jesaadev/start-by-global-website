@@ -7,6 +7,13 @@ import { getArticleQueries } from "@/lib/gsc"
 import { buildContentMap, contentMapToPrompt } from "@/lib/content-map"
 import { anyProviderConfigured, aiJson } from "@/lib/ai"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
+import { getSiteSettings } from "@/lib/site-settings"
+
+// Añade las directrices editables (settings) al prompt base de la rutina.
+function withCustom(base: string, extra: string | undefined): string {
+  const trimmed = (extra ?? "").trim()
+  return trimmed ? `${base}\n\nDIRECTRICES DE ESTILO Y SEO (personalizables):\n${trimmed}` : base
+}
 
 const IMPROVE_SYSTEM = `Eres un editor SEO senior de Start By Global, una agencia de marketing y desarrollo web. Mejoras y amplías artículos existentes para reforzar su posicionamiento orgánico, manteniendo la voz de marca (cercana, profesional, orientada a resultados) y en español.
 
@@ -15,7 +22,8 @@ Reglas de contenido:
 - Usa SOLO este subset de HTML: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <em>, <a>, <code>. Nada de <script>, <style>, <img>, ni atributos salvo href en <a>.
 - Amplía con secciones nuevas que cubran las consultas reales de Google aportadas, refuerza E-E-A-T, mejora encabezados y añade una sección de preguntas frecuentes si aporta valor.
 - Añade enlaces internos relevantes (href relativos como /insights/otro-articulo o /diseno-paginas-web) usando el mapa de contenido; no inventes URLs que no estén en el mapa o en money pages conocidas (/diseno-paginas-web, /publicidad-ads, /servicios, /contacto).
-- No repitas el tema de otro artículo del mapa (evita canibalización); profundiza en el ángulo propio de este.`
+- No repitas el tema de otro artículo del mapa (evita canibalización); profundiza en el ángulo propio de este.
+- Cuando recomiendes explícitamente otro artículo del blog, ponlo en un párrafo propio que contenga el enlace a /insights/… (se renderiza como bloque destacado "Leer también").`
 
 interface ImproveResult {
   title?: string
@@ -92,7 +100,9 @@ Devuelve un JSON con esta forma exacta:
   "keywords": ["keyword1", "keyword2", "..."]
 }`
 
-  const result = await aiJson<ImproveResult>({ system: IMPROVE_SYSTEM, prompt, maxTokens: 8000 })
+  const settings = await getSiteSettings()
+  const system = withCustom(IMPROVE_SYSTEM, settings.ai.improvePrompt)
+  const result = await aiJson<ImproveResult>({ system, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
   }
@@ -186,7 +196,8 @@ Reglas de contenido:
 - 1200-1800 palabras, con introducción, estructura H2/H3 clara, ejemplos concretos y una sección de preguntas frecuentes.
 - Añade enlaces internos relevantes (href relativos) usando el mapa de contenido entregado; no inventes URLs que no estén en el mapa o en las money pages conocidas (/diseno-paginas-web, /publicidad-ads, /servicios, /contacto, /ia-automatizacion).
 - Incluye al final un CTA claro hacia la money page indicada.
-- E-E-A-T: aporta valor real, no relleno; evita promesas exageradas.`
+- E-E-A-T: aporta valor real, no relleno; evita promesas exageradas.
+- Cuando recomiendes explícitamente otro artículo del blog, ponlo en un párrafo propio que contenga el enlace a /insights/… (se renderiza como bloque destacado "Leer también").`
 
 export interface ProposedTopic {
   working_title: string
@@ -292,7 +303,9 @@ Devuelve un JSON con esta forma exacta:
   "read_time": "X min"
 }`
 
-  const result = await aiJson<GenerateResult>({ system: GENERATE_SYSTEM, prompt, maxTokens: 8000 })
+  const settings = await getSiteSettings()
+  const system = withCustom(GENERATE_SYSTEM, settings.ai.createPrompt)
+  const result = await aiJson<GenerateResult>({ system, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
   }
