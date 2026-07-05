@@ -9,7 +9,10 @@ export const maxDuration = 60
 function authorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET
   if (!secret) return false
-  return request.headers.get("authorization") === `Bearer ${secret}`
+  // Cron real de Vercel: Authorization: Bearer <CRON_SECRET>.
+  if (request.headers.get("authorization") === `Bearer ${secret}`) return true
+  // Fallback para pruebas manuales desde navegador: ?key=<CRON_SECRET>.
+  return new URL(request.url, "http://localhost").searchParams.get("key") === secret
 }
 
 // El cron corre a diario (más fiable en Vercel Hobby) pero solo actúa el día
