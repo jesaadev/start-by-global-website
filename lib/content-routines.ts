@@ -371,25 +371,29 @@ export async function runImproveRoutine(limit = 1): Promise<ImproveRoutineResult
 }
 
 export interface CreateRoutineResult {
-  created: string | null
-  error?: string
+  created: string[]
+  errors: string[]
+  skipped?: string
 }
 
-/** Propone temas y genera 1 borrador del primer tema viable (no canibalizador). */
-export async function runCreateRoutine(): Promise<CreateRoutineResult> {
-  if (!anyProviderConfigured()) return { created: null, error: "sin proveedor de IA" }
+/** Propone temas y genera hasta `count` borradores de temas viables (no canibalizadores). */
+export async function runCreateRoutine(count = 1): Promise<CreateRoutineResult> {
+  if (!anyProviderConfigured()) return { created: [], errors: [], skipped: "sin proveedor de IA" }
 
-  const topics = await proposeTopics(3)
-  if (!topics.length) return { created: null, error: "la IA no propuso temas nuevos" }
+  const n = Math.max(1, count)
+  const topics = await proposeTopics(Math.max(3, n + 2))
+  if (!topics.length) return { created: [], errors: [], skipped: "la IA no propuso temas nuevos" }
 
-  let lastError = ""
+  const created: string[] = []
+  const errors: string[] = []
   for (const t of topics) {
+    if (created.length >= n) break
     try {
       const draft = await generateArticle(t)
-      return { created: draft.slug }
+      created.push(draft.slug)
     } catch (e) {
-      lastError = e instanceof Error ? e.message : String(e)
+      errors.push(`${t.primary_keyword}: ${e instanceof Error ? e.message : String(e)}`)
     }
   }
-  return { created: null, error: `no se pudo generar ningún tema (${lastError})` }
+  return { created, errors }
 }

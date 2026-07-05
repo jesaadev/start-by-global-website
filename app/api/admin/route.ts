@@ -134,7 +134,12 @@ export async function GET(request: Request) {
     if (resource === "posts") {
       const status = searchParams.get("status") as BlogPostRow["status"] | null
       const data = await listPosts(status ? { status } : undefined)
-      const ai = { providers: configuredProviders(), active: await getActiveProvider() }
+      const settings = await readSiteSettings()
+      const ai = {
+        providers: configuredProviders(),
+        active: await getActiveProvider(),
+        schedule: settings.ai.schedule,
+      }
       return NextResponse.json({ data, ai })
     }
 
@@ -209,8 +214,31 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: "Proveedor no válido." }, { status: 400 })
       }
       const current = await readSiteSettings()
-      const saved = await saveSiteSettings({ ...current, ai: { provider } })
+      const saved = await saveSiteSettings({ ...current, ai: { ...current.ai, provider } })
       return NextResponse.json({ data: { provider: saved.ai.provider } })
+    }
+
+    // Programación de las rutinas de IA (días y cantidad por ejecución).
+    if (resource === "ai-schedule") {
+      const s = (updates.schedule ?? {}) as Record<string, unknown>
+      const current = await readSiteSettings()
+      const cur = current.ai.schedule
+      const days = (v: unknown, fallback: number[]) =>
+        Array.isArray(v)
+          ? [...new Set(v.map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n <= 6))].sort()
+          : fallback
+      const count = (v: unknown, fallback: number) => {
+        const n = Number(v)
+        return Number.isFinite(n) ? Math.min(5, Math.max(1, Math.round(n))) : fallback
+      }
+      const schedule = {
+        improveDays: days(s.improveDays, cur.improveDays),
+        improveCount: count(s.improveCount, cur.improveCount),
+        createDays: days(s.createDays, cur.createDays),
+        createCount: count(s.createCount, cur.createCount),
+      }
+      const saved = await saveSiteSettings({ ...current, ai: { ...current.ai, schedule } })
+      return NextResponse.json({ data: saved.ai.schedule })
     }
 
     if (resource === "post") {

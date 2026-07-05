@@ -1582,6 +1582,18 @@ interface AdminPost {
   updated_at: string
 }
 
+interface AiSchedule {
+  improveDays: number[]
+  improveCount: number
+  createDays: number[]
+  createCount: number
+}
+
+const SCHEDULE_DAYS = [
+  { n: 1, l: "Lun" }, { n: 2, l: "Mar" }, { n: 3, l: "Mié" }, { n: 4, l: "Jue" },
+  { n: 5, l: "Vie" }, { n: 6, l: "Sáb" }, { n: 0, l: "Dom" },
+]
+
 interface ProposedTopic {
   working_title: string
   slug: string
@@ -1630,6 +1642,8 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [topics, setTopics] = useState<ProposedTopic[]>([])
   const [proposing, setProposing] = useState(false)
   const [generating, setGenerating] = useState<string | null>(null)
+  const [schedule, setSchedule] = useState<AiSchedule | null>(null)
+  const [savingSched, setSavingSched] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -1637,6 +1651,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setPosts(res.data ?? [])
     setProviders(res.ai?.providers ?? [])
     setActiveProvider(res.ai?.active ?? "")
+    setSchedule(res.ai?.schedule ?? null)
     setLoading(false)
   }, [api])
 
@@ -1648,6 +1663,28 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     if (res.error) { setError(res.error); return }
     setNotice(`Motor de IA cambiado a ${PROVIDER_LABEL[p] ?? p}.`)
     await load()
+  }
+  const toggleDay = (field: "improveDays" | "createDays", day: number) => {
+    setSchedule((s) => s
+      ? { ...s, [field]: s[field].includes(day) ? s[field].filter((d) => d !== day) : [...s[field], day].sort() }
+      : s)
+  }
+  const setCount = (field: "improveCount" | "createCount", val: number) => {
+    setSchedule((s) => s ? { ...s, [field]: Math.min(5, Math.max(1, Math.round(val) || 1)) } : s)
+  }
+  const saveSchedule = async () => {
+    if (!schedule) return
+    setSavingSched(true); setError(""); setNotice("")
+    try {
+      const res = await api.patch({ resource: "ai-schedule", schedule })
+      if (res.error || !res.data) { setError(res.error || "No se pudo guardar la programación."); return }
+      setSchedule(res.data)
+      setNotice("Programación guardada.")
+    } catch {
+      setError("Error de red al guardar la programación.")
+    } finally {
+      setSavingSched(false)
+    }
   }
 
   useEffect(() => { load() }, [load])
@@ -1812,6 +1849,47 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
           <Sparkles className="w-3.5 h-3.5" />
           IA de contenido no configurada — añade <code className="text-foreground">ANTHROPIC_API_KEY</code> (Claude) o <code className="text-foreground">GEMINI_API_KEY</code> (Gemini) en el entorno.
         </p>
+      )}
+
+      {aiOn && schedule && (
+        <div className="glass-card rounded-xl p-4 space-y-3">
+          <div>
+            <p className="text-xs font-semibold text-foreground">Programación automática</p>
+            <p className="text-[11px] text-muted-foreground">Los crons corren a diario 06:00 UTC; elige en qué días actúan y cuántos artículos por ejecución. Sin días marcados, esa rutina queda pausada.</p>
+          </div>
+          {([
+            { kind: "improve", label: "Mejorar", daysField: "improveDays", countField: "improveCount" },
+            { kind: "create", label: "Crear", daysField: "createDays", countField: "createCount" },
+          ] as const).map((row) => (
+            <div key={row.kind} className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-foreground w-14 shrink-0">{row.label}</span>
+              <div className="flex gap-1 flex-wrap">
+                {SCHEDULE_DAYS.map((d) => {
+                  const on = schedule[row.daysField].includes(d.n)
+                  return (
+                    <button key={d.n} type="button" onClick={() => toggleDay(row.daysField, d.n)}
+                      className={cn("px-2 py-1 rounded-md text-[11px] font-medium border transition-colors",
+                        on ? "bg-primary text-primary-foreground border-primary" : "bg-secondary/40 text-muted-foreground border-border/50 hover:text-foreground")}>
+                      {d.l}
+                    </button>
+                  )
+                })}
+              </div>
+              <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground ml-1">
+                cantidad
+                <input type="number" min={1} max={5} value={schedule[row.countField]}
+                  onChange={(e) => setCount(row.countField, Number(e.target.value))}
+                  className="w-14 px-2 py-1 rounded-md bg-secondary/50 border border-border/50 text-xs text-foreground focus:outline-none focus:border-primary/50" />
+              </label>
+            </div>
+          ))}
+          <div className="flex justify-end">
+            <button type="button" onClick={saveSchedule} disabled={savingSched}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+              {savingSched ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Guardar programación
+            </button>
+          </div>
+        </div>
       )}
 
       {notice && (

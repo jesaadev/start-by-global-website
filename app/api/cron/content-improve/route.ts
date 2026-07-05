@@ -1,39 +1,34 @@
 import { NextResponse } from "next/server"
 import { runImproveRoutine } from "@/lib/content-routines"
+import { getSiteSettings } from "@/lib/site-settings"
 
-// Cron semanal: genera un borrador de mejora del artículo más antiguo.
-// Vercel inyecta `Authorization: Bearer <CRON_SECRET>` cuando CRON_SECRET está
-// configurado. Sin el secret, la ruta falla cerrada (no es invocable).
+// Cron diario 06:00 UTC (más fiable en Vercel Hobby). Los días en que realmente
+// actúa y cuántos artículos mejora se configuran desde el admin (settings.ai.schedule).
+// Vercel inyecta `Authorization: Bearer <CRON_SECRET>`; ?key=<CRON_SECRET> sirve
+// para pruebas manuales; ?force=1 ignora la compuerta de día.
 export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
 function authorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET
   if (!secret) return false
-  // Cron real de Vercel: Authorization: Bearer <CRON_SECRET>.
   if (request.headers.get("authorization") === `Bearer ${secret}`) return true
-  // Fallback para pruebas manuales desde navegador: ?key=<CRON_SECRET>.
   return new URL(request.url, "http://localhost").searchParams.get("key") === secret
 }
-
-// El cron corre a diario (más fiable en Vercel Hobby) pero solo actúa el día
-// objetivo. Lunes = 1. Con ?force=1 se ejecuta cualquier día (para pruebas).
-const TARGET_DAY = 1
 
 export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 })
   }
   const force = new URL(request.url, "http://localhost").searchParams.get("force") === "1"
+  const { schedule } = (await getSiteSettings()).ai
   const day = new Date().getUTCDay()
-  if (!force && day !== TARGET_DAY) {
-    return NextResponse.json({ ok: true, skipped: `no es el día programado (hoy=${day}, objetivo=${TARGET_DAY})` })
+  if (!force && !schedule.improveDays.includes(day)) {
+    return NextResponse.json({ ok: true, skipped: `no es día programado (hoy=${day}, días=[${schedule.improveDays.join(",")}])` })
   }
   try {
-    const result = await runImproveRoutine(1)
+    const result = await runImproveRoutine(Math.max(1, schedule.improveCount || 1))
     console.log("[cron/content-improve]", JSON.stringify(result))
-    // No-2xx ante errores reales o falta de proveedor; un salto normal por
-    // no haber candidatos sigue siendo 200 (no es un fallo).
     if (result.errors.length > 0 || result.skipped === "sin proveedor de IA") {
       return NextResponse.json({ ok: false, ...result }, { status: 500 })
     }

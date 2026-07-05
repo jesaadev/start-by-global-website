@@ -39,9 +39,20 @@ export interface PixelSettings {
   googleSiteVerification: string
 }
 
+export interface AiScheduleSettings {
+  // Días (UTC, 0=domingo … 6=sábado) en que cada rutina actúa, y cuántos
+  // artículos procesa por ejecución. Los crons corren a diario 06:00 UTC pero
+  // solo actúan si el día está en la lista. Lista vacía = rutina desactivada.
+  improveDays: number[]
+  improveCount: number
+  createDays: number[]
+  createCount: number
+}
+
 export interface AiSettings {
   // Proveedor activo para las rutinas de contenido (mejorar/proponer/generar).
   provider: "claude" | "gemini"
+  schedule: AiScheduleSettings
 }
 
 export interface SiteSettings {
@@ -92,6 +103,12 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   },
   ai: {
     provider: "claude",
+    schedule: {
+      improveDays: [1], // lunes
+      improveCount: 1,
+      createDays: [4], // jueves
+      createCount: 1,
+    },
   },
 }
 
@@ -105,7 +122,11 @@ export function mergeSettings(partial: unknown): SiteSettings {
     seo: { ...DEFAULT_SETTINGS.seo, ...(p.seo ?? {}) },
     organization: { ...DEFAULT_SETTINGS.organization, ...(p.organization ?? {}) },
     pixels: { ...DEFAULT_SETTINGS.pixels, ...(p.pixels ?? {}) },
-    ai: { ...DEFAULT_SETTINGS.ai, ...(p.ai ?? {}) },
+    ai: {
+      ...DEFAULT_SETTINGS.ai,
+      ...(p.ai ?? {}),
+      schedule: { ...DEFAULT_SETTINGS.ai.schedule, ...((p.ai as Partial<AiSettings> | undefined)?.schedule ?? {}) },
+    },
   }
 }
 
