@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 })
   }
-  const force = new URL(request.url).searchParams.get("force") === "1"
+  const force = new URL(request.url, "http://localhost").searchParams.get("force") === "1"
   const day = new Date().getUTCDay()
   if (!force && day !== TARGET_DAY) {
     return NextResponse.json({ ok: true, skipped: `no es el día programado (hoy=${day}, objetivo=${TARGET_DAY})` })
