@@ -13,9 +13,18 @@ function authorized(request: Request): boolean {
   return request.headers.get("authorization") === `Bearer ${secret}`
 }
 
+// El cron corre a diario (más fiable en Vercel Hobby) pero solo actúa el día
+// objetivo. Lunes = 1. Con ?force=1 se ejecuta cualquier día (para pruebas).
+const TARGET_DAY = 1
+
 export async function GET(request: Request) {
   if (!authorized(request)) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 })
+  }
+  const force = new URL(request.url).searchParams.get("force") === "1"
+  const day = new Date().getUTCDay()
+  if (!force && day !== TARGET_DAY) {
+    return NextResponse.json({ ok: true, skipped: `no es el día programado (hoy=${day}, objetivo=${TARGET_DAY})` })
   }
   try {
     const result = await runImproveRoutine(1)
