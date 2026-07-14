@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { pageMetadata } from "@/lib/seo"
+import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo-jsonld"
 import { AdsContent } from "./ads-content"
 
@@ -8,6 +8,7 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Agencia de publicidad digital en República Dominicana: campañas de Google Ads, Meta (Facebook/Instagram), TikTok y LinkedIn que generan clientes, no solo clics. Medición real con pixel + CAPI.",
   path: "/publicidad-ads",
+  languages: hreflangFor("/publicidad-ads"),
   keywords: [
     "agencia de google ads",
     "agencia de meta ads",

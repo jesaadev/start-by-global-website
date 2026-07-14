@@ -5,6 +5,13 @@
 import { getStoredAttribution, getMetaCookies, type Attribution } from "@/lib/attribution"
 import { getConsent } from "@/lib/consent"
 import { getSourceArticle } from "@/lib/blog-track-client"
+import { localeFromPath } from "@/lib/i18n"
+
+/** Locale de la página actual (es | en) para segmentar leads por mercado. */
+function currentLocale(): string {
+  if (typeof window === "undefined") return "es"
+  return localeFromPath(window.location.pathname)
+}
 
 function newEventId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID()
@@ -33,6 +40,7 @@ export interface LeadTrackingPayload {
   nav_variant?: string
   segment?: string
   source_article?: string
+  locale?: string
 }
 
 /**
@@ -49,8 +57,9 @@ export function fireLead(
   const page_url = typeof window !== "undefined" ? window.location.href : ""
   const nav_variant = getNavVariant()
   const source_article = getSourceArticle()
+  const locale = currentLocale()
   if (!getConsent().marketing) {
-    return { source_type: sourceType, attribution: null, page_url, nav_variant, segment, source_article }
+    return { source_type: sourceType, attribution: null, page_url, nav_variant, segment, source_article, locale }
   }
   const eventId = newEventId()
   fbqTrack("Lead", eventId)
@@ -65,6 +74,7 @@ export function fireLead(
     nav_variant,
     segment,
     source_article,
+    locale,
   }
 }
 
@@ -94,6 +104,7 @@ export function fireContact(segment?: string): void {
       nav_variant: getNavVariant(),
       segment,
       source_article: getSourceArticle(),
+      locale: currentLocale(),
     }),
   }).catch(() => {})
 }
@@ -118,6 +129,7 @@ export function fireWhatsAppLead(info: { name?: string; service?: string; segmen
     nav_variant: getNavVariant(),
     segment: info.segment || null,
     source_article: getSourceArticle() || null,
+    locale: currentLocale(),
   }
 
   if (marketing) {

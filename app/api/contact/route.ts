@@ -25,6 +25,7 @@ interface LeadTracking {
   nav_variant?: string | null
   segment?: string | null
   source_article?: string | null
+  locale?: string | null
 }
 
 function escapeHtml(text: string): string {
@@ -186,6 +187,7 @@ export async function POST(request: Request) {
         nav_variant: tracking.nav_variant,
         segment: tracking.segment ?? "form",
         source_article: tracking.source_article,
+        locale: tracking.locale,
       })
     } catch (e) {
       console.error("[Contact API] tracking error:", e)

@@ -11,10 +11,13 @@ const CONSENT_REQUIRED_COUNTRIES = new Set([
 
 const REGION_COOKIE = "sbg_region"
 const NAV_COOKIE = "sbg_nav" // A/B de navegación de la home: 'a' (sidebar) | 'b' (top nav)
+const GEO_SUGGEST_COOKIE = "sbg_geo_us" // visitante de EE.UU. en la versión ES → sugerir /us
 
 export function proxy(request: NextRequest) {
   // Vercel expone el país del visitante en este header.
   const country = (request.headers.get("x-vercel-ip-country") || "").toUpperCase()
+  const { pathname } = request.nextUrl
+  const isUsSection = pathname === "/us" || pathname.startsWith("/us/")
 
   // Si hay país y NO está en la lista → 'row' (resto del mundo, cookies abiertas).
   // Si no se puede determinar (dev local, proxies) → 'eu' por seguridad legal.
@@ -35,6 +38,8 @@ export function proxy(request: NextRequest) {
     const existing = requestHeaders.get("cookie") || ""
     requestHeaders.set("cookie", `${existing}${existing ? "; " : ""}${NAV_COOKIE}=${navVariant}`)
   }
+  // Locale de la petición (lo pueden leer Server Components sin re-derivarlo).
+  requestHeaders.set("x-locale", isUsSection ? "en" : "es")
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
 
@@ -43,6 +48,17 @@ export function proxy(request: NextRequest) {
     maxAge: 60 * 60 * 24, // 1 día
     sameSite: "lax",
   })
+
+  // Señal para el banner "View US site": visitante de EE.UU. navegando la
+  // versión en español. Sin redirección automática (SEO-safe); el banner en
+  // cliente decide mostrarse y se puede descartar.
+  if (country === "US" && !isUsSection) {
+    response.cookies.set(GEO_SUGGEST_COOKIE, "1", {
+      path: "/",
+      maxAge: 60 * 60 * 24, // 1 día
+      sameSite: "lax",
+    })
+  }
 
   if (!existingNav) {
     response.cookies.set(NAV_COOKIE, navVariant, {

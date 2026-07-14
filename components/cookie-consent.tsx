@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Cookie, ToggleLeft, ToggleRight, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useLocale } from "@/lib/i18n"
 import {
   setConsent,
   shouldShowBanner,
@@ -11,6 +12,45 @@ import {
   OPEN_CONSENT_EVENT,
   type ConsentCategories,
 } from "@/lib/consent"
+
+const CONSENT_TEXT = {
+  es: {
+    title: "Tu privacidad",
+    intro: "Usamos cookies propias y de terceros para analítica y marketing. Puedes aceptarlas todas, rechazarlas o configurarlas. Consulta nuestra",
+    policy: "Política de Cookies",
+    customize: "Personalizar",
+    reject: "Rechazar",
+    acceptAll: "Aceptar todo",
+    prefsTitle: "Preferencias de cookies",
+    close: "Cerrar",
+    necessary: "Necesarias",
+    necessaryDesc: "Imprescindibles para el funcionamiento del sitio. Siempre activas.",
+    analytics: "Analítica",
+    analyticsDesc: "Nos ayudan a entender el uso del sitio (Google Analytics, Tag Manager, Clarity).",
+    marketing: "Marketing",
+    marketingDesc: "Medición de campañas y publicidad (Meta Pixel, TikTok) y atribución de visitas.",
+    rejectAll: "Rechazar todo",
+    save: "Guardar preferencias",
+  },
+  en: {
+    title: "Your privacy",
+    intro: "We use first- and third-party cookies for analytics and marketing. You can accept them all, reject them, or customize your choices. See our",
+    policy: "Cookie Policy",
+    customize: "Customize",
+    reject: "Reject",
+    acceptAll: "Accept all",
+    prefsTitle: "Cookie preferences",
+    close: "Close",
+    necessary: "Necessary",
+    necessaryDesc: "Essential for the site to work. Always on.",
+    analytics: "Analytics",
+    analyticsDesc: "Help us understand site usage (Google Analytics, Tag Manager, Clarity).",
+    marketing: "Marketing",
+    marketingDesc: "Campaign and ad measurement (Meta Pixel, TikTok) and visit attribution.",
+    rejectAll: "Reject all",
+    save: "Save preferences",
+  },
+} as const
 
 function ToggleRow({
   label,
@@ -52,6 +92,7 @@ export function CookieConsent() {
   const [visible, setVisible] = useState(false)
   const [showPrefs, setShowPrefs] = useState(false)
   const [prefs, setPrefs] = useState<ConsentCategories>({ analytics: false, marketing: false })
+  const t = CONSENT_TEXT[useLocale()]
 
   // Mostrar el banner solo en la UE sin decisión previa; permitir reabrir.
   useEffect(() => {
@@ -91,11 +132,10 @@ export function CookieConsent() {
                 <Cookie className="w-5 h-5 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">Tu privacidad</p>
+                <p className="text-sm font-semibold text-foreground">{t.title}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  Usamos cookies propias y de terceros para analítica y marketing. Puedes aceptarlas
-                  todas, rechazarlas o configurarlas. Consulta nuestra{" "}
-                  <Link href="/cookies" className="text-primary hover:underline">Política de Cookies</Link>.
+                  {t.intro}{" "}
+                  <Link href="/cookies" className="text-primary hover:underline">{t.policy}</Link>.
                 </p>
               </div>
             </div>
@@ -105,48 +145,48 @@ export function CookieConsent() {
                 onClick={() => setShowPrefs(true)}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors order-3 sm:order-1"
               >
-                Personalizar
+                {t.customize}
               </button>
               <button
                 type="button"
                 onClick={rejectAll}
                 className="px-4 py-2 rounded-lg text-sm font-semibold border border-border text-foreground hover:bg-secondary/60 transition-colors order-2"
               >
-                Rechazar
+                {t.reject}
               </button>
               <button
                 type="button"
                 onClick={acceptAll}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 transition-all order-1 sm:order-3"
               >
-                Aceptar todo
+                {t.acceptAll}
               </button>
             </div>
           </div>
         ) : (
           <div className="p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">Preferencias de cookies</p>
-              <button type="button" onClick={() => setVisible(false)} aria-label="Cerrar">
+              <p className="text-sm font-semibold text-foreground">{t.prefsTitle}</p>
+              <button type="button" onClick={() => setVisible(false)} aria-label={t.close}>
                 <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
             <div className="divide-y divide-border/40">
               <ToggleRow
-                label="Necesarias"
-                desc="Imprescindibles para el funcionamiento del sitio. Siempre activas."
+                label={t.necessary}
+                desc={t.necessaryDesc}
                 value
                 locked
               />
               <ToggleRow
-                label="Analítica"
-                desc="Nos ayudan a entender el uso del sitio (Google Analytics, Tag Manager, Clarity)."
+                label={t.analytics}
+                desc={t.analyticsDesc}
                 value={prefs.analytics}
                 onChange={(v) => setPrefs((p) => ({ ...p, analytics: v }))}
               />
               <ToggleRow
-                label="Marketing"
-                desc="Medición de campañas y publicidad (Meta Pixel, TikTok) y atribución de visitas."
+                label={t.marketing}
+                desc={t.marketingDesc}
                 value={prefs.marketing}
                 onChange={(v) => setPrefs((p) => ({ ...p, marketing: v }))}
               />
@@ -157,14 +197,14 @@ export function CookieConsent() {
                 onClick={rejectAll}
                 className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
               >
-                Rechazar todo
+                {t.rejectAll}
               </button>
               <button
                 type="button"
                 onClick={savePrefs}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25 transition-all"
               >
-                Guardar preferencias
+                {t.save}
               </button>
             </div>
           </div>

@@ -1578,9 +1578,22 @@ interface AdminPost {
   content: string
   status: "draft" | "published" | "archived"
   origin: "manual" | "ai_generated" | "ai_improved"
+  locale: "es" | "en"
   improves_post_id: string | null
   updated_at: string
 }
+
+interface AiSchedule {
+  improveDays: number[]
+  improveCount: number
+  createDays: number[]
+  createCount: number
+}
+
+const SCHEDULE_DAYS = [
+  { n: 1, l: "Lun" }, { n: 2, l: "Mar" }, { n: 3, l: "Mié" }, { n: 4, l: "Jue" },
+  { n: 5, l: "Vie" }, { n: 6, l: "Sáb" }, { n: 0, l: "Dom" },
+]
 
 interface ProposedTopic {
   working_title: string
@@ -1630,15 +1643,24 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [topics, setTopics] = useState<ProposedTopic[]>([])
   const [proposing, setProposing] = useState(false)
   const [generating, setGenerating] = useState<string | null>(null)
+  const [schedule, setSchedule] = useState<AiSchedule | null>(null)
+  const [savingSched, setSavingSched] = useState(false)
+  const [improvePrompt, setImprovePrompt] = useState("")
+  const [createPrompt, setCreatePrompt] = useState("")
+  const [savingPrompts, setSavingPrompts] = useState(false)
+  const [contentLocale, setContentLocale] = useState<"es" | "en">("es")
 
   const load = useCallback(async () => {
     setLoading(true)
-    const res = await api.get({ resource: "posts" })
+    const res = await api.get({ resource: "posts", locale: contentLocale })
     setPosts(res.data ?? [])
     setProviders(res.ai?.providers ?? [])
     setActiveProvider(res.ai?.active ?? "")
+    setSchedule(res.ai?.schedule ?? null)
+    setImprovePrompt(res.ai?.improvePrompt ?? "")
+    setCreatePrompt(res.ai?.createPrompt ?? "")
     setLoading(false)
-  }, [api])
+  }, [api, contentLocale])
 
   const aiOn = providers.length > 0
   const PROVIDER_LABEL: Record<string, string> = { claude: "Claude", gemini: "Gemini" }
@@ -1648,6 +1670,41 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     if (res.error) { setError(res.error); return }
     setNotice(`Motor de IA cambiado a ${PROVIDER_LABEL[p] ?? p}.`)
     await load()
+  }
+  const toggleDay = (field: "improveDays" | "createDays", day: number) => {
+    setSchedule((s) => s
+      ? { ...s, [field]: s[field].includes(day) ? s[field].filter((d) => d !== day) : [...s[field], day].sort() }
+      : s)
+  }
+  const setCount = (field: "improveCount" | "createCount", val: number) => {
+    setSchedule((s) => s ? { ...s, [field]: Math.min(5, Math.max(1, Math.round(val) || 1)) } : s)
+  }
+  const saveSchedule = async () => {
+    if (!schedule) return
+    setSavingSched(true); setError(""); setNotice("")
+    try {
+      const res = await api.patch({ resource: "ai-schedule", schedule })
+      if (res.error || !res.data) { setError(res.error || "No se pudo guardar la programación."); return }
+      setSchedule(res.data)
+      setNotice("Programación guardada.")
+    } catch {
+      setError("Error de red al guardar la programación.")
+    } finally {
+      setSavingSched(false)
+    }
+  }
+  const savePrompts = async () => {
+    setSavingPrompts(true); setError(""); setNotice("")
+    try {
+      const res = await api.patch({ resource: "ai-prompts", improvePrompt, createPrompt })
+      if (res.error || !res.data) { setError(res.error || "No se pudieron guardar los prompts."); return }
+      setImprovePrompt(res.data.improvePrompt); setCreatePrompt(res.data.createPrompt)
+      setNotice("Prompts guardados.")
+    } catch {
+      setError("Error de red al guardar los prompts.")
+    } finally {
+      setSavingPrompts(false)
+    }
   }
 
   useEffect(() => { load() }, [load])
@@ -1685,7 +1742,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     try {
       const res = editing
         ? await api.patch({ resource: "post", id: editing.id, ...payload })
-        : await api.post({ resource: "post", ...payload, status: "draft" })
+        : await api.post({ resource: "post", ...payload, status: "draft", locale: contentLocale })
       if (res.error || !res.data) throw new Error(res.error || "Error")
       await load(); closeEditor()
     } catch {
@@ -1742,7 +1799,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const propose = async () => {
     setProposing(true); setNotice(""); setError("")
     try {
-      const res = await api.post({ resource: "propose-topics", count: 5 })
+      const res = await api.post({ resource: "propose-topics", count: 5, locale: contentLocale })
       if (res.error) { setError(res.error); return }
       setTopics(res.topics ?? [])
       if (!(res.topics?.length)) setNotice("La IA no propuso temas nuevos (la cobertura actual ya parece amplia).")
@@ -1755,7 +1812,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const generate = async (t: ProposedTopic) => {
     setGenerating(t.primary_keyword); setNotice(""); setError("")
     try {
-      const res = await api.post({ resource: "generate-article", topic: t })
+      const res = await api.post({ resource: "generate-article", topic: t, locale: contentLocale })
       if (res.error || !res.data) { setError(res.error || "No se pudo generar el artículo."); return }
       setNotice(`Borrador creado: "${res.data.title}". Revísalo abajo, ajusta la imagen y publícalo.`)
       setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))
@@ -1778,6 +1835,16 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
             {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Importar del código
           </button>
+          {/* Idioma del contenido: ES (raíz) o EN (/us) */}
+          <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg" title="Idioma del contenido">
+            {(["es", "en"] as const).map((l) => (
+              <button key={l} type="button" onClick={() => setContentLocale(l)}
+                className={cn("px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase transition-all",
+                  contentLocale === l ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                {l}
+              </button>
+            ))}
+          </div>
           {aiOn && (
             <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
@@ -1812,6 +1879,79 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
           <Sparkles className="w-3.5 h-3.5" />
           IA de contenido no configurada — añade <code className="text-foreground">ANTHROPIC_API_KEY</code> (Claude) o <code className="text-foreground">GEMINI_API_KEY</code> (Gemini) en el entorno.
         </p>
+      )}
+
+      {aiOn && schedule && (
+        <div className="glass-card rounded-xl p-4 space-y-3">
+          <div>
+            <p className="text-xs font-semibold text-foreground">Programación automática</p>
+            <p className="text-[11px] text-muted-foreground">Los crons corren a diario 06:00 UTC; elige en qué días actúan y cuántos artículos por ejecución. Sin días marcados, esa rutina queda pausada.</p>
+          </div>
+          {([
+            { kind: "improve", label: "Mejorar", daysField: "improveDays", countField: "improveCount" },
+            { kind: "create", label: "Crear", daysField: "createDays", countField: "createCount" },
+          ] as const).map((row) => (
+            <div key={row.kind} className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-foreground w-14 shrink-0">{row.label}</span>
+              <div className="flex gap-1 flex-wrap">
+                {SCHEDULE_DAYS.map((d) => {
+                  const on = schedule[row.daysField].includes(d.n)
+                  return (
+                    <button key={d.n} type="button" onClick={() => toggleDay(row.daysField, d.n)}
+                      className={cn("px-2 py-1 rounded-md text-[11px] font-medium border transition-colors",
+                        on ? "bg-primary text-primary-foreground border-primary" : "bg-secondary/40 text-muted-foreground border-border/50 hover:text-foreground")}>
+                      {d.l}
+                    </button>
+                  )
+                })}
+              </div>
+              <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground ml-1">
+                cantidad
+                <input type="number" min={1} max={5} value={schedule[row.countField]}
+                  onChange={(e) => setCount(row.countField, Number(e.target.value))}
+                  className="w-14 px-2 py-1 rounded-md bg-secondary/50 border border-border/50 text-xs text-foreground focus:outline-none focus:border-primary/50" />
+              </label>
+            </div>
+          ))}
+          <div className="flex justify-end">
+            <button type="button" onClick={saveSchedule} disabled={savingSched}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+              {savingSched ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Guardar programación
+            </button>
+          </div>
+        </div>
+      )}
+
+      {aiOn && (
+        <details className="glass-card rounded-xl p-4 group">
+          <summary className="cursor-pointer text-xs font-semibold text-foreground flex items-center gap-2 select-none">
+            <Pencil className="w-3.5 h-3.5 text-primary" /> Prompts de IA (estilo y SEO)
+            <span className="text-[11px] font-normal text-muted-foreground ml-1">— clic para editar</span>
+          </summary>
+          <div className="mt-3 space-y-4">
+            <p className="text-[11px] text-muted-foreground">
+              Directrices que se añaden al prompt base de cada rutina (las reglas de formato HTML son fijas). Deja vacío para usar solo el prompt base.
+            </p>
+            <div>
+              <FieldLabel>Prompt de mejora</FieldLabel>
+              <textarea rows={4} value={improvePrompt} onChange={(e) => setImprovePrompt(e.target.value)}
+                className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
+                placeholder="Estrategia de contenido/SEO para mejorar artículos…" />
+            </div>
+            <div>
+              <FieldLabel>Prompt de creación</FieldLabel>
+              <textarea rows={4} value={createPrompt} onChange={(e) => setCreatePrompt(e.target.value)}
+                className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
+                placeholder="Estrategia de contenido/SEO para crear artículos nuevos…" />
+            </div>
+            <div className="flex justify-end">
+              <button type="button" onClick={savePrompts} disabled={savingPrompts}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold disabled:opacity-40 hover:shadow-md transition-all">
+                {savingPrompts ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Guardar prompts
+              </button>
+            </div>
+          </div>
+        </details>
       )}
 
       {notice && (

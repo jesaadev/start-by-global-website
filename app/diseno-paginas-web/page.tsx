@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { pageMetadata } from "@/lib/seo"
+import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo-jsonld"
 import { WebContent } from "./web-content"
 import { WEB_FAQS } from "./faqs"
@@ -9,6 +9,7 @@ export const metadata: Metadata = pageMetadata({
   description:
     "Diseño y desarrollo de páginas web profesionales en República Dominicana: webs corporativas, tiendas online y landing pages optimizadas para SEO y conversión. Proyectos desde $400.",
   path: "/diseno-paginas-web",
+  languages: hreflangFor("/diseno-paginas-web"),
   keywords: [
     "diseño de páginas web República Dominicana",
     "desarrollo web Santo Domingo",

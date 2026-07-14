@@ -1,5 +1,20 @@
 // Utilidades de protección para rutas API (anti-abuso).
 
+import { timingSafeEqual } from "node:crypto"
+
+/**
+ * Comparación de secretos en tiempo constante: evita que un atacante deduzca
+ * el secreto carácter a carácter midiendo tiempos de respuesta (timing attack).
+ * Úsala para ADMIN_PASSWORD, CRON_SECRET y similares en lugar de `===`.
+ */
+export function safeEqual(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (typeof a !== "string" || typeof b !== "string" || !a || !b) return false
+  const bufA = Buffer.from(a)
+  const bufB = Buffer.from(b)
+  if (bufA.length !== bufB.length) return false
+  return timingSafeEqual(bufA, bufB)
+}
+
 /**
  * Extrae la IP del cliente priorizando headers fijados por el proxy de confianza
  * (no falsificables por el cliente) antes que X-Forwarded-For, cuyo primer
