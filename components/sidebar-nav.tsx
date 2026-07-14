@@ -4,6 +4,7 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { localeFromPath } from "@/lib/i18n"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {
   LayoutDashboard,
@@ -25,7 +26,7 @@ import {
   Code2,
 } from "lucide-react"
 
-const navItems = [
+const navItemsEs = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/servicios", label: "Servicios", icon: Briefcase },
   { href: "/diseno-paginas-web", label: "Diseño Web", icon: Code2, highlight: true, highlightColor: "#e05a2b" },
@@ -36,6 +37,16 @@ const navItems = [
   { href: "/ia-automatizacion", label: "IA & Automatización", icon: Cpu, highlight: true, highlightColor: "#7B61FF" },
   { href: "/publicidad-ads", label: "Publicidad & Ads", icon: Megaphone, highlight: true, highlightColor: "#F43F5E" },
   { href: "/contacto", label: "Contacto", icon: Mail },
+]
+
+// Embudo US: navegación reducida y orientada a conversión.
+const navItemsEn = [
+  { href: "/us", label: "Home", icon: LayoutDashboard },
+  { href: "/us/website-design", label: "Website Design", icon: Code2, highlight: true, highlightColor: "#e05a2b" },
+  { href: "/us/google-ads", label: "Google & Meta Ads", icon: Megaphone, highlight: true, highlightColor: "#F43F5E" },
+  { href: "/us/insights", label: "Insights", icon: BookOpen },
+  { href: "/us/contact", label: "Contact", icon: Mail },
+  { href: "/", label: "Sitio en español", icon: Globe },
 ]
 
 const dashboardScrollItems = [
@@ -54,10 +65,42 @@ const regions = [
   { flag: "US", label: "EE.UU." },
 ]
 
+// Textos del chrome por locale.
+const CHROME_TEXT = {
+  es: {
+    navSection: "Navegacion",
+    sections: "Secciones",
+    regions: "Regiones",
+    theme: "Tema claro / oscuro",
+    collapse: "Colapsar",
+    openMenu: "Abrir menu",
+    closeMenu: "Cerrar menu",
+    expandMenu: "Expandir menu",
+    collapseMenu: "Colapsar menu",
+    badge: "New",
+  },
+  en: {
+    navSection: "Navigation",
+    sections: "Sections",
+    regions: "Regions",
+    theme: "Light / dark theme",
+    collapse: "Collapse",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    expandMenu: "Expand menu",
+    collapseMenu: "Collapse menu",
+    badge: "New",
+  },
+} as const
+
 export function SidebarNav() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
+  const locale = localeFromPath(pathname)
+  const t = CHROME_TEXT[locale]
+  const navItems = locale === "en" ? navItemsEn : navItemsEs
+  const homeHref = locale === "en" ? "/us" : "/"
   const isHome = pathname === "/"
 
   const handleScrollTo = (id: string) => {
@@ -75,7 +118,7 @@ export function SidebarNav() {
         type="button"
         onClick={() => setMobileOpen(!mobileOpen)}
         className="fixed top-4 left-4 z-50 lg:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-card/80 backdrop-blur-xl border border-border/50 text-foreground"
-        aria-label={mobileOpen ? "Cerrar menu" : "Abrir menu"}
+        aria-label={mobileOpen ? t.closeMenu : t.openMenu}
       >
         {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -88,7 +131,7 @@ export function SidebarNav() {
           onKeyDown={(e) => e.key === "Escape" && setMobileOpen(false)}
           role="button"
           tabIndex={0}
-          aria-label="Cerrar menu"
+          aria-label={t.closeMenu}
         />
       )}
 
@@ -102,7 +145,7 @@ export function SidebarNav() {
       >
         {/* Logo */}
         <div className={cn("flex items-center gap-3 px-4 h-16 border-b border-border/50", collapsed && "justify-center px-2")}>
-          <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+          <Link href={homeHref} className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <img 
               src="/logo-black.svg" 
               alt="Start By Global" 
@@ -114,7 +157,7 @@ export function SidebarNav() {
         {/* Main Navigation */}
         <nav className="flex-1 py-4 px-2 flex flex-col gap-1 overflow-y-auto">
           <div className={cn("px-1 mb-2", collapsed && "hidden")}>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Navegacion</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.navSection}</p>
           </div>
 
           {navItems.map((item) => {
@@ -164,7 +207,7 @@ export function SidebarNav() {
           {isHome && (
             <>
               <div className={cn("px-1 mt-4 mb-2", collapsed && "hidden")}>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Secciones</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.sections}</p>
               </div>
               {dashboardScrollItems.map((item) => (
                 <button
@@ -188,7 +231,7 @@ export function SidebarNav() {
         {/* Regions */}
         <div className={cn("px-3 py-3 border-t border-border/50", collapsed && "px-2")}>
           {!collapsed && (
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-1">Regiones</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 px-1">{t.regions}</p>
           )}
           <div className={cn("flex gap-1.5 flex-wrap", collapsed && "flex-col items-center")}>
             {regions.map((r) => (
@@ -207,7 +250,7 @@ export function SidebarNav() {
         {/* Theme toggle */}
         <div className={cn("px-2 py-3 border-t border-border/50 flex", collapsed ? "justify-center" : "items-center gap-2")}>
           <ThemeToggle className="w-9 h-9 shrink-0" />
-          {!collapsed && <span className="text-xs text-muted-foreground">Tema claro / oscuro</span>}
+          {!collapsed && <span className="text-xs text-muted-foreground">{t.theme}</span>}
         </div>
 
         {/* Collapse toggle (desktop) */}
@@ -216,10 +259,10 @@ export function SidebarNav() {
             type="button"
             onClick={() => setCollapsed(!collapsed)}
             className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors text-xs"
-            aria-label={collapsed ? "Expandir menu" : "Colapsar menu"}
+            aria-label={collapsed ? t.expandMenu : t.collapseMenu}
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            {!collapsed && <span>Colapsar</span>}
+            {!collapsed && <span>{t.collapse}</span>}
           </button>
         </div>
       </aside>

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
 import { supabaseAdmin } from "@/lib/supabase"
+import { enforceRateLimit } from "@/lib/rate-limit"
+import { safeEqual } from "@/lib/request-guards"
 import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
 import { getAttributionStats } from "@/lib/lead-events"
 import { getBlogStats } from "@/lib/blog-events"
@@ -18,7 +20,7 @@ import { configuredProviders, getActiveProvider, type AiProvider } from "@/lib/a
 const POST_FIELDS = [
   "slug", "title", "excerpt", "author", "author_role", "category", "image", "read_time",
   "date_iso", "last_modified_iso", "keywords", "primary_keyword", "content", "status",
-  "origin", "improves_post_id", "published_at",
+  "origin", "locale", "improves_post_id", "published_at",
 ] as const
 
 // Columnas opcionales DATE/UUID: una cadena vacía rompe el INSERT/UPDATE en
@@ -37,8 +39,12 @@ function pickPostFields(obj: Record<string, unknown>): Partial<BlogPostRow> {
 
 function revalidateBlog(slug?: string) {
   revalidatePath("/insights")
+  revalidatePath("/us/insights")
   revalidatePath("/sitemap.xml")
-  if (slug) revalidatePath(`/insights/${slug}`)
+  if (slug) {
+    revalidatePath(`/insights/${slug}`)
+    revalidatePath(`/us/insights/${slug}`)
+  }
 }
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
@@ -49,14 +55,24 @@ function checkAuth(request: Request): boolean {
     console.error("[Admin API] ADMIN_PASSWORD no está configurado en el entorno.")
     return false
   }
-  const auth = request.headers.get("x-admin-password")
-  return auth === ADMIN_PASSWORD
+  // Comparación en tiempo constante (evita timing attacks sobre la contraseña).
+  return safeEqual(request.headers.get("x-admin-password"), ADMIN_PASSWORD)
+}
+
+/**
+ * Respuesta ante auth fallida, con rate limit por IP sobre los INTENTOS
+ * fallidos (anti fuerza bruta): 10 fallos / 10 min → 429.
+ */
+function unauthorized(request: Request) {
+  const limited = enforceRateLimit(request, "admin-auth-fail", 10, 10 * 60 * 1000)
+  if (limited) return limited
+  return NextResponse.json({ error: "No autorizado." }, { status: 401 })
 }
 
 // GET /api/admin?resource=conversations|insights|overrides&page=1
 export async function GET(request: Request) {
   if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 })
+    return unauthorized(request)
   }
 
   const { searchParams } = new URL(request.url)
@@ -133,7 +149,8 @@ export async function GET(request: Request) {
 
     if (resource === "posts") {
       const status = searchParams.get("status") as BlogPostRow["status"] | null
-      const data = await listPosts(status ? { status } : undefined)
+      const locale = searchParams.get("locale") === "en" ? ("en" as const) : ("es" as const)
+      const data = await listPosts({ ...(status ? { status } : {}), locale })
       const settings = await readSiteSettings()
       const ai = {
         providers: configuredProviders(),
@@ -196,7 +213,7 @@ export async function GET(request: Request) {
 // PATCH /api/admin — actualizar insight u override
 export async function PATCH(request: Request) {
   if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 })
+    return unauthorized(request)
   }
 
   try {
@@ -331,7 +348,7 @@ export async function PATCH(request: Request) {
 // POST /api/admin — crear insight u override
 export async function POST(request: Request) {
   if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 })
+    return unauthorized(request)
   }
 
   try {
@@ -367,11 +384,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // Claude propone temas nuevos no canibalizadores.
+    // La IA propone temas nuevos no canibalizadores.
     if (resource === "propose-topics") {
       try {
         const count = Number(payload.count) || 5
-        const topics = await proposeTopics(count)
+        const locale = payload.locale === "en" ? ("en" as const) : ("es" as const)
+        const topics = await proposeTopics(count, locale)
         return NextResponse.json({ topics })
       } catch (e) {
         const message = e instanceof Error ? e.message : "Error al proponer temas."
@@ -386,7 +404,8 @@ export async function POST(request: Request) {
         if (!topic?.primary_keyword) {
           return NextResponse.json({ error: "tema inválido." }, { status: 400 })
         }
-        const draft = await generateArticle(topic)
+        const locale = payload.locale === "en" ? ("en" as const) : ("es" as const)
+        const draft = await generateArticle(topic, locale)
         revalidateBlog()
         return NextResponse.json({ data: draft })
       } catch (e) {
@@ -456,7 +475,7 @@ export async function POST(request: Request) {
 // DELETE /api/admin — eliminar insight u override
 export async function DELETE(request: Request) {
   if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 })
+    return unauthorized(request)
   }
 
   try {

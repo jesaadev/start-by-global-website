@@ -21,17 +21,62 @@ const categoryColors: Record<string, string> = {
   "Tendencias Tech":   "bg-chart-4/10 text-chart-4 border-chart-4/20",
 }
 
-// CTA contextual: cada categoría empuja a la money page más afín.
-const categoryCta: Record<string, { href: string; label: string }> = {
-  "Marketing Digital": { href: "/publicidad-ads", label: "Solicita una auditoría de Ads gratis" },
-  "Desarrollo Web":    { href: "/diseno-paginas-web", label: "Solicita tu propuesta de web" },
-  "Tendencias Tech":   { href: "/contacto", label: "Agenda una consultoría gratuita" },
-}
-const defaultCta = { href: "/contacto", label: "Agenda una consultoría gratuita" }
+// CTA contextual: cada categoría empuja a la money page más afín (por locale).
+const CATEGORY_CTA = {
+  es: {
+    map: {
+      "Marketing Digital": { href: "/publicidad-ads", label: "Solicita una auditoría de Ads gratis" },
+      "Desarrollo Web":    { href: "/diseno-paginas-web", label: "Solicita tu propuesta de web" },
+      "Tendencias Tech":   { href: "/contacto", label: "Agenda una consultoría gratuita" },
+    } as Record<string, { href: string; label: string }>,
+    fallback: { href: "/contacto", label: "Agenda una consultoría gratuita" },
+  },
+  en: {
+    map: {
+      "Marketing Digital": { href: "/us/google-ads", label: "Get a free ads audit" },
+      "Desarrollo Web":    { href: "/us/website-design", label: "Get your website quote" },
+      "Tendencias Tech":   { href: "/us/contact", label: "Book a free consultation" },
+    } as Record<string, { href: string; label: string }>,
+    fallback: { href: "/us/contact", label: "Book a free consultation" },
+  },
+} as const
+
+// Textos del chrome del artículo por locale.
+const ARTICLE_TEXT = {
+  es: {
+    base: "/insights",
+    back: "Volver a Insights",
+    readTime: "de lectura",
+    readNext: "Leer también",
+    aboutAuthor: "Sobre el autor",
+    authorBlurb: (category: string) =>
+      `Especialista en ${category} con amplia experiencia ayudando a empresas en República Dominicana, España y Latinoamérica a crecer en el entorno digital.`,
+    keepReading: "Sigue leyendo",
+    ctaKicker: "Start By Global",
+    ctaTitle: "¿Listo para Aplicar Estas Estrategias?",
+    ctaBody: "Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado a tu negocio y mercado específico.",
+    moreArticles: "Más Artículos",
+  },
+  en: {
+    base: "/us/insights",
+    back: "Back to Insights",
+    readTime: "read",
+    readNext: "Read next",
+    aboutAuthor: "About the author",
+    authorBlurb: (category: string) =>
+      `${category} specialist with extensive experience helping businesses in the U.S. and Latin America grow online.`,
+    keepReading: "Keep reading",
+    ctaKicker: "Start By Global",
+    ctaTitle: "Ready to Put This Into Practice?",
+    ctaBody: "Our team can implement what you just read, tailored to your business and market.",
+    moreArticles: "More Articles",
+  },
+} as const
 
 interface BlogPostContentProps {
   post: BlogPostView
   related: RelatedPost[]
+  locale?: "es" | "en"
 }
 
 // ---------------------------------------------------------------------------
@@ -39,7 +84,7 @@ interface BlogPostContentProps {
 // Converts the HTML strings in blog-data into JSX with explicit Tailwind
 // classes so typography renders correctly without @tailwindcss/typography.
 // ---------------------------------------------------------------------------
-function ArticleBody({ html }: { html: string }) {
+function ArticleBody({ html, readNextLabel = "Leer también" }: { html: string; readNextLabel?: string }) {
   // Split on block-level tags we care about
   const segments: React.ReactNode[] = []
 
@@ -96,7 +141,7 @@ function ArticleBody({ html }: { html: string }) {
           <aside key={key++} className="my-8 flex items-start gap-3.5 rounded-xl border border-primary/25 bg-primary/[0.06] px-5 py-4">
             <BookOpen className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <div>
-              <span className="block text-[11px] font-semibold uppercase tracking-widest text-primary mb-1">Leer también</span>
+              <span className="block text-[11px] font-semibold uppercase tracking-widest text-primary mb-1">{readNextLabel}</span>
               <p className="text-foreground/90 leading-relaxed text-[0.975rem]">
                 <InlineHtml html={inner} />
               </p>
@@ -195,10 +240,12 @@ function InlineHtml({ html }: { html: string }) {
 
 // ---------------------------------------------------------------------------
 
-export function BlogPostContent({ post, related }: BlogPostContentProps) {
+export function BlogPostContent({ post, related, locale = "es" }: BlogPostContentProps) {
   const colorClass =
     categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
-  const cta = categoryCta[post.category] ?? defaultCta
+  const ctas = CATEGORY_CTA[locale]
+  const cta = ctas.map[post.category] ?? ctas.fallback
+  const t = ARTICLE_TEXT[locale]
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -206,11 +253,11 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
       {/* Back */}
       <AnimateIn>
         <Link
-          href="/insights"
+          href={t.base}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Volver a Insights
+          {t.back}
         </Link>
       </AnimateIn>
 
@@ -231,7 +278,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
             </span>
             <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />
-              {post.readTime} de lectura
+              {post.readTime} {t.readTime}
             </span>
             <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <User className="w-3.5 h-3.5" />
@@ -274,7 +321,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
       {/* Article Body */}
       <AnimateIn delay={0.3}>
         <article className="glass-card rounded-2xl p-7 sm:p-12">
-          <ArticleBody html={post.content} />
+          <ArticleBody html={post.content} readNextLabel={t.readNext} />
         </article>
       </AnimateIn>
 
@@ -282,7 +329,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
       <AnimateIn delay={0.4}>
         <div className="glass-card rounded-2xl p-6 sm:p-8">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-4">
-            Sobre el autor
+            {t.aboutAuthor}
           </p>
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center text-xl font-bold text-white shrink-0 font-display">
@@ -292,8 +339,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
               <h3 className="font-display text-lg font-bold">{post.author}</h3>
               <p className="text-sm text-primary mb-2">{post.authorRole} · Start By Global</p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Especialista en {post.category} con amplia experiencia ayudando a empresas en
-                República Dominicana, España y Latinoamérica a crecer en el entorno digital.
+                {t.authorBlurb(post.category)}
               </p>
             </div>
           </div>
@@ -305,7 +351,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
         <AnimateIn delay={0.45}>
           <section aria-labelledby="related-heading" className="space-y-4">
             <h2 id="related-heading" className="font-display text-xl sm:text-2xl font-bold tracking-tight">
-              Sigue leyendo
+              {t.keepReading}
             </h2>
             <div className="grid sm:grid-cols-3 gap-4">
               {related.map((r) => {
@@ -313,7 +359,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
                 return (
                   <Link
                     key={r.slug}
-                    href={`/insights/${r.slug}`}
+                    href={`${t.base}/${r.slug}`}
                     className="group glass-card rounded-2xl p-5 flex flex-col gap-3 hover:border-primary/30 transition-all"
                   >
                     <span className={`inline-flex w-fit items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold ${rColor}`}>
@@ -325,7 +371,7 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
                     </h3>
                     <span className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Clock className="w-3.5 h-3.5" />
-                      {r.readTime} de lectura
+                      {r.readTime} {t.readTime}
                     </span>
                   </Link>
                 )
@@ -346,14 +392,13 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
         >
           <div className="relative z-10 space-y-5">
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-              Start By Global
+              {t.ctaKicker}
             </p>
             <h3 className="font-display text-2xl sm:text-3xl font-bold text-balance">
-              ¿Listo para Aplicar Estas Estrategias?
+              {t.ctaTitle}
             </h3>
             <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado
-              a tu negocio y mercado específico.
+              {t.ctaBody}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
               <Link
@@ -364,11 +409,11 @@ export function BlogPostContent({ post, related }: BlogPostContentProps) {
                 <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/insights"
+                href={t.base}
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-card border border-border/50 text-foreground font-medium hover:border-primary/30 transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Más Artículos
+                {t.moreArticles}
               </Link>
             </div>
           </div>

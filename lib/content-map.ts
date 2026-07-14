@@ -1,7 +1,7 @@
-import { listPosts } from "@/lib/blog-posts"
+import { listPosts, type PostLocale } from "@/lib/blog-posts"
 
-// Mapa de contenido publicado: la base para el enlazado interno y para evitar
-// canibalización (que dos artículos compitan por la misma keyword principal).
+// Mapa de contenido publicado (por idioma): la base para el enlazado interno y
+// para evitar canibalización (que dos artículos compitan por la misma keyword).
 
 export interface ContentMapEntry {
   slug: string
@@ -11,8 +11,8 @@ export interface ContentMapEntry {
   keywords: string[]
 }
 
-export async function buildContentMap(excludeSlug?: string): Promise<ContentMapEntry[]> {
-  const rows = await listPosts({ status: "published" })
+export async function buildContentMap(excludeSlug?: string, locale: PostLocale = "es"): Promise<ContentMapEntry[]> {
+  const rows = await listPosts({ status: "published", locale })
   return rows
     .filter((r) => r.slug !== excludeSlug)
     .map((r) => ({
@@ -25,9 +25,14 @@ export async function buildContentMap(excludeSlug?: string): Promise<ContentMapE
 }
 
 /** Texto compacto del mapa para incluirlo en el prompt del LLM. */
-export function contentMapToPrompt(entries: ContentMapEntry[]): string {
-  if (!entries.length) return "(no hay otros artículos publicados todavía)"
+export function contentMapToPrompt(entries: ContentMapEntry[], locale: PostLocale = "es"): string {
+  const base = locale === "en" ? "/us/insights" : "/insights"
+  if (!entries.length) {
+    return locale === "en"
+      ? "(no other published articles yet)"
+      : "(no hay otros artículos publicados todavía)"
+  }
   return entries
-    .map((e) => `- /insights/${e.slug} — "${e.title}" [${e.category}] kw principal: ${e.primary_keyword ?? "—"}`)
+    .map((e) => `- ${base}/${e.slug} — "${e.title}" [${e.category}] primary kw: ${e.primary_keyword ?? "—"}`)
     .join("\n")
 }

@@ -1,6 +1,6 @@
 import {
   getRowBySlug, getPostById, createPost, updatePost, deletePost,
-  getUsedPrimaryKeywords, listPosts, type BlogPostRow,
+  getUsedPrimaryKeywords, listPosts, type BlogPostRow, type PostLocale,
 } from "@/lib/blog-posts"
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries } from "@/lib/gsc"
@@ -24,6 +24,16 @@ Reglas de contenido:
 - Añade enlaces internos relevantes (href relativos como /insights/otro-articulo o /diseno-paginas-web) usando el mapa de contenido; no inventes URLs que no estén en el mapa o en money pages conocidas (/diseno-paginas-web, /publicidad-ads, /servicios, /contacto).
 - No repitas el tema de otro artículo del mapa (evita canibalización); profundiza en el ángulo propio de este.
 - Cuando recomiendes explícitamente otro artículo del blog, ponlo en un párrafo propio que contenga el enlace a /insights/… (se renderiza como bloque destacado "Leer también").`
+
+const IMPROVE_SYSTEM_EN = `You are a senior SEO editor at Start By Global, a marketing and web development agency targeting U.S. businesses. You improve and expand existing articles to strengthen their organic rankings in Google US, keeping the brand voice (approachable, professional, results-oriented) and writing in English.
+
+Content rules:
+- Return the COMPLETE improved article, not just the changes.
+- Use ONLY this HTML subset: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <em>, <a>, <code>. No <script>, <style>, <img>, and no attributes except href on <a>.
+- Expand with new sections that cover the real Google queries provided, strengthen E-E-A-T, improve headings and add an FAQ section if it adds value.
+- Add relevant internal links (relative hrefs like /us/insights/another-article or /us/website-design) using the content map; never invent URLs that aren't in the map or the known money pages (/us/website-design, /us/google-ads, /us/contact).
+- Do not overlap the topic of another article in the map (avoid cannibalization); go deeper on this article's own angle.
+- When you explicitly recommend another blog article, put it in its own paragraph containing the /us/insights/… link (it renders as a highlighted "Read next" block).`
 
 interface ImproveResult {
   title?: string
@@ -53,12 +63,14 @@ export async function improveArticle(slug: string): Promise<ImproveOutcome> {
   const row = await getRowBySlug(slug)
   if (!row) throw new Error(`No existe el artículo "${slug}".`)
   if (row.status !== "published") throw new Error("Solo se pueden mejorar artículos publicados.")
+  const locale = (row.locale ?? "es") as PostLocale
+  const gscPath = locale === "en" ? `/us/insights/${slug}` : `/insights/${slug}`
 
   // Señales: métricas de lectura + consultas reales de Google + mapa de contenido.
   const stats = await getBlogStats(90).catch(() => null)
   const metrics = stats?.articles.find((a) => a.slug === slug) ?? null
-  const gsc = await getArticleQueries(`/insights/${slug}`, 28).catch(() => ({ configured: false, rows: [] as never[] }))
-  const map = await buildContentMap(slug)
+  const gsc = await getArticleQueries(gscPath, 28).catch(() => ({ configured: false, rows: [] as never[] }))
+  const map = await buildContentMap(slug, locale)
 
   const gscBlock = gsc.configured && gsc.rows.length
     ? gsc.rows
@@ -84,7 +96,7 @@ CONSULTAS REALES EN GOOGLE (Search Console):
 ${gscBlock}
 
 MAPA DE CONTENIDO (para enlaces internos, NO repetir estos temas):
-${contentMapToPrompt(map)}
+${contentMapToPrompt(map, locale)}
 
 CONTENIDO ACTUAL (HTML):
 ${row.content}
@@ -101,7 +113,8 @@ Devuelve un JSON con esta forma exacta:
 }`
 
   const settings = await getSiteSettings()
-  const system = withCustom(IMPROVE_SYSTEM, settings.ai.improvePrompt)
+  const baseSystem = locale === "en" ? IMPROVE_SYSTEM_EN : IMPROVE_SYSTEM
+  const system = withCustom(baseSystem, settings.ai.improvePrompt)
   const result = await aiJson<ImproveResult>({ system, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
@@ -129,6 +142,7 @@ Devuelve un JSON con esta forma exacta:
     content,
     status: "draft",
     origin: "ai_improved",
+    locale,
     improves_post_id: row.id,
   })
 
@@ -199,6 +213,30 @@ Reglas de contenido:
 - E-E-A-T: aporta valor real, no relleno; evita promesas exageradas.
 - Cuando recomiendes explícitamente otro artículo del blog, ponlo en un párrafo propio que contenga el enlace a /insights/… (se renderiza como bloque destacado "Leer también").`
 
+const PROPOSE_SYSTEM_EN = `You are an SEO content strategist at Start By Global, a marketing and web development agency targeting U.S. small and mid-size businesses. You propose new article topics to expand organic coverage in Google US across four verticals: website design & development, paid advertising (Google/Meta/TikTok Ads), digital marketing, and automation/AI.
+
+Rules:
+- English (US). Focused on winning clients (commercial/transactional intent or conversion-adjacent informational), using real technical and conversion keywords U.S. businesses search for.
+- Do NOT propose topics that overlap (cannibalize) the existing articles or keywords provided. Each topic must have a distinct primary keyword and its own angle.
+- The category must be exactly one of these internal codes: "Marketing Digital", "Desarrollo Web", "Tendencias Tech" (they render as Digital Marketing / Web Development / Tech Trends).`
+
+const GENERATE_SYSTEM_EN = `You are a senior SEO writer at Start By Global (marketing and web development agency serving U.S. businesses). You write complete, genuinely useful, client-winning articles in English (US) with the brand voice (approachable, professional, results-oriented).
+
+Content rules:
+- Use ONLY this HTML subset: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <blockquote>, <strong>, <em>, <a>, <code>. No <script>, <style>, <img>, and no attributes except href on <a>.
+- 1200-1800 words, with an introduction, clear H2/H3 structure, concrete examples and an FAQ section.
+- Add relevant internal links (relative hrefs) using the provided content map; never invent URLs that aren't in the map or the known money pages (/us/website-design, /us/google-ads, /us/contact).
+- End with a clear CTA to the indicated money page.
+- E-E-A-T: real value, no filler; avoid exaggerated promises.
+- When you explicitly recommend another blog article, put it in its own paragraph containing the /us/insights/… link (it renders as a highlighted "Read next" block).`
+
+// Money pages del CTA final por categoría, para artículos EN.
+const CATEGORY_CTA_EN: Record<string, string> = {
+  "Marketing Digital": "/us/google-ads",
+  "Desarrollo Web": "/us/website-design",
+  "Tendencias Tech": "/us/contact",
+}
+
 export interface ProposedTopic {
   working_title: string
   slug: string
@@ -218,18 +256,18 @@ function slugify(input: string): string {
     .replace(/^-|-$/g, "")
 }
 
-/** Claude propone temas nuevos no canibalizadores a partir del mapa de contenido. */
-export async function proposeTopics(count = 5): Promise<ProposedTopic[]> {
+/** La IA propone temas nuevos no canibalizadores a partir del mapa de contenido. */
+export async function proposeTopics(count = 5, locale: PostLocale = "es"): Promise<ProposedTopic[]> {
   if (!anyProviderConfigured()) {
     throw new Error("No hay proveedor de IA configurado (ANTHROPIC_API_KEY o GEMINI_API_KEY): no se pueden proponer temas.")
   }
-  const map = await buildContentMap()
-  const used = await getUsedPrimaryKeywords()
+  const map = await buildContentMap(undefined, locale)
+  const used = await getUsedPrimaryKeywords(undefined, locale)
 
   const prompt = `Propón ${count} temas de artículos nuevos.
 
 MAPA DE CONTENIDO ACTUAL (no repitas estos temas ni sus keywords):
-${contentMapToPrompt(map)}
+${contentMapToPrompt(map, locale)}
 
 KEYWORDS PRINCIPALES YA OCUPADAS (no las repitas):
 ${used.length ? used.join(", ") : "(ninguna)"}
@@ -250,7 +288,11 @@ Devuelve un JSON con esta forma exacta:
   ]
 }`
 
-  const res = await aiJson<{ topics: ProposedTopic[] }>({ system: PROPOSE_SYSTEM, prompt, maxTokens: 3000 })
+  const res = await aiJson<{ topics: ProposedTopic[] }>({
+    system: locale === "en" ? PROPOSE_SYSTEM_EN : PROPOSE_SYSTEM,
+    prompt,
+    maxTokens: 3000,
+  })
   const topics = Array.isArray(res?.topics) ? res.topics : []
   const usedSet = new Set(used)
   return topics.filter((t) => t?.primary_keyword && !usedSet.has(t.primary_keyword.toLowerCase().trim()))
@@ -265,22 +307,25 @@ interface GenerateResult {
 }
 
 /** Genera un artículo completo (borrador ai_generated) a partir de un tema. */
-export async function generateArticle(topic: ProposedTopic): Promise<BlogPostRow> {
+export async function generateArticle(topic: ProposedTopic, locale: PostLocale = "es"): Promise<BlogPostRow> {
   if (!anyProviderConfigured()) {
     throw new Error("No hay proveedor de IA configurado (ANTHROPIC_API_KEY o GEMINI_API_KEY): no se puede generar el artículo.")
   }
   const primary = (topic.primary_keyword || "").trim()
   if (!primary) throw new Error("El tema no tiene palabra clave principal.")
 
-  // Chequeo final anti-canibalización.
-  const used = await getUsedPrimaryKeywords()
+  // Chequeo final anti-canibalización (por idioma).
+  const used = await getUsedPrimaryKeywords(undefined, locale)
   if (used.includes(primary.toLowerCase())) {
     throw new Error("Ese tema canibaliza un artículo publicado (misma keyword principal).")
   }
 
   const category = POST_CATEGORIES.includes(topic.category) ? topic.category : "Marketing Digital"
-  const cta = CATEGORY_CTA[category] ?? "/contacto"
-  const map = await buildContentMap()
+  const cta =
+    locale === "en"
+      ? (CATEGORY_CTA_EN[category] ?? "/us/contact")
+      : (CATEGORY_CTA[category] ?? "/contacto")
+  const map = await buildContentMap(undefined, locale)
 
   const prompt = `Escribe el artículo completo para este tema.
 
@@ -292,7 +337,7 @@ INTENCIÓN DE BÚSQUEDA: ${topic.search_intent || "—"}
 CTA FINAL (money page): ${cta}
 
 MAPA DE CONTENIDO (para enlaces internos):
-${contentMapToPrompt(map)}
+${contentMapToPrompt(map, locale)}
 
 Devuelve un JSON con esta forma exacta:
 {
@@ -304,7 +349,7 @@ Devuelve un JSON con esta forma exacta:
 }`
 
   const settings = await getSiteSettings()
-  const system = withCustom(GENERATE_SYSTEM, settings.ai.createPrompt)
+  const system = withCustom(locale === "en" ? GENERATE_SYSTEM_EN : GENERATE_SYSTEM, settings.ai.createPrompt)
   const result = await aiJson<GenerateResult>({ system, prompt, maxTokens: 8000 })
   if (!result || typeof result !== "object") {
     throw new Error("La respuesta de la IA no tiene el formato esperado.")
@@ -336,6 +381,7 @@ Devuelve un JSON con esta forma exacta:
     content,
     status: "draft",
     origin: "ai_generated",
+    locale,
   })
 
   if (!draft) throw new Error("No se pudo guardar el borrador generado.")
@@ -352,10 +398,10 @@ export interface ImproveRoutineResult {
 }
 
 /** Mejora los N artículos publicados más antiguos que no tengan ya una mejora pendiente. */
-export async function runImproveRoutine(limit = 1): Promise<ImproveRoutineResult> {
+export async function runImproveRoutine(limit = 1, locale: PostLocale = "es"): Promise<ImproveRoutineResult> {
   if (!anyProviderConfigured()) return { improved: [], errors: [], skipped: "sin proveedor de IA" }
 
-  const all = await listPosts()
+  const all = await listPosts({ locale })
   const pendingTargets = new Set(
     all
       .filter((p) => p.origin === "ai_improved" && p.improves_post_id !== null)
@@ -390,11 +436,11 @@ export interface CreateRoutineResult {
 }
 
 /** Propone temas y genera hasta `count` borradores de temas viables (no canibalizadores). */
-export async function runCreateRoutine(count = 1): Promise<CreateRoutineResult> {
+export async function runCreateRoutine(count = 1, locale: PostLocale = "es"): Promise<CreateRoutineResult> {
   if (!anyProviderConfigured()) return { created: [], errors: [], skipped: "sin proveedor de IA" }
 
   const n = Math.max(1, count)
-  const topics = await proposeTopics(Math.max(3, n + 2))
+  const topics = await proposeTopics(Math.max(3, n + 2), locale)
   if (!topics.length) return { created: [], errors: [], skipped: "la IA no propuso temas nuevos" }
 
   const created: string[] = []
@@ -402,7 +448,7 @@ export async function runCreateRoutine(count = 1): Promise<CreateRoutineResult> 
   for (const t of topics) {
     if (created.length >= n) break
     try {
-      const draft = await generateArticle(t)
+      const draft = await generateArticle(t, locale)
       created.push(draft.slug)
     } catch (e) {
       errors.push(`${t.primary_keyword}: ${e instanceof Error ? e.message : String(e)}`)

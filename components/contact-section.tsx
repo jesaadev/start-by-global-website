@@ -5,20 +5,84 @@ import { Send, MapPin, Phone, Mail, Clock, ArrowUpRight, CheckCircle } from "luc
 import { useState } from "react"
 import { AnimateIn } from "@/components/animate-in"
 import { fireLead, fireContact } from "@/lib/track-client"
+import { useLocale } from "@/lib/i18n"
 
 const offices = [
-  { city: "Santo Domingo", country: "Rep. Dominicana", timezone: "GMT-4" },
-  { city: "Madrid", country: "España", timezone: "GMT+1" },
-  { city: "Ciudad de México", country: "México", timezone: "GMT-6" },
-  { city: "Miami", country: "EE.UU.", timezone: "GMT-5" },
+  { city: "Santo Domingo", country: "Rep. Dominicana", countryEn: "Dominican Republic", timezone: "GMT-4" },
+  { city: "Madrid", country: "España", countryEn: "Spain", timezone: "GMT+1" },
+  { city: "Ciudad de México", country: "México", countryEn: "Mexico", timezone: "GMT-6" },
+  { city: "Miami", country: "EE.UU.", countryEn: "USA", timezone: "GMT-5" },
 ]
 
 const WHATSAPP_NUMBERS = [
-  { label: "RD / Internacional", number: "18493562247", display: "+1 849 356 2247" },
-  { label: "Rep. Dominicana", number: "18096378488", display: "+1 809 637 8488" },
+  { label: "RD / Internacional", labelEn: "International", number: "18493562247", display: "+1 849 356 2247" },
+  { label: "Rep. Dominicana", labelEn: "Dominican Republic", number: "18096378488", display: "+1 809 637 8488" },
 ]
 
+const CONTACT_TEXT = {
+  es: {
+    heading: "Contacto",
+    sub: "Hablemos sobre tu próximo proyecto",
+    sentTitle: "Mensaje Enviado",
+    sentBody: "Gracias por contactarnos. Nuestro equipo te responderá en las próximas 24 horas.",
+    name: "Nombre completo",
+    namePh: "Tu nombre",
+    email: "Email",
+    emailPh: "tu@email.com",
+    company: "Empresa",
+    companyPh: "Tu empresa",
+    service: "Servicio de interés",
+    select: "Seleccionar...",
+    services: {
+      web: "Desarrollo Web", seo: "SEO", marketing: "Marketing Digital",
+      branding: "Branding", analytics: "Analítica", automation: "Automatización",
+    },
+    message: "Mensaje",
+    messagePh: "Cuéntanos sobre tu proyecto...",
+    privacyPre: "He leído y acepto la",
+    privacyLink: "Política de Privacidad",
+    sending: "Enviando...",
+    send: "Enviar Mensaje",
+    sendError: "Error al enviar. Intenta de nuevo.",
+    connError: "Error de conexión. Verifica tu internet e intenta de nuevo.",
+    offices: "Nuestras Oficinas",
+    quick: "Respuesta Rápida",
+    quickBody: "¿Necesitas una cotización urgente? Nuestro equipo responde en menos de 2 horas en horario laboral.",
+  },
+  en: {
+    heading: "Contact",
+    sub: "Let's talk about your next project",
+    sentTitle: "Message Sent",
+    sentBody: "Thanks for reaching out. Our team will get back to you within 24 hours.",
+    name: "Full name",
+    namePh: "Your name",
+    email: "Email",
+    emailPh: "you@email.com",
+    company: "Company",
+    companyPh: "Your company",
+    service: "Service of interest",
+    select: "Select...",
+    services: {
+      web: "Web Development", seo: "SEO", marketing: "Digital Marketing",
+      branding: "Branding", analytics: "Analytics", automation: "Automation",
+    },
+    message: "Message",
+    messagePh: "Tell us about your project...",
+    privacyPre: "I have read and accept the",
+    privacyLink: "Privacy Policy",
+    sending: "Sending...",
+    send: "Send Message",
+    sendError: "Something went wrong. Please try again.",
+    connError: "Connection error. Check your internet and try again.",
+    offices: "Our Offices",
+    quick: "Fast Response",
+    quickBody: "Need an urgent quote? Our team replies in under 2 hours during business hours.",
+  },
+} as const
+
 export function ContactSection() {
+  const locale = useLocale()
+  const t = CONTACT_TEXT[locale]
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -49,7 +113,7 @@ export function ContactSection() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || "Error al enviar. Intenta de nuevo.")
+        setError(data.error || t.sendError)
         setSending(false)
         return
       }
@@ -58,7 +122,7 @@ export function ContactSection() {
       setFormData({ name: "", email: "", company: "", service: "", message: "" })
       setTimeout(() => setSubmitted(false), 5000)
     } catch {
-      setError("Error de conexión. Verifica tu internet e intenta de nuevo.")
+      setError(t.connError)
     } finally {
       setSending(false)
     }
@@ -68,8 +132,8 @@ export function ContactSection() {
     <section id="contact" className="flex flex-col gap-6">
       <AnimateIn>
         <div>
-          <h2 className="font-display text-2xl font-bold text-foreground">Contacto</h2>
-          <p className="text-sm text-muted-foreground mt-1">Hablemos sobre tu próximo proyecto</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">{t.heading}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t.sub}</p>
         </div>
       </AnimateIn>
 
@@ -82,9 +146,9 @@ export function ContactSection() {
                 <div className="w-16 h-16 rounded-full bg-chart-3/10 flex items-center justify-center animate-pulse-glow">
                   <CheckCircle className="w-8 h-8 text-chart-3" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground">Mensaje Enviado</h3>
+                <h3 className="font-display text-xl font-bold text-foreground">{t.sentTitle}</h3>
                 <p className="text-sm text-muted-foreground text-center max-w-xs">
-                  Gracias por contactarnos. Nuestro equipo te responderá en las próximas 24 horas.
+                  {t.sentBody}
                 </p>
               </div>
             ) : (
@@ -101,7 +165,7 @@ export function ContactSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="name" className="text-xs text-muted-foreground font-medium">
-                      Nombre completo
+                      {t.name}
                     </label>
                     <input
                       id="name"
@@ -110,12 +174,12 @@ export function ContactSection() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                      placeholder="Tu nombre"
+                      placeholder={t.namePh}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="email" className="text-xs text-muted-foreground font-medium">
-                      Email
+                      {t.email}
                     </label>
                     <input
                       id="email"
@@ -124,7 +188,7 @@ export function ContactSection() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                      placeholder="tu@email.com"
+                      placeholder={t.emailPh}
                     />
                   </div>
                 </div>
@@ -132,7 +196,7 @@ export function ContactSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="company" className="text-xs text-muted-foreground font-medium">
-                      Empresa
+                      {t.company}
                     </label>
                     <input
                       id="company"
@@ -140,12 +204,12 @@ export function ContactSection() {
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
-                      placeholder="Tu empresa"
+                      placeholder={t.companyPh}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label htmlFor="service" className="text-xs text-muted-foreground font-medium">
-                      Servicio de interés
+                      {t.service}
                     </label>
                     <select
                       id="service"
@@ -153,20 +217,17 @@ export function ContactSection() {
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                       className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all appearance-none"
                     >
-                      <option value="" className="bg-card text-foreground">Seleccionar...</option>
-                      <option value="web" className="bg-card text-foreground">Desarrollo Web</option>
-                      <option value="seo" className="bg-card text-foreground">SEO</option>
-                      <option value="marketing" className="bg-card text-foreground">Marketing Digital</option>
-                      <option value="branding" className="bg-card text-foreground">Branding</option>
-                      <option value="analytics" className="bg-card text-foreground">Analítica</option>
-                      <option value="automation" className="bg-card text-foreground">Automatización</option>
+                      <option value="" className="bg-card text-foreground">{t.select}</option>
+                      {Object.entries(t.services).map(([value, label]) => (
+                        <option key={value} value={value} className="bg-card text-foreground">{label}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="message" className="text-xs text-muted-foreground font-medium">
-                    Mensaje
+                    {t.message}
                   </label>
                   <textarea
                     id="message"
@@ -175,7 +236,7 @@ export function ContactSection() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all resize-none"
-                    placeholder="Cuéntanos sobre tu proyecto..."
+                    placeholder={t.messagePh}
                   />
                 </div>
 
@@ -188,8 +249,8 @@ export function ContactSection() {
                     className="mt-0.5 accent-primary"
                   />
                   <span>
-                    He leído y acepto la{" "}
-                    <a href="/privacidad" target="_blank" className="text-primary hover:underline">Política de Privacidad</a>.
+                    {t.privacyPre}{" "}
+                    <a href="/privacidad" target="_blank" className="text-primary hover:underline">{t.privacyLink}</a>.
                   </span>
                 </label>
 
@@ -207,12 +268,12 @@ export function ContactSection() {
                   {sending ? (
                     <>
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      Enviando...
+                      {t.sending}
                     </>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      Enviar Mensaje
+                      {t.send}
                     </>
                   )}
                 </button>
@@ -227,7 +288,7 @@ export function ContactSection() {
             <div className="glass-card rounded-xl p-5 flex-1">
               <h3 className="font-display font-semibold text-foreground mb-4 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Nuestras Oficinas
+                {t.offices}
               </h3>
               <div className="flex flex-col gap-3">
                 {offices.map((office, i) => (
@@ -235,7 +296,9 @@ export function ContactSection() {
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors group">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">{office.city}</p>
-                        <p className="text-[10px] text-muted-foreground">{office.country}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {locale === "en" ? office.countryEn : office.country}
+                        </p>
                       </div>
                       <div className="text-right flex flex-col items-end gap-0.5 shrink-0">
                         <span className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -251,9 +314,9 @@ export function ContactSection() {
 
             {/* Quick contact card */}
             <div className="glass-card rounded-xl p-5 glow-accent">
-              <h3 className="font-display font-semibold text-foreground mb-3">Respuesta Rápida</h3>
+              <h3 className="font-display font-semibold text-foreground mb-3">{t.quick}</h3>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                ¿Necesitas una cotización urgente? Nuestro equipo responde en menos de 2 horas en horario laboral.
+                {t.quickBody}
               </p>
               <div className="flex flex-col gap-2">
                 <a
@@ -275,7 +338,9 @@ export function ContactSection() {
                   >
                     <Phone className="w-4 h-4 text-[#25D366]" />
                     {wa.display}
-                    <span className="text-[10px] text-muted-foreground">· {wa.label}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      · {locale === "en" ? wa.labelEn : wa.label}
+                    </span>
                     <ArrowUpRight className="w-3 h-3 ml-auto" />
                   </a>
                 ))}

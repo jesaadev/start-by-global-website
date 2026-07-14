@@ -19,12 +19,47 @@ import {
   Tag
 } from "lucide-react"
 
-const categories = [
-  { id: "all", label: "Todos", icon: Sparkles },
-  { id: "marketing", label: "Marketing Digital", icon: Megaphone },
-  { id: "desarrollo", label: "Desarrollo Web", icon: Code },
-  { id: "tendencias", label: "Tendencias Tech", icon: TrendingUp },
-]
+const CATEGORY_SETS = {
+  es: [
+    { id: "all", label: "Todos", icon: Sparkles },
+    { id: "marketing", label: "Marketing Digital", icon: Megaphone },
+    { id: "desarrollo", label: "Desarrollo Web", icon: Code },
+    { id: "tendencias", label: "Tendencias Tech", icon: TrendingUp },
+  ],
+  en: [
+    { id: "all", label: "All", icon: Sparkles },
+    { id: "marketing", label: "Digital Marketing", icon: Megaphone },
+    { id: "desarrollo", label: "Web Development", icon: Code },
+    { id: "tendencias", label: "Tech Trends", icon: TrendingUp },
+  ],
+} as const
+
+const LISTING_TEXT = {
+  es: {
+    base: "/insights",
+    title: "Insights & Blog",
+    sub: "Tendencias, estrategias y análisis del mundo digital para impulsar tu negocio",
+    searchPh: "Buscar artículos...",
+    emptyTitle: "No se encontraron artículos",
+    emptyBody: "Intenta con otra búsqueda o categoría",
+    newsTitle: "Mantente al Día",
+    newsBody: "Recibe nuestros mejores insights directamente en tu inbox",
+    newsPh: "tu@email.com",
+    newsCta: "Suscribirme",
+  },
+  en: {
+    base: "/us/insights",
+    title: "Insights & Blog",
+    sub: "Trends, strategies and analysis to grow your business online",
+    searchPh: "Search articles...",
+    emptyTitle: "No articles found",
+    emptyBody: "Try a different search or category",
+    newsTitle: "Stay in the Loop",
+    newsBody: "Get our best insights straight to your inbox",
+    newsPh: "you@email.com",
+    newsCta: "Subscribe",
+  },
+} as const
 
 // Mapea la categoría (label de blog-data) al id del filtro de categorías.
 const CATEGORY_ID: Record<string, string> = {
@@ -40,9 +75,11 @@ function shortDate(iso: string): string {
   return `${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`
 }
 
-export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
+export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[]; locale?: "es" | "en" }) {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const categories = CATEGORY_SETS[locale]
+  const t = LISTING_TEXT[locale]
 
   // Fuente única: el listado se deriva de los posts publicados (mismos que las
   // páginas de detalle), ordenado por fecha descendente. El más reciente queda
@@ -86,7 +123,7 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
             Insights & Blog
           </h1>
           <p className="text-muted-foreground text-lg text-balance">
-            Tendencias, estrategias y análisis del mundo digital para impulsar tu negocio
+            {t.sub}
           </p>
         </div>
       </AnimateIn>
@@ -99,7 +136,7 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Buscar artículos..."
+              placeholder={t.searchPh}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
@@ -132,7 +169,7 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
       {/* Featured Post */}
       {selectedCategory === "all" && featuredPost && (
         <AnimateIn delay={0.2}>
-          <Link href={`/insights/${featuredPost.slug}`}>
+          <Link href={`${t.base}/${featuredPost.slug}`}>
             <div className="glass-card-hover rounded-2xl overflow-hidden group">
               <div className="grid lg:grid-cols-2 gap-0">
                 {/* Image */}
@@ -192,7 +229,7 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {regularPosts.map((post, index) => (
           <AnimateIn key={post.slug} delay={0.3 + index * 0.05}>
-            <Link href={`/insights/${post.slug}`}>
+            <Link href={`${t.base}/${post.slug}`}>
               <div className="glass-card-hover rounded-2xl overflow-hidden h-full flex flex-col group">
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
@@ -251,9 +288,9 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
         <AnimateIn delay={0.3}>
           <div className="glass-card rounded-2xl p-12 text-center">
             <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="font-display text-xl font-bold mb-2">No se encontraron artículos</h3>
+            <h3 className="font-display text-xl font-bold mb-2">{t.emptyTitle}</h3>
             <p className="text-muted-foreground text-sm">
-              Intenta con otra búsqueda o categoría
+              {t.emptyBody}
             </p>
           </div>
         </AnimateIn>
@@ -269,12 +306,12 @@ export function InsightsContent({ posts }: { posts: BlogPostView[] }) {
               Mantente al Día
             </h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Recibe nuestros mejores insights directamente en tu inbox
+              {t.newsBody}
             </p>
             <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
               <input
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t.newsPh}
                 className="flex-1 px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
               <button

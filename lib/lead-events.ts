@@ -12,6 +12,7 @@ export interface LeadEventInput {
   nav_variant?: string | null
   segment?: string | null
   source_article?: string | null
+  locale?: string | null
 }
 
 /** Registra un evento de conversión con su atribución para el medidor de Insights. */
@@ -37,6 +38,7 @@ export async function logLeadEvent(input: LeadEventInput): Promise<void> {
     nav_variant: input.nav_variant ?? null,
     segment: input.segment ?? null,
     source_article: input.source_article ?? null,
+    locale: input.locale ?? "es",
   })
   if (error) console.error("[lead_events] insert error:", error)
 }

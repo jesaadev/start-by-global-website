@@ -19,6 +19,7 @@ interface CapiBody {
   nav_variant?: string | null
   segment?: string | null
   source_article?: string | null
+  locale?: string | null
 }
 
 export async function POST(request: Request) {
@@ -69,6 +70,7 @@ export async function POST(request: Request) {
         nav_variant: body.nav_variant,
         segment: body.segment,
         source_article: body.source_article,
+        locale: body.locale,
       })
     }
 

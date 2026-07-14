@@ -1578,6 +1578,7 @@ interface AdminPost {
   content: string
   status: "draft" | "published" | "archived"
   origin: "manual" | "ai_generated" | "ai_improved"
+  locale: "es" | "en"
   improves_post_id: string | null
   updated_at: string
 }
@@ -1647,10 +1648,11 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [improvePrompt, setImprovePrompt] = useState("")
   const [createPrompt, setCreatePrompt] = useState("")
   const [savingPrompts, setSavingPrompts] = useState(false)
+  const [contentLocale, setContentLocale] = useState<"es" | "en">("es")
 
   const load = useCallback(async () => {
     setLoading(true)
-    const res = await api.get({ resource: "posts" })
+    const res = await api.get({ resource: "posts", locale: contentLocale })
     setPosts(res.data ?? [])
     setProviders(res.ai?.providers ?? [])
     setActiveProvider(res.ai?.active ?? "")
@@ -1658,7 +1660,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setImprovePrompt(res.ai?.improvePrompt ?? "")
     setCreatePrompt(res.ai?.createPrompt ?? "")
     setLoading(false)
-  }, [api])
+  }, [api, contentLocale])
 
   const aiOn = providers.length > 0
   const PROVIDER_LABEL: Record<string, string> = { claude: "Claude", gemini: "Gemini" }
@@ -1740,7 +1742,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     try {
       const res = editing
         ? await api.patch({ resource: "post", id: editing.id, ...payload })
-        : await api.post({ resource: "post", ...payload, status: "draft" })
+        : await api.post({ resource: "post", ...payload, status: "draft", locale: contentLocale })
       if (res.error || !res.data) throw new Error(res.error || "Error")
       await load(); closeEditor()
     } catch {
@@ -1797,7 +1799,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const propose = async () => {
     setProposing(true); setNotice(""); setError("")
     try {
-      const res = await api.post({ resource: "propose-topics", count: 5 })
+      const res = await api.post({ resource: "propose-topics", count: 5, locale: contentLocale })
       if (res.error) { setError(res.error); return }
       setTopics(res.topics ?? [])
       if (!(res.topics?.length)) setNotice("La IA no propuso temas nuevos (la cobertura actual ya parece amplia).")
@@ -1810,7 +1812,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const generate = async (t: ProposedTopic) => {
     setGenerating(t.primary_keyword); setNotice(""); setError("")
     try {
-      const res = await api.post({ resource: "generate-article", topic: t })
+      const res = await api.post({ resource: "generate-article", topic: t, locale: contentLocale })
       if (res.error || !res.data) { setError(res.error || "No se pudo generar el artículo."); return }
       setNotice(`Borrador creado: "${res.data.title}". Revísalo abajo, ajusta la imagen y publícalo.`)
       setTopics((prev) => prev.filter((x) => x.primary_keyword !== t.primary_keyword))
@@ -1833,6 +1835,16 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 disabled:opacity-40 transition-colors">
             {seeding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />} Importar del código
           </button>
+          {/* Idioma del contenido: ES (raíz) o EN (/us) */}
+          <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg" title="Idioma del contenido">
+            {(["es", "en"] as const).map((l) => (
+              <button key={l} type="button" onClick={() => setContentLocale(l)}
+                className={cn("px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase transition-all",
+                  contentLocale === l ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                {l}
+              </button>
+            ))}
+          </div>
           {aiOn && (
             <label className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <Sparkles className="w-3.5 h-3.5 text-primary" />

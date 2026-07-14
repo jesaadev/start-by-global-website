@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { fireLead, fireContact } from "@/lib/track-client"
+import { useLocale, type Locale } from "@/lib/i18n"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,15 +29,66 @@ type ChatPhase = "chat" | "ask-email" | "email-captured"
 const WHATSAPP_NUMBER = "18493562247"
 const CHAT_ENABLED = true // Cambiar a false para desactivar el chat temporalmente
 
-const SUGGESTED_QUESTIONS = [
-  "¿Qué servicios ofrecen?",
-  "¿Cuánto cuesta una web?",
-  "¿Trabajan con clientes fuera de RD?",
-  "Quiero una consultoría gratis",
-]
+// Textos del chat por locale (el resto de la conversación la lleva la IA en el
+// idioma del visitante).
+const CHAT_TEXT = {
+  es: {
+    suggested: [
+      "¿Qué servicios ofrecen?",
+      "¿Cuánto cuesta una web?",
+      "¿Trabajan con clientes fuera de RD?",
+      "Quiero una consultoría gratis",
+    ],
+    welcome:
+      "¡Hola! 👋 Soy el asistente virtual de **Start By Global**. Estoy aquí para ayudarte con información sobre nuestros servicios, precios y cómo podemos impulsar tu negocio digital.\n\n¿En qué te puedo ayudar hoy?",
+    errorMsg: "Lo siento, tuve un problema. Por favor intenta de nuevo o escríbenos a **info@startbyglobal.com**",
+    assistant: "Asistente SBG",
+    online: "En línea",
+    phForm: "Completa el formulario de arriba...",
+    phWrite: "Escribe tu mensaje...",
+    ariaSend: "Enviar",
+    emailPrompt: "Para enviarte una propuesta personalizada, ¿me compartes tu email? 📩",
+    namePh: "Tu nombre (opcional)",
+    emailPh: "tu@email.com *",
+    invalidEmail: "Ingresa un email válido",
+    sendBtn: "Enviar",
+    skip: "Omitir",
+    privacyPre: "Al enviar aceptas nuestra",
+    privacyLink: "Política de Privacidad",
+    waTitle: "¿Hablamos directamente?",
+    waBody: "Un especialista puede atenderte ahora mismo por WhatsApp.",
+    waButton: "Abrir WhatsApp ahora",
+  },
+  en: {
+    suggested: [
+      "What services do you offer?",
+      "How much does a website cost?",
+      "Do you work with US businesses?",
+      "I want a free consultation",
+    ],
+    welcome:
+      "Hi! 👋 I'm the **Start By Global** virtual assistant. I can help you with our services, pricing, and how we can grow your business online.\n\nHow can I help you today?",
+    errorMsg: "Sorry, something went wrong. Please try again or email us at **info@startbyglobal.com**",
+    assistant: "SBG Assistant",
+    online: "Online",
+    phForm: "Complete the form above...",
+    phWrite: "Type your message...",
+    ariaSend: "Send",
+    emailPrompt: "To send you a tailored proposal, could you share your email? 📩",
+    namePh: "Your name (optional)",
+    emailPh: "you@email.com *",
+    invalidEmail: "Enter a valid email",
+    sendBtn: "Send",
+    skip: "Skip",
+    privacyPre: "By submitting you accept our",
+    privacyLink: "Privacy Policy",
+    waTitle: "Want to talk directly?",
+    waBody: "A specialist can help you right now on WhatsApp.",
+    waButton: "Open WhatsApp now",
+  },
+} as const
 
-const WELCOME_TEXT =
-  "¡Hola! 👋 Soy el asistente virtual de **Start By Global**. Estoy aquí para ayudarte con información sobre nuestros servicios, precios y cómo podemos impulsar tu negocio digital.\n\n¿En qué te puedo ayudar hoy?"
+type ChatText = (typeof CHAT_TEXT)[Locale]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -58,9 +110,11 @@ function formatText(text: string) {
   })
 }
 
-function buildWhatsAppUrl(summary: string): string {
+function buildWhatsAppUrl(summary: string, locale: Locale = "es"): string {
   const msg = encodeURIComponent(
-    `Hola Start By Global! Vengo del chat de su sitio web.\n\nResumen de mi consulta: ${summary}`
+    locale === "en"
+      ? `Hi Start By Global! I'm coming from your website chat.\n\nSummary of my inquiry: ${summary}`
+      : `Hola Start By Global! Vengo del chat de su sitio web.\n\nResumen de mi consulta: ${summary}`
   )
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`
 }
@@ -76,9 +130,11 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 function EmailCapture({
   onSubmit,
   onSkip,
+  t,
 }: {
   onSubmit: (email: string, name: string) => void
   onSkip: () => void
+  t: ChatText
 }) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -87,7 +143,7 @@ function EmailCapture({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      setError("Ingresa un email válido")
+      setError(t.invalidEmail)
       return
     }
     onSubmit(email, name)
@@ -100,14 +156,14 @@ function EmailCapture({
           <Bot className="w-3.5 h-3.5 text-muted-foreground" />
         </div>
         <div className="bg-secondary/60 text-foreground rounded-2xl rounded-bl-sm border border-border/30 px-3.5 py-2.5 text-sm leading-relaxed max-w-[85%]">
-          Para enviarte una propuesta personalizada, ¿me compartes tu email? 📩
+          {t.emailPrompt}
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2 pl-9">
         <input
           type="text"
-          placeholder="Tu nombre (opcional)"
+          placeholder={t.namePh}
           value={name}
           onChange={(e) => setName(e.target.value)}
           className={cn(
@@ -119,7 +175,7 @@ function EmailCapture({
         />
         <input
           type="email"
-          placeholder="tu@email.com *"
+          placeholder={t.emailPh}
           value={email}
           onChange={(e) => { setEmail(e.target.value); setError("") }}
           className={cn(
@@ -145,20 +201,20 @@ function EmailCapture({
             )}
           >
             <Mail className="w-3.5 h-3.5" />
-            Enviar
+            {t.sendBtn}
           </button>
           <button
             type="button"
             onClick={onSkip}
             className="px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
           >
-            Omitir
+            {t.skip}
           </button>
         </div>
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          Al enviar aceptas nuestra{" "}
+          {t.privacyPre}{" "}
           <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            Política de Privacidad
+            {t.privacyLink}
           </a>.
         </p>
       </form>
@@ -171,9 +227,13 @@ function EmailCapture({
 function WhatsAppCTA({
   summary,
   onDismiss,
+  t,
+  waLocale,
 }: {
   summary: string
   onDismiss: () => void
+  t: ChatText
+  waLocale: Locale
 }) {
   return (
     <div className="mx-3 mb-3 p-3.5 rounded-xl border border-[#25D366]/30 bg-[#25D366]/8">
@@ -183,10 +243,10 @@ function WhatsAppCTA({
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-foreground mb-0.5">
-            ¿Hablamos directamente?
+            {t.waTitle}
           </p>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Un especialista puede atenderte ahora mismo por WhatsApp.
+            {t.waBody}
           </p>
         </div>
         <button
@@ -199,7 +259,7 @@ function WhatsAppCTA({
         </button>
       </div>
       <a
-        href={buildWhatsAppUrl(summary)}
+        href={buildWhatsAppUrl(summary, waLocale)}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => fireContact()}
@@ -211,7 +271,7 @@ function WhatsAppCTA({
         )}
       >
         <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
-        Abrir WhatsApp ahora
+        {t.waButton}
         <ArrowRight className="w-3.5 h-3.5" />
       </a>
     </div>
@@ -268,10 +328,12 @@ function ChatInactive() {
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 function ChatWidgetInner() {
+  const locale = useLocale()
+  const t = CHAT_TEXT[locale]
   const [open, setOpen] = useState(false)
   const [minimized, setMinimized] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "welcome", role: "model", text: WELCOME_TEXT },
+  const [messages, setMessages] = useState<Message[]>(() => [
+    { id: "welcome", role: "model", text: CHAT_TEXT[locale].welcome },
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -405,7 +467,7 @@ function ChatWidgetInner() {
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: chatHistory.current, messageCount: newCount }),
+          body: JSON.stringify({ messages: chatHistory.current, messageCount: newCount, locale }),
         })
 
         const data = await res.json()
@@ -442,7 +504,7 @@ function ChatWidgetInner() {
           {
             id: `err-${Date.now()}`,
             role: "model",
-            text: "Lo siento, tuve un problema. Por favor intenta de nuevo o escríbenos a **info@startbyglobal.com**",
+            text: t.errorMsg,
           },
         ])
       } finally {
@@ -534,7 +596,7 @@ function ChatWidgetInner() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-foreground">Asistente SBG</p>
+              <p className="text-sm font-semibold text-foreground">{t.assistant}</p>
               {capturedEmail && (
                 <span className="flex items-center gap-1 text-[10px] text-chart-3 font-medium">
                   <CheckCircle2 className="w-3 h-3" />
@@ -543,7 +605,7 @@ function ChatWidgetInner() {
               )}
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted-foreground">En línea</span>
+              <span className="text-[10px] text-muted-foreground">{t.online}</span>
               {CHAT_ENABLED && (
                 <>
                   <span className="text-[10px] text-muted-foreground">·</span>
@@ -558,7 +620,7 @@ function ChatWidgetInner() {
           <div className="flex items-center gap-1">
             {/* WhatsApp directo desde header */}
             <a
-              href={buildWhatsAppUrl(conversationSummary || "consulta general")}
+              href={buildWhatsAppUrl(conversationSummary || (locale === "en" ? "general inquiry" : "consulta general"), locale)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => fireContact()}
@@ -644,7 +706,7 @@ function ChatWidgetInner() {
 
                 {/* Email capture */}
                 {phase === "ask-email" && (
-                  <EmailCapture onSubmit={handleEmailSubmit} onSkip={handleEmailSkip} />
+                  <EmailCapture onSubmit={handleEmailSubmit} onSkip={handleEmailSkip} t={t} />
                 )}
 
                 {/* WhatsApp CTA */}
@@ -652,13 +714,15 @@ function ChatWidgetInner() {
                   <WhatsAppCTA
                     summary={conversationSummary}
                     onDismiss={() => setShowWhatsApp(false)}
+                    t={t}
+                    waLocale={locale}
                   />
                 )}
 
                 {/* Preguntas sugeridas — solo al inicio */}
                 {messages.length === 1 && !loading && phase === "chat" && (
                   <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-                    {SUGGESTED_QUESTIONS.map((q) => (
+                    {t.suggested.map((q) => (
                       <button
                         key={q}
                         type="button"
@@ -681,8 +745,8 @@ function ChatWidgetInner() {
                       onKeyDown={handleKeyDown}
                       placeholder={
                         phase === "ask-email"
-                          ? "Completa el formulario de arriba..."
-                          : "Escribe tu mensaje..."
+                          ? t.phForm
+                          : t.phWrite
                       }
                       rows={1}
                       disabled={loading || phase === "ask-email"}
@@ -704,7 +768,7 @@ function ChatWidgetInner() {
                       type="button"
                       onClick={() => sendMessage(input)}
                       disabled={!input.trim() || loading || phase === "ask-email"}
-                      aria-label="Enviar"
+                      aria-label={t.ariaSend}
                       className={cn(
                         "flex items-center justify-center w-10 h-10 rounded-xl shrink-0",
                         "bg-primary text-primary-foreground transition-all duration-200",

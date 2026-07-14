@@ -10,6 +10,7 @@ import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 
 export type PostStatus = "draft" | "published" | "archived"
 export type PostOrigin = "manual" | "ai_generated" | "ai_improved"
+export type PostLocale = "es" | "en"
 
 /** Fila tal cual en la tabla (snake_case). */
 export interface BlogPostRow {
@@ -29,6 +30,7 @@ export interface BlogPostRow {
   content: string
   status: PostStatus
   origin: PostOrigin
+  locale: PostLocale
   improves_post_id: string | null
   created_at: string
   updated_at: string
@@ -70,6 +72,22 @@ export function longDateEs(iso: string | null | undefined): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ""
   return `${d.getUTCDate()} de ${MESES[d.getUTCMonth()]} de ${d.getUTCFullYear()}`
+}
+
+const MONTHS_EN = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+]
+
+export function longDateEn(iso: string | null | undefined): string {
+  if (!iso) return ""
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ""
+  return `${MONTHS_EN[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
+}
+
+function longDate(iso: string | null | undefined, locale: PostLocale): string {
+  return locale === "en" ? longDateEn(iso) : longDateEs(iso)
 }
 
 /** Mapea una entrada del archivo TS al modelo de vista (fallback). */
@@ -115,60 +133,74 @@ function toView(r: BlogPostRow): BlogPostView {
     excerpt: r.excerpt,
     author: r.author,
     authorRole: r.author_role,
-    date: longDateEs(r.date_iso),
+    date: longDate(r.date_iso, r.locale ?? "es"),
     dateISO: r.date_iso ?? "",
     lastModifiedISO: r.last_modified_iso ?? r.date_iso ?? "",
     readTime: r.read_time,
     category: r.category,
     image: r.image,
     keywords: r.keywords ?? [],
-    content: r.content,
+    // En consultas de listado (LIST_COLUMNS) content no viene; los consumidores
+    // de listas no lo usan.
+    content: r.content ?? "",
   }
 }
 
 // ─── Lectura pública (published) ────────────────────────────────────────────
 
-export async function getPublishedSlugs(): Promise<string[]> {
+export async function getPublishedSlugs(locale: PostLocale = "es"): Promise<string[]> {
   const { data, error } = await supabaseAdmin
     .from("blog_posts")
     .select("slug")
     .eq("status", "published")
+    .eq("locale", locale)
   if (error) {
     console.error("[blog_posts] getPublishedSlugs error:", error)
-    return Object.keys(blogPostsData)
+    return locale === "es" ? Object.keys(blogPostsData) : []
   }
   const slugs = (data ?? []).map((r) => r.slug as string)
-  return slugs.length ? slugs : Object.keys(blogPostsData)
+  if (slugs.length) return slugs
+  // Fallback al archivo TS solo para el español (el inglés nace en la BD).
+  return locale === "es" ? Object.keys(blogPostsData) : []
 }
 
-export async function getPublishedPostBySlug(slug: string): Promise<BlogPostView | null> {
+export async function getPublishedPostBySlug(slug: string, locale: PostLocale = "es"): Promise<BlogPostView | null> {
   const { data, error } = await supabaseAdmin
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
     .eq("status", "published")
+    .eq("locale", locale)
     .maybeSingle()
   if (error) {
     console.error("[blog_posts] getPublishedPostBySlug error:", error)
   }
   if (data) return toView(data as BlogPostRow)
+  if (locale !== "es") return null
   // Miss: fallback al TS solo si la tabla aún no está sembrada.
   if (await tableHasPublished()) return null
   const p = blogPostsData[slug]
   return p ? viewFromTs(slug, p) : null
 }
 
-export async function getAllPublished(): Promise<BlogPostView[]> {
+// Columnas de listado (sin `content`): el listado, el sitemap, los relacionados
+// y el JSON-LD no usan el HTML completo — evitamos transferir ~8KB por artículo.
+const LIST_COLUMNS =
+  "id, slug, title, excerpt, author, author_role, category, image, read_time, date_iso, last_modified_iso, keywords, primary_keyword, status, origin, locale, improves_post_id, created_at, updated_at, published_at"
+
+export async function getAllPublished(locale: PostLocale = "es"): Promise<BlogPostView[]> {
   const { data, error } = await supabaseAdmin
     .from("blog_posts")
-    .select("*")
+    .select(LIST_COLUMNS)
     .eq("status", "published")
+    .eq("locale", locale)
     .order("date_iso", { ascending: false })
   if (error) {
     console.error("[blog_posts] getAllPublished error:", error)
   }
   const rows = (data ?? []) as BlogPostRow[]
   if (rows.length) return rows.map(toView)
+  if (locale !== "es") return []
   // Tabla sin sembrar: fallback al archivo TS (ordenado por fecha desc).
   return Object.entries(blogPostsData)
     .map(([slug, p]) => viewFromTs(slug, p))
@@ -176,8 +208,13 @@ export async function getAllPublished(): Promise<BlogPostView[]> {
 }
 
 /** Relacionados: misma categoría primero, luego el resto, por fecha desc. */
-export async function getRelatedPublished(slug: string, category: string, n = 3): Promise<RelatedPost[]> {
-  const all = await getAllPublished()
+export async function getRelatedPublished(
+  slug: string,
+  category: string,
+  n = 3,
+  locale: PostLocale = "es"
+): Promise<RelatedPost[]> {
+  const all = await getAllPublished(locale)
   const others = all.filter((p) => p.slug !== slug)
   others.sort((a, b) => {
     const aSame = a.category === category
@@ -195,9 +232,10 @@ export async function getRelatedPublished(slug: string, category: string, n = 3)
 
 // ─── Admin (cualquier status) ───────────────────────────────────────────────
 
-export async function listPosts(filter?: { status?: PostStatus }): Promise<BlogPostRow[]> {
+export async function listPosts(filter?: { status?: PostStatus; locale?: PostLocale }): Promise<BlogPostRow[]> {
   let q = supabaseAdmin.from("blog_posts").select("*").order("updated_at", { ascending: false })
   if (filter?.status) q = q.eq("status", filter.status)
+  if (filter?.locale) q = q.eq("locale", filter.locale)
   const { data, error } = await q
   if (error) {
     console.error("[blog_posts] listPosts error:", error)
@@ -277,12 +315,13 @@ export async function deletePost(id: string): Promise<void> {
   }
 }
 
-/** primary_keywords ya usados por posts publicados (anti-canibalización). */
-export async function getUsedPrimaryKeywords(excludeId?: string): Promise<string[]> {
+/** primary_keywords ya usados por posts publicados (anti-canibalización, por idioma). */
+export async function getUsedPrimaryKeywords(excludeId?: string, locale: PostLocale = "es"): Promise<string[]> {
   const { data, error } = await supabaseAdmin
     .from("blog_posts")
     .select("id, primary_keyword")
     .eq("status", "published")
+    .eq("locale", locale)
     .not("primary_keyword", "is", null)
   if (error) {
     console.error("[blog_posts] getUsedPrimaryKeywords error:", error)

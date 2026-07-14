@@ -6,6 +6,7 @@ import { ChatWidget } from '@/components/chat-widget'
 import { SitePixels } from '@/components/site-pixels'
 import { AttributionTracker } from '@/components/attribution-tracker'
 import { CookieConsent } from '@/components/cookie-consent'
+import { UsSuggestBanner } from '@/components/us-suggest-banner'
 import { ThemeProvider } from '@/components/theme-provider'
 import { JsonLd } from '@/components/json-ld'
 import { getSiteSettings } from '@/lib/site-settings'
@@ -35,7 +36,11 @@ export async function generateMetadata(): Promise<Metadata> {
     description: seo.description,
     keywords: seo.keywords,
     applicationName: seo.siteName,
-    alternates: { canonical: '/' },
+    alternates: {
+      canonical: '/',
+      // hreflang de la home: la versión US en inglés vive en /us.
+      languages: { es: '/', 'en-US': '/us', 'x-default': '/' },
+    },
     openGraph: {
       type: 'website',
       locale: seo.locale,
@@ -87,6 +92,7 @@ export default async function RootLayout({
           <SitePixels pixels={settings.pixels} />
           <AttributionTracker />
           <CookieConsent />
+          <UsSuggestBanner />
           <SpeedInsights />
         </ThemeProvider>
       </body>
