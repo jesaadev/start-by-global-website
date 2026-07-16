@@ -62,7 +62,13 @@ async function generateImageBytes(prompt: string): Promise<GeneratedImage> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+        // gemini-2.5-flash-image ("Nano Banana") genera imágenes vía
+        // generateContent con responseModalities; la imagen vuelve como
+        // inlineData. imageConfig fija el aspecto apaisado 16:9 para el hero.
+        generationConfig: {
+          responseModalities: ["TEXT", "IMAGE"],
+          imageConfig: { aspectRatio: "16:9" },
+        },
       }),
     }).catch((err) => new Response(err instanceof Error ? err.message : "Network Error", { status: 500 }))
 
