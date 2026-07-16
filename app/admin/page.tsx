@@ -1621,7 +1621,7 @@ const ORIGIN_META: Record<string, string> = {
 }
 
 // Ruta pública del artículo (el blog EN vive bajo /us/insights).
-const postHref = (p: { slug: string; locale: "es" | "en" }) =>
+const postHref = (p: { slug: string; locale?: "es" | "en" | null }) =>
   p.locale === "en" ? `/us/insights/${p.slug}` : `/insights/${p.slug}`
 
 const emptyPostForm = {
