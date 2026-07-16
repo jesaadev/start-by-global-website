@@ -15,6 +15,7 @@ import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 import { improveArticle, applyImprovement, proposeTopics, generateArticle, type ProposedTopic } from "@/lib/content-routines"
 import { configuredProviders, getActiveProvider, type AiProvider } from "@/lib/ai"
+import { generateArticleImage, imageProviderConfigured } from "@/lib/ai-image"
 
 // Columnas escribibles de blog_posts vía API (allowlist).
 const POST_FIELDS = [
@@ -380,6 +381,43 @@ export async function POST(request: Request) {
         })
       } catch (e) {
         const message = e instanceof Error ? e.message : "Error al generar la mejora."
+        return NextResponse.json({ error: message }, { status: 502 })
+      }
+    }
+
+    // Genera (o regenera) la imagen destacada de un artículo con IA. Si viene
+    // postId, persiste la nueva URL y revalida; si no, solo devuelve la URL
+    // para que el editor la use en un borrador aún sin guardar.
+    if (resource === "generate-image") {
+      if (!imageProviderConfigured()) {
+        return NextResponse.json(
+          { error: "La generación de imágenes requiere GEMINI_API_KEY configurada." },
+          { status: 400 },
+        )
+      }
+      const title = (payload.title as string | undefined)?.trim()
+      if (!title) return NextResponse.json({ error: "title requerido." }, { status: 400 })
+      try {
+        const keywords = Array.isArray(payload.keywords)
+          ? (payload.keywords as string[])
+          : typeof payload.keywords === "string"
+            ? payload.keywords.split(",").map((s: string) => s.trim()).filter(Boolean)
+            : []
+        const url = await generateArticleImage({
+          slug: (payload.slug as string) || "articulo",
+          title,
+          category: (payload.category as string) || "Marketing Digital",
+          keywords,
+          locale: payload.locale === "en" ? "en" : "es",
+        })
+        const postId = payload.postId as string | undefined
+        if (postId) {
+          const updated = await updatePost(postId, { image: url })
+          if (updated?.status === "published") revalidateBlog(updated.slug)
+        }
+        return NextResponse.json({ url })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Error al generar la imagen."
         return NextResponse.json({ error: message }, { status: 502 })
       }
     }

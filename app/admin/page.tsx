@@ -1643,6 +1643,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [topics, setTopics] = useState<ProposedTopic[]>([])
   const [proposing, setProposing] = useState(false)
   const [generating, setGenerating] = useState<string | null>(null)
+  const [genImg, setGenImg] = useState(false)
   const [schedule, setSchedule] = useState<AiSchedule | null>(null)
   const [savingSched, setSavingSched] = useState(false)
   const [improvePrompt, setImprovePrompt] = useState("")
@@ -1807,6 +1808,34 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
       setError("Error de red o del servidor al proponer temas.")
     } finally {
       setProposing(false)
+    }
+  }
+  // Genera (o regenera) la imagen destacada con IA. Si es un artículo existente,
+  // el servidor persiste la nueva imagen; si es un borrador sin guardar, solo
+  // rellena el campo para guardarlo después.
+  const generateImage = async () => {
+    if (!form.title.trim()) { setError("Escribe un título antes de generar la imagen."); return }
+    setGenImg(true); setError(""); setNotice("")
+    try {
+      const res = await api.post({
+        resource: "generate-image",
+        postId: editing?.id,
+        slug: form.slug,
+        title: form.title,
+        category: form.category,
+        keywords: form.keywords,
+        locale: contentLocale,
+      })
+      if (res.error || !res.url) { setError(res.error || "No se pudo generar la imagen."); return }
+      setForm((f) => ({ ...f, image: res.url }))
+      setNotice(editing
+        ? "Imagen generada y guardada en el artículo."
+        : "Imagen generada. Guarda el borrador para conservarla.")
+      if (editing) await load()
+    } catch {
+      setError("Error de red o del servidor al generar la imagen.")
+    } finally {
+      setGenImg(false)
     }
   }
   const generate = async (t: ProposedTopic) => {
@@ -2055,8 +2084,23 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                   <input className={fieldInputCls} value={form.date_iso} onChange={(e) => setForm({ ...form, date_iso: e.target.value })} placeholder="2026-06-23" />
                 </div>
                 <div>
-                  <FieldLabel>Imagen (URL)</FieldLabel>
-                  <input className={fieldInputCls} value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                  <FieldLabel>Imagen destacada</FieldLabel>
+                  <div className="flex gap-2">
+                    <input className={fieldInputCls} value={form.image} placeholder="URL de la imagen"
+                      onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                    {providers.includes("gemini") && (
+                      <button type="button" onClick={generateImage} disabled={genImg || !form.title.trim()}
+                        title="Generar imagen única con IA (Gemini)"
+                        className="shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg bg-primary/10 border border-primary/25 text-primary text-xs font-semibold disabled:opacity-40 hover:bg-primary/15 transition-colors">
+                        {genImg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Wand2 className="w-3.5 h-3.5" />}
+                        {editing ? "Regenerar" : "Generar"}
+                      </button>
+                    )}
+                  </div>
+                  {form.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={form.image} alt="" className="mt-2 h-24 w-auto rounded-lg border border-border/40 object-cover" />
+                  )}
                 </div>
                 <div className="sm:col-span-2">
                   <FieldLabel>Keywords (separadas por coma)</FieldLabel>
