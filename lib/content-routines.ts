@@ -6,6 +6,7 @@ import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries } from "@/lib/gsc"
 import { buildContentMap, contentMapToPrompt } from "@/lib/content-map"
 import { anyProviderConfigured, aiJson } from "@/lib/ai"
+import { generateArticleImage, imageProviderConfigured } from "@/lib/ai-image"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 import { getSiteSettings } from "@/lib/site-settings"
 
@@ -366,6 +367,24 @@ Devuelve un JSON con esta forma exacta:
     ? result.keywords
     : [primary, ...(topic.secondary_keywords || [])]
 
+  // Imagen destacada única generada con IA (best-effort): si Gemini no está
+  // configurado o la generación falla, caemos a la imagen por defecto para no
+  // bloquear la creación del artículo.
+  let image = DEFAULT_ARTICLE_IMAGE
+  if (imageProviderConfigured()) {
+    try {
+      image = await generateArticleImage({
+        slug,
+        title: result.title?.trim() || topic.working_title,
+        category,
+        keywords,
+        locale,
+      })
+    } catch (e) {
+      console.error("[content] imagen IA, uso fallback:", e instanceof Error ? e.message : e)
+    }
+  }
+
   const draft = await createPost({
     slug,
     title: result.title?.trim() || topic.working_title,
@@ -373,7 +392,7 @@ Devuelve un JSON con esta forma exacta:
     author: "Jhon Alejandro Esáa",
     author_role: "Founder & Lead Developer",
     category,
-    image: DEFAULT_ARTICLE_IMAGE,
+    image,
     read_time: result.read_time?.trim() || "7 min",
     date_iso: new Date().toISOString().slice(0, 10),
     keywords,
