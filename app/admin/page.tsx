@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, Loader2, CheckCircle2,
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
   Search, Building2, Activity, Megaphone,
-  FileText, Share2, MousePointerClick, Download, Target, Sparkles, Wand2,
+  FileText, Share2, MousePointerClick, Download, Target, Sparkles, Wand2, ExternalLink,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
@@ -1620,6 +1620,10 @@ const ORIGIN_META: Record<string, string> = {
   ai_improved: "IA · mejora",
 }
 
+// Ruta pública del artículo (el blog EN vive bajo /us/insights).
+const postHref = (p: { slug: string; locale?: "es" | "en" | null }) =>
+  p.locale === "en" ? `/us/insights/${p.slug}` : `/insights/${p.slug}`
+
 const emptyPostForm = {
   slug: "", title: "", excerpt: "", author: "Jhon Alejandro Esáa",
   author_role: "Founder & Lead Developer", category: "Marketing Digital",
@@ -2158,7 +2162,16 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                   <tr key={p.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
                     <td className="px-3 py-2.5 max-w-[280px]">
                       <p className="text-xs font-medium text-foreground truncate">{p.title}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">/insights/{p.slug}</p>
+                      {p.status === "published" ? (
+                        <a href={postHref(p)} target="_blank" rel="noopener noreferrer"
+                          title="Abrir el artículo en el sitio"
+                          className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors truncate max-w-full">
+                          <span className="truncate">{postHref(p)}</span>
+                          <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                        </a>
+                      ) : (
+                        <p className="text-[10px] text-muted-foreground truncate">{postHref(p)}</p>
+                      )}
                     </td>
                     <td className="px-3 py-2.5"><span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full", st.cls)}>{st.label}</span></td>
                     <td className="px-3 py-2.5 text-xs text-muted-foreground">{p.category}</td>
@@ -2171,6 +2184,10 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-1">
+                        {p.status === "published" && (
+                          <a href={postHref(p)} target="_blank" rel="noopener noreferrer" title="Ver el artículo en el sitio"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><ExternalLink className="w-3.5 h-3.5" /></a>
+                        )}
                         <button type="button" onClick={() => startEdit(p)} title="Editar"
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
                         {p.origin === "ai_improved" ? (
