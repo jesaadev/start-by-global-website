@@ -16,6 +16,10 @@ function Tracker() {
   const consent = useConsent()
 
   useEffect(() => {
+    // No capturar atribución ni enviar PageView server-side desde el propio
+    // panel de administración: no es tráfico de visitantes reales.
+    if (pathname?.startsWith("/admin")) return
+
     // Atribución y PageView server-side son tracking de marketing: requieren
     // consentimiento (en la UE; fuera está concedido por defecto).
     if (!consent.marketing) return

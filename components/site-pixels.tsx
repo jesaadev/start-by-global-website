@@ -45,10 +45,16 @@ function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) 
  * Cada bloque se renderiza solo si su ID correspondiente está definido.
  */
 export function SitePixels({ pixels }: { pixels: PixelSettings }) {
+  const pathname = usePathname()
   const { ga4Id, gtmId, metaPixelId, clarityId, tiktokPixelId } = pixels
   const consent = useConsent()
   const analytics = consent.analytics
   const marketing = consent.marketing
+
+  // No cargar ningún pixel/etiqueta en el panel de administración: evita que
+  // los clicks y la navegación del propio equipo se registren como eventos de
+  // visitantes reales (GA4, Meta, TikTok, Clarity, GTM).
+  if (pathname?.startsWith("/admin")) return null
 
   return (
     <>
