@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SiteSettings } from "@/lib/site-settings"
+import type { CapiTestResult } from "@/lib/meta-capi"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 import { sanitizeArticleHtml } from "@/lib/sanitize-html"
 
@@ -731,6 +732,30 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState("")
+  const [capiTesting, setCapiTesting] = useState(false)
+  const [capiResult, setCapiResult] = useState<CapiTestResult | null>(null)
+
+  const testCapi = async () => {
+    setCapiTesting(true); setCapiResult(null)
+    try {
+      const res = await api.post({
+        resource: "test-capi",
+        sourceUrl: typeof window !== "undefined" ? window.location.origin : undefined,
+      })
+      const fallback: CapiTestResult = {
+        configured: false, hasToken: false, pixelId: null, testEventCode: "",
+        error: res.error || "Sin respuesta.",
+      }
+      setCapiResult(res.result ?? fallback)
+    } catch {
+      setCapiResult({
+        configured: false, hasToken: false, pixelId: null, testEventCode: "",
+        error: "Error de red al probar CAPI.",
+      })
+    } finally {
+      setCapiTesting(false)
+    }
+  }
 
   useEffect(() => {
     let active = true
@@ -969,6 +994,54 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
             <FieldLabel>Google Search Console (verificación)</FieldLabel>
             <input className={fieldInputCls} value={pixels.googleSiteVerification} onChange={(e) => setPixel("googleSiteVerification", e.target.value)} />
           </div>
+        </div>
+
+        {/* Diagnóstico Meta CAPI */}
+        <div className="border-t border-border/40 pt-4 space-y-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-xs font-medium text-foreground">Conversions API (server-side)</p>
+              <p className="text-[11px] text-muted-foreground">Envía un evento Lead de prueba a Meta y muestra su respuesta. No cuenta en el reporte (usa test_event_code).</p>
+            </div>
+            <button type="button" onClick={testCapi} disabled={capiTesting}
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/60 border border-border/50 text-xs font-semibold text-foreground disabled:opacity-40 hover:bg-secondary transition-colors">
+              {capiTesting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+              Probar CAPI
+            </button>
+          </div>
+
+          {capiResult && (
+            <div className={cn(
+              "rounded-lg border p-3 space-y-2 text-xs",
+              capiResult.ok ? "border-chart-3/40 bg-chart-3/5"
+                : "border-destructive/40 bg-destructive/5",
+            )}>
+              <div className="flex items-center gap-2 font-semibold">
+                {capiResult.ok
+                  ? <><CheckCircle2 className="w-4 h-4 text-chart-3" /><span className="text-chart-3">Meta aceptó el evento de prueba</span></>
+                  : <><XCircle className="w-4 h-4 text-destructive" /><span className="text-destructive">
+                      {capiResult.configured === false ? "CAPI no configurado" : "Meta rechazó el evento"}
+                    </span></>}
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-muted-foreground">
+                <span>Pixel ID: <span className="text-foreground font-mono">{capiResult.pixelId ?? "—"}</span></span>
+                <span>Token: <span className="text-foreground">{capiResult.hasToken ? "presente" : "ausente (falta META_CAPI_ACCESS_TOKEN)"}</span></span>
+                {capiResult.httpStatus !== undefined && <span>HTTP: <span className="text-foreground font-mono">{capiResult.httpStatus}</span></span>}
+                {capiResult.testEventCode && <span>test_event_code: <span className="text-foreground font-mono">{capiResult.testEventCode}</span></span>}
+              </div>
+              {capiResult.configured === false && (
+                <p className="text-muted-foreground">Configura el <span className="text-foreground">Meta Pixel ID</span> arriba y la variable <span className="font-mono text-foreground">META_CAPI_ACCESS_TOKEN</span> en Vercel.</p>
+              )}
+              {!capiResult.ok && capiResult.configured !== false && (
+                <p className="text-muted-foreground">Si ves <span className="font-mono">code 100 / subcode 33</span>, el token no tiene permiso sobre este pixel: genera el token desde <span className="text-foreground">ese mismo dataset</span> en Events Manager.</p>
+              )}
+              {(capiResult.response !== undefined || capiResult.error) && (
+                <pre className="mt-1 max-h-48 overflow-auto rounded bg-background/60 p-2 text-[10px] leading-relaxed text-foreground/80 whitespace-pre-wrap break-all">
+                  {capiResult.error ?? JSON.stringify(capiResult.response, null, 2)}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
