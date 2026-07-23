@@ -734,6 +734,7 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [error, setError] = useState("")
   const [capiTesting, setCapiTesting] = useState(false)
   const [capiResult, setCapiResult] = useState<CapiTestResult | null>(null)
+  const [capiTestCode, setCapiTestCode] = useState("")
 
   const testCapi = async () => {
     setCapiTesting(true); setCapiResult(null)
@@ -741,6 +742,7 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
       const res = await api.post({
         resource: "test-capi",
         sourceUrl: typeof window !== "undefined" ? window.location.origin : undefined,
+        testEventCode: capiTestCode.trim() || undefined,
       })
       const fallback: CapiTestResult = {
         configured: false, hasToken: false, pixelId: null, testEventCode: "",
@@ -1003,11 +1005,16 @@ function SeoTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
               <p className="text-xs font-medium text-foreground">Conversions API (server-side)</p>
               <p className="text-[11px] text-muted-foreground">Envía un evento Lead de prueba a Meta y muestra su respuesta. No cuenta en el reporte (usa test_event_code).</p>
             </div>
-            <button type="button" onClick={testCapi} disabled={capiTesting}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/60 border border-border/50 text-xs font-semibold text-foreground disabled:opacity-40 hover:bg-secondary transition-colors">
-              {capiTesting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
-              Probar CAPI
-            </button>
+            <div className="flex items-center gap-2">
+              <input value={capiTestCode} onChange={(e) => setCapiTestCode(e.target.value)}
+                placeholder="Código de Meta (opcional)" title="Pega aquí el test_event_code que muestra la pestaña 'Probar eventos' de Meta para verlo reflejado ahí en vivo"
+                className="w-44 px-2.5 py-2 rounded-lg bg-background border border-border/50 text-xs font-mono placeholder:font-sans placeholder:text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/40" />
+              <button type="button" onClick={testCapi} disabled={capiTesting}
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/60 border border-border/50 text-xs font-semibold text-foreground disabled:opacity-40 hover:bg-secondary transition-colors">
+                {capiTesting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+                Probar CAPI
+              </button>
+            </div>
           </div>
 
           {capiResult && (

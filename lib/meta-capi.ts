@@ -125,11 +125,13 @@ export interface CapiTestResult {
  * test_event_code, así el evento aparece en "Probar eventos" y NO contamina el
  * reporte real.
  */
-export async function testCapiEvent(sourceUrl?: string): Promise<CapiTestResult> {
+export async function testCapiEvent(sourceUrl?: string, testEventCodeOverride?: string): Promise<CapiTestResult> {
   const token = process.env.META_CAPI_ACCESS_TOKEN
   const { pixels } = await getSiteSettings()
   const pixelId = pixels.metaPixelId || null
-  const testEventCode = process.env.META_CAPI_TEST_CODE || "SBG_ADMIN_TEST"
+  // Permite pegar el código dinámico que muestra la pestaña "Probar eventos" de
+  // Meta para esa sesión, así el evento aparece filtrado ahí en vivo.
+  const testEventCode = testEventCodeOverride?.trim() || process.env.META_CAPI_TEST_CODE || "SBG_ADMIN_TEST"
 
   if (!token || !pixelId) {
     return { configured: false, hasToken: Boolean(token), pixelId, testEventCode }
