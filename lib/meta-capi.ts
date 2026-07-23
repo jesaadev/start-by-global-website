@@ -105,3 +105,81 @@ export function getClientIp(headers: Headers): string | undefined {
   const ip = clientIp(headers)
   return ip === "unknown" ? undefined : ip
 }
+
+// ─── Diagnóstico: prueba de conexión CAPI ────────────────────────────────────
+
+export interface CapiTestResult {
+  configured: boolean          // hay token y pixel
+  hasToken: boolean
+  pixelId: string | null
+  testEventCode: string
+  httpStatus?: number
+  ok?: boolean
+  response?: unknown           // cuerpo de respuesta de Meta (verbatim)
+  error?: string
+}
+
+/**
+ * Envía un evento Lead de PRUEBA a Meta y devuelve su respuesta cruda, para
+ * validar desde el admin que el par pixel + token es correcto. Usa siempre un
+ * test_event_code, así el evento aparece en "Probar eventos" y NO contamina el
+ * reporte real.
+ */
+export async function testCapiEvent(sourceUrl?: string): Promise<CapiTestResult> {
+  const token = process.env.META_CAPI_ACCESS_TOKEN
+  const { pixels } = await getSiteSettings()
+  const pixelId = pixels.metaPixelId || null
+  const testEventCode = process.env.META_CAPI_TEST_CODE || "SBG_ADMIN_TEST"
+
+  if (!token || !pixelId) {
+    return { configured: false, hasToken: Boolean(token), pixelId, testEventCode }
+  }
+
+  const payload = {
+    data: [
+      {
+        event_name: "Lead",
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: `admin-test-${Date.now()}`,
+        action_source: "website",
+        ...(sourceUrl ? { event_source_url: sourceUrl } : {}),
+        user_data: {
+          em: [sha256("test@startbyglobal.com")],
+          client_user_agent: "SBG-Admin-CAPI-Test",
+        },
+      },
+    ],
+    test_event_code: testEventCode,
+  }
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/${GRAPH_VERSION}/${pixelId}/events?access_token=${token}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    )
+    const text = await res.text().catch(() => "")
+    let response: unknown = text
+    try { response = JSON.parse(text) } catch { /* deja el texto crudo */ }
+    return {
+      configured: true,
+      hasToken: true,
+      pixelId,
+      testEventCode,
+      httpStatus: res.status,
+      ok: res.ok,
+      response,
+    }
+  } catch (e) {
+    return {
+      configured: true,
+      hasToken: true,
+      pixelId,
+      testEventCode,
+      error: e instanceof Error ? e.message : "Error de red al contactar a Meta.",
+    }
+  }
+}

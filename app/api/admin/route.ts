@@ -16,6 +16,7 @@ import { blogPostsData } from "@/app/insights/[slug]/blog-data"
 import { improveArticle, applyImprovement, proposeTopics, generateArticle, type ProposedTopic } from "@/lib/content-routines"
 import { configuredProviders, getActiveProvider, type AiProvider } from "@/lib/ai"
 import { generateArticleImage, imageProviderConfigured } from "@/lib/ai-image"
+import { testCapiEvent } from "@/lib/meta-capi"
 
 // Columnas escribibles de blog_posts vía API (allowlist).
 const POST_FIELDS = [
@@ -383,6 +384,13 @@ export async function POST(request: Request) {
         const message = e instanceof Error ? e.message : "Error al generar la mejora."
         return NextResponse.json({ error: message }, { status: 502 })
       }
+    }
+
+    // Envía un evento Lead de prueba a Meta CAPI y devuelve su respuesta cruda
+    // (diagnóstico del par pixel + token). Usa test_event_code, no contamina.
+    if (resource === "test-capi") {
+      const result = await testCapiEvent(payload.sourceUrl as string | undefined)
+      return NextResponse.json({ result })
     }
 
     // Genera (o regenera) la imagen destacada de un artículo con IA. Si viene
