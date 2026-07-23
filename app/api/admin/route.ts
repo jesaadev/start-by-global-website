@@ -389,7 +389,10 @@ export async function POST(request: Request) {
     // Envía un evento Lead de prueba a Meta CAPI y devuelve su respuesta cruda
     // (diagnóstico del par pixel + token). Usa test_event_code, no contamina.
     if (resource === "test-capi") {
-      const result = await testCapiEvent(payload.sourceUrl as string | undefined)
+      const result = await testCapiEvent(
+        payload.sourceUrl as string | undefined,
+        payload.testEventCode as string | undefined,
+      )
       return NextResponse.json({ result })
     }
 
