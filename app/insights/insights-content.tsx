@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { AnimateIn } from "@/components/animate-in"
 import type { BlogPostView } from "@/lib/blog-posts"
 import {
   TrendingUp,
@@ -117,54 +116,50 @@ export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[
   return (
     <div className="space-y-8">
       {/* Header */}
-      <AnimateIn>
-        <div className="text-center space-y-3 max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl sm:text-5xl font-bold text-balance">
-            Insights & Blog
-          </h1>
-          <p className="text-muted-foreground text-lg text-balance">
-            {t.sub}
-          </p>
-        </div>
-      </AnimateIn>
+      <div className="text-center space-y-3 max-w-3xl mx-auto">
+        <h1 className="font-display text-4xl sm:text-5xl font-bold text-balance">
+          Insights & Blog
+        </h1>
+        <p className="text-muted-foreground text-lg text-balance">
+          {t.sub}
+        </p>
+      </div>
 
       {/* Search & Filters */}
-      <AnimateIn delay={0.1}>
-        <div className="glass-card rounded-2xl p-4 sm:p-6 space-y-4">
-          {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={t.searchPh}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-            />
-          </div>
-
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => {
-              const Icon = cat.icon
-              const isActive = selectedCategory === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                    : "bg-card/50 text-foreground hover:bg-card hover:border-primary/30 border border-border/50"
-                    }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {cat.label}
-                </button>
-              )
-            })}
-          </div>
+      <div className="glass-card rounded-2xl p-4 sm:p-6 space-y-4">
+        {/* Search */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder={t.searchPh}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+          />
         </div>
-      </AnimateIn>
+
+        {/* Categories */}
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => {
+            const Icon = cat.icon
+            const isActive = selectedCategory === cat.id
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${isActive
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                  : "bg-card/50 text-foreground hover:bg-card hover:border-primary/30 border border-border/50"
+                  }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       {/* Featured Post */}
       {selectedCategory === "all" && featuredPost && (
@@ -281,45 +276,41 @@ export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[
 
       {/* Empty State */}
       {filteredPosts.length === 0 && (
-        <AnimateIn delay={0.3}>
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="font-display text-xl font-bold mb-2">{t.emptyTitle}</h3>
-            <p className="text-muted-foreground text-sm">
-              {t.emptyBody}
-            </p>
-          </div>
-        </AnimateIn>
+        <div className="glass-card rounded-2xl p-12 text-center">
+          <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+          <h3 className="font-display text-xl font-bold mb-2">{t.emptyTitle}</h3>
+          <p className="text-muted-foreground text-sm">
+            {t.emptyBody}
+          </p>
+        </div>
       )}
 
       {/* Newsletter CTA */}
-      <AnimateIn delay={0.4}>
-        <div className="glass-card rounded-2xl p-8 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10 opacity-50" />
-          <div className="relative z-10">
-            <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="font-display text-2xl font-bold mb-2">
-              Mantente al Día
-            </h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              {t.newsBody}
-            </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-              <input
-                type="email"
-                placeholder={t.newsPh}
-                className="flex-1 px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all"
-              >
-                Suscribirme
-              </button>
-            </form>
-          </div>
+      <div className="glass-card rounded-2xl p-8 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10 opacity-50" />
+        <div className="relative z-10">
+          <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h3 className="font-display text-2xl font-bold mb-2">
+            Mantente al Día
+          </h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            {t.newsBody}
+          </p>
+          <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+            <input
+              type="email"
+              placeholder={t.newsPh}
+              className="flex-1 px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all"
+            >
+              Suscribirme
+            </button>
+          </form>
         </div>
-      </AnimateIn>
+      </div>
     </div>
   )
 }
