@@ -168,118 +168,114 @@ export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[
 
       {/* Featured Post */}
       {selectedCategory === "all" && featuredPost && (
-        <AnimateIn delay={0.2}>
-          <Link href={`${t.base}/${featuredPost.slug}`}>
-            <div className="glass-card-hover rounded-2xl overflow-hidden group">
-              <div className="grid lg:grid-cols-2 gap-0">
-                {/* Image */}
-                <div className="relative h-64 lg:h-auto overflow-hidden">
-                  <Image
-                    src={featuredPost.image}
-                    alt={featuredPost.title}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-card/90 to-transparent" />
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                      Featured
-                    </span>
-                  </div>
+        <Link href={`${t.base}/${featuredPost.slug}`}>
+          <div className="glass-card-hover rounded-2xl overflow-hidden group">
+            <div className="grid lg:grid-cols-2 gap-0">
+              {/* Image */}
+              <div className="relative h-64 lg:h-auto overflow-hidden">
+                <Image
+                  src={featuredPost.image}
+                  alt={featuredPost.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-card/90 to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+                    Featured
+                  </span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 sm:p-8 flex flex-col justify-center">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3" />
+                    {featuredPost.date}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3 h-3" />
+                    {featuredPost.readTime}
+                  </span>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 sm:p-8 flex flex-col justify-center">
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3 h-3" />
-                      {featuredPost.date}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="w-3 h-3" />
-                      {featuredPost.readTime}
-                    </span>
-                  </div>
+                <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3 text-balance group-hover:text-primary transition-colors">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-muted-foreground mb-4 text-balance">
+                  {featuredPost.excerpt}
+                </p>
 
-                  <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3 text-balance group-hover:text-primary transition-colors">
-                    {featuredPost.title}
-                  </h2>
-                  <p className="text-muted-foreground mb-4 text-balance">
-                    {featuredPost.excerpt}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-2 text-sm">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-foreground font-medium">{featuredPost.author}</span>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-foreground font-medium">{featuredPost.author}</span>
                   </div>
+                  <ArrowRight className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </div>
-          </Link>
-        </AnimateIn>
+          </div>
+        </Link>
       )}
 
       {/* Posts Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {regularPosts.map((post, index) => (
-          <AnimateIn key={post.slug} delay={0.3 + index * 0.05}>
-            <Link href={`${t.base}/${post.slug}`}>
-              <div className="glass-card-hover rounded-2xl overflow-hidden h-full flex flex-col group">
-                {/* Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
-                  <div className="absolute bottom-3 left-3">
-                    <span className="px-2.5 py-1 rounded-lg bg-card/80 backdrop-blur-sm text-xs font-medium border border-border/50">
-                      {categories.find((c) => c.id === post.category)?.label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {post.dateShort}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {post.readTime}
-                    </span>
-                  </div>
-
-                  <h3 className="font-display text-lg font-bold mb-2 text-balance group-hover:text-primary transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-balance">
-                    {post.excerpt}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
-                    <div className="flex items-center gap-2 text-xs">
-                      <User className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span className="text-foreground font-medium">{post.author}</span>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
-                  </div>
+        {regularPosts.map((post) => (
+          <Link key={post.slug} href={`${t.base}/${post.slug}`}>
+            <div className="glass-card-hover rounded-2xl overflow-hidden h-full flex flex-col group">
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
+                <div className="absolute bottom-3 left-3">
+                  <span className="px-2.5 py-1 rounded-lg bg-card/80 backdrop-blur-sm text-xs font-medium border border-border/50">
+                    {categories.find((c) => c.id === post.category)?.label}
+                  </span>
                 </div>
               </div>
-            </Link>
-          </AnimateIn>
+
+              {/* Content */}
+              <div className="p-5 flex-1 flex flex-col">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {post.dateShort}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {post.readTime}
+                  </span>
+                </div>
+
+                <h3 className="font-display text-lg font-bold mb-2 text-balance group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2 text-balance">
+                  {post.excerpt}
+                </p>
+
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/50">
+                  <div className="flex items-center gap-2 text-xs">
+                    <User className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-foreground font-medium">{post.author}</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
 
