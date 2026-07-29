@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase"
 import type { PostLocale } from "@/lib/blog-posts"
+import { getSiteSettings, DEFAULT_IMAGE_PROMPT } from "@/lib/site-settings"
 
 // Generación de la imagen destacada de cada artículo con Gemini (modelo de
 // imagen, "Nano Banana") y almacenamiento en Supabase Storage. Reutiliza la
@@ -24,21 +25,27 @@ const CATEGORY_MOTIF: Record<string, string> = {
     "abstract AI and automation motifs, connected nodes, futuristic yet clean tech shapes",
 }
 
-/** Construye un prompt visual editorial (sin texto) a partir de los metadatos. */
+/**
+ * Construye un prompt visual editorial a partir de los metadatos. La directriz
+ * de estilo (`styleDirective`, editable desde el admin) controla el look & feel;
+ * las garantías —sin texto, formato 16:9, contexto del artículo— son fijas para
+ * que no se puedan romper por error.
+ */
 export function buildImagePrompt(opts: {
   title: string
   category: string
   keywords?: string[]
   locale?: PostLocale
+  styleDirective?: string
 }): string {
   const motif = CATEGORY_MOTIF[opts.category] ?? "modern business and technology motifs"
   const kws = (opts.keywords ?? []).filter(Boolean).slice(0, 4).join(", ")
+  const style = (opts.styleDirective ?? "").trim() || DEFAULT_IMAGE_PROMPT
   return [
     `A modern, professional editorial hero image for a blog article titled "${opts.title}"`,
     `about ${opts.category} for a digital marketing and web development agency.`,
     `Visual concept: ${motif}${kws ? ` (theme: ${kws})` : ""}.`,
-    "Style: clean, minimal, contemporary flat/3D illustration with soft gradients and depth,",
-    "warm accent palette of orange and coral over a light neutral background.",
+    `Style: ${style}`,
     "Wide 16:9 landscape composition with generous negative space.",
     "Absolutely no text, no words, no letters, no numbers, no logos and no watermarks.",
     "High quality, crisp, suitable as a website article cover image.",
@@ -158,7 +165,14 @@ export async function generateArticleImage(opts: {
   keywords?: string[]
   locale?: PostLocale
 }): Promise<string> {
-  const prompt = buildImagePrompt(opts)
+  // La directriz de estilo es editable desde el admin (settings.ai.imagePrompt).
+  let styleDirective: string | undefined
+  try {
+    styleDirective = (await getSiteSettings()).ai.imagePrompt
+  } catch {
+    /* usa el estilo por defecto dentro de buildImagePrompt */
+  }
+  const prompt = buildImagePrompt({ ...opts, styleDirective })
   const img = await generateImageBytes(prompt)
   return uploadImage(opts.slug, img)
 }
