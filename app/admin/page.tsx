@@ -1732,6 +1732,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const [savingSched, setSavingSched] = useState(false)
   const [improvePrompt, setImprovePrompt] = useState("")
   const [createPrompt, setCreatePrompt] = useState("")
+  const [imagePrompt, setImagePrompt] = useState("")
   const [savingPrompts, setSavingPrompts] = useState(false)
   const [contentLocale, setContentLocale] = useState<"es" | "en">("es")
 
@@ -1744,6 +1745,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     setSchedule(res.ai?.schedule ?? null)
     setImprovePrompt(res.ai?.improvePrompt ?? "")
     setCreatePrompt(res.ai?.createPrompt ?? "")
+    setImagePrompt(res.ai?.imagePrompt ?? "")
     setLoading(false)
   }, [api, contentLocale])
 
@@ -1781,9 +1783,9 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
   const savePrompts = async () => {
     setSavingPrompts(true); setError(""); setNotice("")
     try {
-      const res = await api.patch({ resource: "ai-prompts", improvePrompt, createPrompt })
+      const res = await api.patch({ resource: "ai-prompts", improvePrompt, createPrompt, imagePrompt })
       if (res.error || !res.data) { setError(res.error || "No se pudieron guardar los prompts."); return }
-      setImprovePrompt(res.data.improvePrompt); setCreatePrompt(res.data.createPrompt)
+      setImprovePrompt(res.data.improvePrompt); setCreatePrompt(res.data.createPrompt); setImagePrompt(res.data.imagePrompt)
       setNotice("Prompts guardados.")
     } catch {
       setError("Error de red al guardar los prompts.")
@@ -2056,6 +2058,13 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
               <textarea rows={4} value={createPrompt} onChange={(e) => setCreatePrompt(e.target.value)}
                 className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
                 placeholder="Estrategia de contenido/SEO para crear artículos nuevos…" />
+            </div>
+            <div>
+              <FieldLabel>Prompt de imagen destacada</FieldLabel>
+              <textarea rows={3} value={imagePrompt} onChange={(e) => setImagePrompt(e.target.value)}
+                className={cn(fieldInputCls, "resize-y text-xs leading-relaxed")}
+                placeholder="Estilo visual de la imagen (ej. ilustración plana, paleta cálida…)" />
+              <p className="text-[11px] text-muted-foreground mt-1">Solo el estilo visual. El formato 16:9, la ausencia de texto/logos y el tema del artículo son fijos.</p>
             </div>
             <div className="flex justify-end">
               <button type="button" onClick={savePrompts} disabled={savingPrompts}

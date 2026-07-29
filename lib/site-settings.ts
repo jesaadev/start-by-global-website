@@ -57,6 +57,9 @@ export interface AiSettings {
   // rutina (además de las reglas fijas de formato HTML).
   improvePrompt: string
   createPrompt: string
+  // Directriz de estilo visual para la imagen destacada generada con IA. Se
+  // inserta en el prompt de imagen; las garantías (sin texto, 16:9) son fijas.
+  imagePrompt: string
 }
 
 export const DEFAULT_IMPROVE_PROMPT =
@@ -64,6 +67,9 @@ export const DEFAULT_IMPROVE_PROMPT =
 
 export const DEFAULT_CREATE_PROMPT =
   "Aplica las mejores prácticas de SEO y contenido orgánico: intención de búsqueda clara, encabezados escaneables, ejemplos concretos y datos del mercado hispano (RD, España, LatAm), y enlaces internos naturales. Escribe original y con voz propia; evita clichés de IA como \"En conclusión\", \"En resumen\", \"En el mundo actual\", \"En la era digital\" y los cierres genéricos. Termina con una sección práctica (pasos, checklist o FAQ), no con una conclusión de relleno. Cuando recomiendes otro artículo del blog, ponlo en un párrafo propio con el enlace a /insights/…."
+
+export const DEFAULT_IMAGE_PROMPT =
+  "Ilustración editorial moderna, limpia y minimalista, con gradientes suaves y sensación de profundidad. Paleta cálida de naranjas y corales sobre un fondo neutro claro. Estilo profesional, nítido y de alta calidad, adecuado como portada de artículo."
 
 export interface SiteSettings {
   seo: SeoSettings
@@ -121,6 +127,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     },
     improvePrompt: DEFAULT_IMPROVE_PROMPT,
     createPrompt: DEFAULT_CREATE_PROMPT,
+    imagePrompt: DEFAULT_IMAGE_PROMPT,
   },
 }
 

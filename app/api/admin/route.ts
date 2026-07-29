@@ -160,6 +160,7 @@ export async function GET(request: Request) {
         schedule: settings.ai.schedule,
         improvePrompt: settings.ai.improvePrompt,
         createPrompt: settings.ai.createPrompt,
+        imagePrompt: settings.ai.imagePrompt,
       }
       return NextResponse.json({ data, ai })
     }
@@ -271,9 +272,10 @@ export async function PATCH(request: Request) {
         ...current.ai,
         improvePrompt: str(updates.improvePrompt, current.ai.improvePrompt),
         createPrompt: str(updates.createPrompt, current.ai.createPrompt),
+        imagePrompt: str(updates.imagePrompt, current.ai.imagePrompt),
       }
       const saved = await saveSiteSettings({ ...current, ai })
-      return NextResponse.json({ data: { improvePrompt: saved.ai.improvePrompt, createPrompt: saved.ai.createPrompt } })
+      return NextResponse.json({ data: { improvePrompt: saved.ai.improvePrompt, createPrompt: saved.ai.createPrompt, imagePrompt: saved.ai.imagePrompt } })
     }
 
     if (resource === "post") {
