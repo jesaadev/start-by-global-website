@@ -15,7 +15,7 @@ function sha256(value?: string | null): string | undefined {
 }
 
 export interface CapiEvent {
-  eventName: "Lead" | "Contact" | "PageView"
+  eventName: "Lead" | "Contact" | "PageView" | "CompleteRegistration"
   eventId: string
   eventSourceUrl?: string
   email?: string | null

@@ -109,6 +109,60 @@ export function fireContact(segment?: string): void {
   }).catch(() => {})
 }
 
+function fbqTrackCustom(event: string) {
+  const fbq = (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq
+  if (typeof fbq === "function") fbq("trackCustom", event, {})
+}
+
+/** ViewContent al cargar una landing (retargeting de visitantes). Pixel-only. */
+export function fireViewContent(): void {
+  if (typeof window === "undefined" || !getConsent().marketing) return
+  fbqTrack("ViewContent", newEventId())
+}
+
+/** Señal de calidad de tráfico: 75% de scroll de la landing. Pixel-only. */
+export function fireScroll75(): void {
+  if (typeof window === "undefined" || !getConsent().marketing) return
+  fbqTrackCustom("Scroll75")
+}
+
+export interface LandingLeadTracking {
+  eventId?: string
+  attribution: Attribution | null
+  fbp?: string
+  fbc?: string
+  page_url: string
+  nav_variant?: string
+  segment?: string
+  locale?: string
+}
+
+/**
+ * Tracking para las landings por persona. Dispara el pixel del evento adecuado
+ * (Lead para la agenda, CompleteRegistration para el lead magnet) con un
+ * event_id compartido, y devuelve el payload para el POST a /api/landing-lead
+ * (que reenvía el mismo evento por CAPI). Sin consentimiento: sin pixel ni
+ * event_id, pero el lead se registra igual server-side.
+ */
+export function fireLandingLead(
+  kind: "agenda" | "lead_magnet",
+  segment?: string
+): LandingLeadTracking {
+  const page_url = typeof window !== "undefined" ? window.location.href : ""
+  const base: LandingLeadTracking = {
+    attribution: null,
+    page_url,
+    nav_variant: getNavVariant(),
+    segment,
+    locale: currentLocale(),
+  }
+  if (typeof window === "undefined" || !getConsent().marketing) return base
+  const eventId = newEventId()
+  fbqTrack(kind === "agenda" ? "Lead" : "CompleteRegistration", eventId)
+  const { fbp, fbc } = getMetaCookies()
+  return { ...base, eventId, attribution: getStoredAttribution(), fbp, fbc }
+}
+
 /**
  * Registra un Lead enviado desde el modal de WhatsApp: siempre lo registra
  * server-side (aparece en el medidor de Atribución) y, solo con consentimiento
