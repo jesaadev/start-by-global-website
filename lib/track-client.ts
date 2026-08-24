@@ -114,16 +114,48 @@ function fbqTrackCustom(event: string) {
   if (typeof fbq === "function") fbq("trackCustom", event, {})
 }
 
-/** ViewContent al cargar una landing (retargeting de visitantes). Pixel-only. */
-export function fireViewContent(): void {
-  if (typeof window === "undefined" || !getConsent().marketing) return
-  fbqTrack("ViewContent", newEventId())
+/** ID de sesión anónimo para el embudo de landings (persiste por pestaña). */
+export function landingSession(): string {
+  if (typeof window === "undefined") return "server"
+  try {
+    const KEY = "sbg_l_sid"
+    let id = sessionStorage.getItem(KEY)
+    if (!id) { id = newEventId(); sessionStorage.setItem(KEY, id) }
+    return id
+  } catch {
+    return newEventId()
+  }
 }
 
-/** Señal de calidad de tráfico: 75% de scroll de la landing. Pixel-only. */
-export function fireScroll75(): void {
-  if (typeof window === "undefined" || !getConsent().marketing) return
-  fbqTrackCustom("Scroll75")
+/** Persiste una señal ligera del embudo (view/scroll75/contact) en 1st-party. */
+function postLandingEvent(landing: string, eventType: "view" | "scroll75" | "contact") {
+  if (typeof window === "undefined" || !getConsent().analytics) return
+  fetch("/api/landing-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    keepalive: true,
+    body: JSON.stringify({
+      landing,
+      event_type: eventType,
+      session_id: landingSession(),
+      path: window.location.pathname,
+      attribution: getConsent().marketing ? getStoredAttribution() : null,
+    }),
+  }).catch(() => {})
+}
+
+/** ViewContent al cargar una landing: pixel (retargeting) + embudo 1st-party. */
+export function fireViewContent(landing: string): void {
+  if (typeof window === "undefined") return
+  if (getConsent().marketing) fbqTrack("ViewContent", newEventId())
+  postLandingEvent(landing, "view")
+}
+
+/** 75% de scroll: señal de calidad de tráfico. Pixel + embudo 1st-party. */
+export function fireScroll75(landing: string): void {
+  if (typeof window === "undefined") return
+  if (getConsent().marketing) fbqTrackCustom("Scroll75")
+  postLandingEvent(landing, "scroll75")
 }
 
 export interface LandingLeadTracking {
