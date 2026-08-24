@@ -5,7 +5,7 @@ import { ServiceJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo-jso
 import { PersonaLanding } from "@/components/landings/persona-landing"
 import { getPersonaLanding } from "@/lib/persona-landings"
 
-const SLUG = "web-que-genera-clientes"
+const SLUG = "agencias-white-label"
 
 export const metadata: Metadata = (() => {
   const data = getPersonaLanding(SLUG)
