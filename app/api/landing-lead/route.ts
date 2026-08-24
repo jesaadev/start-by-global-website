@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { Resend } from "resend"
 import { sendCapiEvent, getClientIp } from "@/lib/meta-capi"
 import { logLeadEvent } from "@/lib/lead-events"
+import { logLandingEvent } from "@/lib/landing-events"
 import { enforceRateLimit } from "@/lib/rate-limit"
 import { sameOriginOk, isBot } from "@/lib/request-guards"
 import type { Attribution } from "@/lib/attribution"
@@ -14,6 +15,8 @@ import type { Attribution } from "@/lib/attribution"
 interface Body {
   kind?: "agenda" | "lead_magnet"
   landing?: string // persona / slug, para contexto en la notificación
+  landingKey?: string // clave de analítica (segment): landing_a…
+  session_id?: string
   name?: string
   contact?: string // email o teléfono
   qualifier?: string // "a qué se dedica", "profesión", "URL tienda", "empresa"…
@@ -104,6 +107,14 @@ export async function POST(request: Request) {
         nav_variant: body.nav_variant ?? null,
         segment,
         locale: body.locale ?? "es",
+      })
+      // Embudo de la pestaña "Landings".
+      await logLandingEvent({
+        landing: (body.landingKey ?? landing).slice(0, 60),
+        event_type: kind === "lead_magnet" ? "lead_magnet" : "lead",
+        session_id: body.session_id ?? null,
+        path: body.page_url ?? null,
+        attribution: body.attribution ?? null,
       })
     } catch (e) {
       console.error("[Landing Lead] tracking error:", e)

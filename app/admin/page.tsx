@@ -8,8 +8,10 @@ import {
   XCircle, TrendingUp, TrendingDown, Mail, RefreshCw, Save, X,
   Search, Building2, Activity, Megaphone,
   FileText, Share2, MousePointerClick, Download, Target, Sparkles, Wand2, ExternalLink,
+  Rocket, Users, MousePointer, ArrowDownWideNarrow,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { LANDING_LABELS } from "@/lib/persona-landings"
 import type { SiteSettings } from "@/lib/site-settings"
 import type { CapiTestResult } from "@/lib/meta-capi"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
@@ -1115,6 +1117,162 @@ const SEGMENT_LABELS: Record<string, string> = {
   hero_cta: "Hero (CTA principal)",
   nav: "Navegación",
   form: "Formulario",
+}
+
+// ─── Landings Tab ─────────────────────────────────────────────────────────────
+
+interface LandingFunnel {
+  landing: string
+  views: number
+  visitors: number
+  scroll75: number
+  leads: number
+  lead_magnets: number
+  contacts: number
+  lead_rate: number
+  scroll_rate: number
+}
+interface LandingStats {
+  days: number
+  totals: { views: number; visitors: number; scroll75: number; leads: number; lead_magnets: number; contacts: number }
+  landings: LandingFunnel[]
+  by_channel: Record<string, number>
+}
+
+function LandingsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [stats, setStats] = useState<LandingStats | null>(null)
+  const [days, setDays] = useState(30)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      setLoading(true); setError("")
+      try {
+        const res = await api.get({ resource: "landings", days: String(days) })
+        if (!active) return
+        if (res.data) setStats(res.data)
+        else setError(res.error || "No se pudieron cargar los datos.")
+      } catch {
+        if (active) setError("Error de conexión.")
+      } finally {
+        if (active) setLoading(false)
+      }
+    })()
+    return () => { active = false }
+  }, [api, days])
+
+  const label = (seg: string) => LANDING_LABELS[seg]?.persona ?? seg
+  const slug = (seg: string) => LANDING_LABELS[seg]?.slug
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground">
+          Embudo de cada landing por persona: visitas → 75% scroll → agenda → descarga. Datos 1st-party (los eventos de píxel viven además en Meta Events Manager).
+        </p>
+        <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg">
+          {[7, 30, 90].map((d) => (
+            <button key={d} type="button" onClick={() => setDays(d)}
+              className={cn("px-3 py-1 rounded-md text-xs font-medium transition-all",
+                days === d ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+              {d}d
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+      ) : error ? (
+        <div className="glass-card rounded-xl p-6 text-center text-sm text-destructive">{error}</div>
+      ) : stats ? (
+        <>
+          {/* Totales */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { label: "Visitas", value: stats.totals.views, icon: Eye, color: "text-chart-2" },
+              { label: "Visitantes", value: stats.totals.visitors, icon: Users, color: "text-chart-2" },
+              { label: "Scroll 75%", value: stats.totals.scroll75, icon: ArrowDownWideNarrow, color: "text-chart-4" },
+              { label: "Agendas (Lead)", value: stats.totals.leads, icon: TrendingUp, color: "text-chart-3" },
+              { label: "Descargas", value: stats.totals.lead_magnets, icon: Download, color: "text-primary" },
+              { label: "Contactos", value: stats.totals.contacts, icon: MousePointer, color: "text-chart-3" },
+            ].map((c) => {
+              const Icon = c.icon
+              return (
+                <div key={c.label} className="glass-card rounded-xl p-4">
+                  <div className={cn("flex items-center gap-2", c.color)}>
+                    <Icon className="w-4 h-4" />
+                    <span className="font-display text-xl font-bold text-foreground">{c.value}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-1">{c.label}</p>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Tabla por landing */}
+          {stats.landings.length === 0 ? (
+            <div className="glass-card rounded-xl p-8 text-center text-sm text-muted-foreground">
+              Aún no hay eventos registrados en las landings para este periodo. Se poblará cuando reciban tráfico.
+            </div>
+          ) : (
+            <div className="glass-card rounded-xl overflow-x-auto">
+              <table className="w-full text-sm min-w-[720px]">
+                <thead>
+                  <tr className="border-b border-border/50 bg-secondary/30">
+                    {["Landing", "Visitantes", "Scroll 75%", "Agendas", "Descargas", "Conv. agenda", ""].map((h) => (
+                      <th key={h} className="px-3 py-3 text-left text-[11px] uppercase tracking-wider text-muted-foreground font-medium whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.landings.map((l) => (
+                    <tr key={l.landing} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                      <td className="px-3 py-2.5">
+                        <p className="text-xs font-medium text-foreground">{label(l.landing)}</p>
+                        {slug(l.landing) && <p className="text-[10px] text-muted-foreground">/{slug(l.landing)}</p>}
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-foreground">{l.visitors}</td>
+                      <td className="px-3 py-2.5 text-xs text-muted-foreground">{l.scroll75} <span className="text-[10px]">({l.scroll_rate}%)</span></td>
+                      <td className="px-3 py-2.5 text-xs font-semibold text-chart-3">{l.leads}</td>
+                      <td className="px-3 py-2.5 text-xs text-primary">{l.lead_magnets}</td>
+                      <td className="px-3 py-2.5">
+                        <span className={cn("text-xs font-semibold", l.lead_rate >= 5 ? "text-chart-3" : l.lead_rate > 0 ? "text-chart-4" : "text-muted-foreground")}>{l.lead_rate}%</span>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {slug(l.landing) && (
+                          <a href={`/${slug(l.landing)}`} target="_blank" rel="noopener noreferrer" title="Ver landing"
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors inline-flex">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Leads por canal */}
+          {Object.keys(stats.by_channel).length > 0 && (
+            <div className="glass-card rounded-xl p-5">
+              <h3 className="text-xs font-semibold text-foreground mb-3">Agendas por canal</h3>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(stats.by_channel).sort((a, b) => b[1] - a[1]).map(([ch, n]) => (
+                  <span key={ch} className="text-xs px-2.5 py-1 rounded-lg bg-secondary/60 text-foreground">
+                    {ch}: <span className="font-semibold">{n}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      ) : null}
+    </div>
+  )
 }
 
 function AttributionTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
@@ -2315,7 +2473,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "blog" | "content">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "landings" | "blog" | "content">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -2341,6 +2499,7 @@ export default function AdminDashboard() {
     { id: "overrides" as const, label: "Prompt Overrides", icon: Settings },
     { id: "seo" as const, label: "SEO & Métricas", icon: Search },
     { id: "attribution" as const, label: "Atribución", icon: Megaphone },
+    { id: "landings" as const, label: "Landings", icon: Rocket },
     { id: "blog" as const, label: "Blog / Orgánico", icon: FileText },
     { id: "content" as const, label: "Contenido", icon: Pencil },
   ]
@@ -2432,6 +2591,7 @@ export default function AdminDashboard() {
         {activeTab === "overrides" && <OverridesTab api={api} />}
         {activeTab === "seo" && <SeoTab api={api} />}
         {activeTab === "attribution" && <AttributionTab api={api} />}
+        {activeTab === "landings" && <LandingsTab api={api} />}
         {activeTab === "blog" && <BlogTab api={api} />}
         {activeTab === "content" && <ContentTab api={api} />}
       </main>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { ArrowRight, Check, Plus, Send, Lock } from "lucide-react"
-import { fireLandingLead, fireViewContent, fireScroll75 } from "@/lib/track-client"
+import { fireLandingLead, fireViewContent, fireScroll75, landingSession } from "@/lib/track-client"
 import type { PersonaLandingData } from "@/lib/persona-landings"
 
 // Plantilla común de las landings por persona: arquitectura fija de 9 bloques.
@@ -14,7 +14,7 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
 
   // Bloque 1: ViewContent al cargar. Bloque de medición: Scroll75 una vez.
   useEffect(() => {
-    fireViewContent()
+    fireViewContent(data.segment)
     let fired = false
     const onScroll = () => {
       if (fired) return
@@ -22,13 +22,13 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       const total = document.documentElement.scrollHeight
       if (total > 0 && scrolled / total >= 0.75) {
         fired = true
-        fireScroll75()
+        fireScroll75(data.segment)
         window.removeEventListener("scroll", onScroll)
       }
     }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+  }, [data.segment])
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
@@ -45,39 +45,40 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       </nav>
 
       {/* BLOQUE 1 — Encabezado */}
-      <header className="relative overflow-hidden pt-32 pb-16 px-6">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] bg-primary/15" />
-        <div className="relative max-w-3xl mx-auto text-center flex flex-col items-center gap-6">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+      <header className="relative overflow-hidden pt-32 pb-20 px-6">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] bg-primary/20" />
+        <div className="absolute -top-10 left-0 w-[380px] h-[380px] rounded-full blur-[120px] bg-chart-2/10" />
+        <div className="relative max-w-4xl mx-auto text-center flex flex-col items-center gap-7">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/25 uppercase tracking-wide">
             {data.hero.badge}
           </span>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] text-balance">
+          <h1 className="font-display text-[2.6rem] leading-[1.03] sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-balance">
             {data.hero.h1}
           </h1>
-          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl leading-relaxed">
+          <p className="text-lg sm:text-2xl text-foreground/80 max-w-2xl leading-relaxed font-medium">
             {data.hero.subtitle}
           </p>
-          <a href="#contacto" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all">
-            {data.hero.ctaLabel} <ArrowRight className="w-4 h-4" />
+          <a href="#contacto" className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
+            {data.hero.ctaLabel} <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </a>
-          <p className="text-xs text-muted-foreground max-w-md">{data.hero.microcopy}</p>
+          <p className="text-sm text-muted-foreground max-w-md">{data.hero.microcopy}</p>
         </div>
       </header>
 
       {/* BLOQUE 2 — Espejo del dolor */}
-      <section className="px-6 py-14">
+      <section className="px-6 py-16">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6">{data.pain.h2}</h2>
-          <ul className="flex flex-col gap-3">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.pain.h2}</h2>
+          <ul className="flex flex-col gap-4">
             {data.pain.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-muted-foreground">
-                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                <span className="leading-relaxed">{b}</span>
+              <li key={b} className="flex items-start gap-3.5 text-base sm:text-lg text-foreground/85 leading-relaxed">
+                <span className="mt-2.5 w-2 h-2 rounded-full bg-primary shrink-0" />
+                <span>{b}</span>
               </li>
             ))}
           </ul>
           {data.pain.closing && (
-            <p className="mt-6 text-foreground font-medium border-l-4 border-primary/50 pl-4">{data.pain.closing}</p>
+            <p className="mt-8 text-lg sm:text-xl font-semibold text-foreground bg-primary/[0.06] border-l-4 border-primary rounded-r-xl py-4 pl-5 pr-4 text-balance">{data.pain.closing}</p>
           )}
         </div>
       </section>
@@ -85,19 +86,19 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       {/* BLOQUE 3 — Mecanismo */}
       <section className="px-6 py-14 border-y border-border/50">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-8 max-w-2xl">{data.mechanism.h2}</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10 max-w-2xl tracking-tight text-balance">{data.mechanism.h2}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {data.mechanism.items.map((it) => (
-              <div key={it.title} className="glass-card rounded-2xl p-6">
-                <h3 className="font-semibold text-foreground">{it.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{it.desc}</p>
+              <div key={it.title} className="glass-card rounded-2xl p-7 hover:border-primary/30 transition-colors">
+                <h3 className="font-display text-lg font-bold text-foreground">{it.title}</h3>
+                <p className="text-base text-foreground/70 mt-2 leading-relaxed">{it.desc}</p>
               </div>
             ))}
           </div>
           {/* CTA repetido */}
-          <div className="mt-8 flex justify-center">
-            <a href="#contacto" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all">
-              {data.hero.ctaLabel} <ArrowRight className="w-4 h-4" />
+          <div className="mt-10 flex justify-center">
+            <a href="#contacto" className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
+              {data.hero.ctaLabel} <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
             </a>
           </div>
         </div>
@@ -106,11 +107,11 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       {/* BLOQUE 4 — Qué incluye */}
       <section className="px-6 py-14">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6">{data.includes.h2}</h2>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.includes.h2}</h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
             {data.includes.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+              <li key={b} className="flex items-start gap-3 text-base text-foreground/85">
+                <Check className="w-5 h-5 mt-0.5 shrink-0 text-primary" />
                 <span className="leading-relaxed">{b}</span>
               </li>
             ))}
@@ -125,10 +126,10 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
             <Lock className="w-4 h-4 text-muted-foreground" />
             <span className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Prueba de método</span>
           </div>
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6">{data.proof.h2}</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.proof.h2}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {data.proof.bullets.map((b) => (
-              <div key={b} className="glass-card rounded-xl p-5 text-sm text-muted-foreground leading-relaxed">{b}</div>
+              <div key={b} className="glass-card rounded-xl p-6 text-base text-foreground/80 leading-relaxed">{b}</div>
             ))}
           </div>
         </div>
@@ -137,12 +138,12 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       {/* BLOQUE 6 — Objeciones / FAQ */}
       <section className="px-6 py-14">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-6">Preguntas frecuentes</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">Preguntas frecuentes</h2>
           <div className="flex flex-col gap-2.5">
             {data.faqs.map((f, i) => (
               <div key={f.q} className="glass-card rounded-xl overflow-hidden">
                 <button type="button" onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left">
-                  <span className="text-sm font-medium text-foreground">{f.q}</span>
+                  <span className="text-base font-semibold text-foreground">{f.q}</span>
                   <Plus className={`w-4 h-4 shrink-0 text-primary transition-transform ${openFaq === i ? "rotate-45" : ""}`} />
                 </button>
                 {openFaq === i && <p className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">{f.a}</p>}
@@ -155,7 +156,7 @@ export function PersonaLanding({ data }: { data: PersonaLandingData }) {
       {/* BLOQUE 7 — Cómo trabajamos */}
       <section className="px-6 py-14 border-y border-border/50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold mb-8">Cómo trabajamos</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10 tracking-tight text-balance">Cómo trabajamos</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {data.process.steps.map((s, i) => (
               <div key={s.title} className="glass-card rounded-xl p-5">
@@ -209,7 +210,8 @@ function AgendaForm({ data }: { data: PersonaLandingData }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kind: "agenda", landing: data.persona,
+          kind: "agenda", landing: data.persona, landingKey: data.segment,
+          session_id: landingSession(),
           name, contact, qualifier, qualifierLabel: data.form.qualifierLabel,
           company_website: hp.current?.value ?? "",
           ...tracking,
@@ -228,8 +230,8 @@ function AgendaForm({ data }: { data: PersonaLandingData }) {
     <section id="contacto" className="px-6 py-16 scroll-mt-20">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="font-display text-2xl sm:text-3xl font-bold">{data.form.h2}</h2>
-          <p className="text-muted-foreground mt-2 leading-relaxed">{data.form.text}</p>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-balance">{data.form.h2}</h2>
+          <p className="text-base sm:text-lg text-foreground/75 mt-3 leading-relaxed">{data.form.text}</p>
         </div>
         {sent ? (
           <div className="glass-card rounded-2xl p-8 text-center">
@@ -279,7 +281,8 @@ function LeadMagnet({ data }: { data: PersonaLandingData }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kind: "lead_magnet", landing: data.persona, contact: email,
+          kind: "lead_magnet", landing: data.persona, landingKey: data.segment,
+          session_id: landingSession(), contact: email,
           asset: data.leadMagnet.asset,
           company_website: hp.current?.value ?? "",
           ...tracking,

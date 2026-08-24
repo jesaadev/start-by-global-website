@@ -142,3 +142,9 @@ export const PERSONA_LANDINGS: Record<string, PersonaLandingData> = {
 export function getPersonaLanding(slug: string): PersonaLandingData | undefined {
   return PERSONA_LANDINGS[slug]
 }
+
+/** Etiquetas por clave de analítica (segment) para la pestaña "Landings". */
+export const LANDING_LABELS: Record<string, { persona: string; slug: string }> =
+  Object.fromEntries(
+    Object.values(PERSONA_LANDINGS).map((l) => [l.segment, { persona: l.persona, slug: l.slug }])
+  )

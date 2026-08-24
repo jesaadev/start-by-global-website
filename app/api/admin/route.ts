@@ -5,6 +5,7 @@ import { enforceRateLimit } from "@/lib/rate-limit"
 import { safeEqual } from "@/lib/request-guards"
 import { readSiteSettings, saveSiteSettings } from "@/lib/site-settings"
 import { getAttributionStats } from "@/lib/lead-events"
+import { getLandingStats } from "@/lib/landing-events"
 import { getBlogStats } from "@/lib/blog-events"
 import { getArticleQueries, gscConfigured } from "@/lib/gsc"
 import {
@@ -132,6 +133,12 @@ export async function GET(request: Request) {
     if (resource === "attribution") {
       const days = parseInt(searchParams.get("days") ?? "30")
       const data = await getAttributionStats(Number.isFinite(days) ? days : 30)
+      return NextResponse.json({ data })
+    }
+
+    if (resource === "landings") {
+      const days = parseInt(searchParams.get("days") ?? "30")
+      const data = await getLandingStats(Number.isFinite(days) ? days : 30)
       return NextResponse.json({ data })
     }
 
