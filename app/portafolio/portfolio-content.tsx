@@ -23,7 +23,6 @@ const allProjects = [
     title: "Resort Punta Cana",
     category: "Web",
     description: "Sitio web de lujo para resort 5 estrellas con sistema de reservas integrado y experiencia inmersiva. Implementamos un sistema de booking personalizado que incremento las reservas directas.",
-    metrics: { conversion: "+45%", traffic: "120K/mes", roi: "320%", leads: "850/mes" },
     region: "Rep. Dominicana",
     color: "primary",
     tech: ["Next.js", "Stripe", "Sanity CMS", "Vercel"],
@@ -34,7 +33,6 @@ const allProjects = [
     title: "Fintech Barcelona",
     category: "E-commerce",
     description: "Plataforma de pagos digitales con interfaz intuitiva y procesamiento en tiempo real para el mercado europeo. Diseño centrado en seguridad y experiencia del usuario.",
-    metrics: { conversion: "+62%", traffic: "85K/mes", roi: "450%", leads: "1.2K/mes" },
     region: "España",
     color: "chart-2",
     tech: ["React", "Node.js", "PostgreSQL", "AWS"],
@@ -45,7 +43,6 @@ const allProjects = [
     title: "Restaurante CDMX",
     category: "Branding",
     description: "Rebranding completo y presencia digital para cadena de restaurantes gourmet. Incluyo identidad visual, redes sociales y estrategia de contenido.",
-    metrics: { conversion: "+38%", traffic: "45K/mes", roi: "280%", leads: "320/mes" },
     region: "Latinoamérica",
     color: "chart-4",
     tech: ["Figma", "WordPress", "Instagram", "TikTok"],
@@ -56,7 +53,6 @@ const allProjects = [
     title: "SaaS Miami",
     category: "Marketing",
     description: "Estrategia integral de growth marketing para startup SaaS B2B. Campañas multicanal que posicionaron la marca en el mercado norteamericano.",
-    metrics: { conversion: "+78%", traffic: "200K/mes", roi: "520%", leads: "2.5K/mes" },
     region: "EE.UU.",
     color: "chart-3",
     tech: ["HubSpot", "Google Ads", "GA4", "Mixpanel"],
@@ -67,7 +63,6 @@ const allProjects = [
     title: "E-commerce Bogota",
     category: "E-commerce",
     description: "Tienda en línea de moda sostenible con integración de pasarelas de pago locales e internacionales. Estrategia omnicanal con email marketing avanzado.",
-    metrics: { conversion: "+55%", traffic: "95K/mes", roi: "380%", leads: "1.8K/mes" },
     region: "Latinoamérica",
     color: "primary",
     tech: ["Shopify", "Klaviyo", "Meta Ads", "Google Ads"],
@@ -78,7 +73,6 @@ const allProjects = [
     title: "Clinica Madrid",
     category: "Web",
     description: "Portal medico con reserva de citas online, telemedicina y gestión de pacientes. Plataforma integral para clinica privada con multiples especialidades.",
-    metrics: { conversion: "+41%", traffic: "60K/mes", roi: "290%", leads: "600/mes" },
     region: "España",
     color: "chart-2",
     tech: ["Next.js", "Supabase", "Tailwind", "Vercel"],
@@ -89,7 +83,6 @@ const allProjects = [
     title: "Hotel Bavaro Collection",
     category: "Web",
     description: "Experiencia digital premium para grupo hotelero con 5 propiedades. Sistema de reservas unificado con soporte multilingue y multi-moneda.",
-    metrics: { conversion: "+52%", traffic: "180K/mes", roi: "410%", leads: "1.1K/mes" },
     region: "Rep. Dominicana",
     color: "chart-4",
     tech: ["Next.js", "Contentful", "Stripe", "i18n"],
@@ -100,20 +93,12 @@ const allProjects = [
     title: "Legal Tech Santiago",
     category: "Marketing",
     description: "Estrategia de posicionamiento digital para firma de abogados. SEO especializado y campañas de Google Ads en mercado competitivo.",
-    metrics: { conversion: "+67%", traffic: "35K/mes", roi: "350%", leads: "450/mes" },
     region: "Latinoamérica",
     color: "chart-3",
     tech: ["Google Ads", "SEMrush", "WordPress", "HubSpot"],
     year: "2025",
     duration: "Ongoing",
   },
-]
-
-const overallStats = [
-  { label: "Proyectos Entregados", value: "150+", icon: BarChart3 },
-  { label: "Clientes Activos", value: "85", icon: Users },
-  { label: "Países", value: "12", icon: Globe },
-  { label: "ROI Promedio", value: "380%", icon: TrendingUp },
 ]
 
 export function PortfolioPageContent() {
@@ -127,27 +112,7 @@ export function PortfolioPageContent() {
   })
 
   return (
-    <DashboardLayout title="Portafolio" subtitle="Proyectos destacados que demuestran resultados reales">
-      {/* Overall stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {overallStats.map((stat, i) => {
-          const Icon = stat.icon
-          return (
-            <AnimateIn key={stat.label} delay={i * 80}>
-              <div className="glass-card rounded-xl p-4 flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-display text-xl font-bold text-foreground">{stat.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{stat.label}</p>
-                </div>
-              </div>
-            </AnimateIn>
-          )
-        })}
-      </div>
-
+    <DashboardLayout title="Portafolio" subtitle="Ejemplos del tipo de proyectos que desarrollamos">
       {/* Filters */}
       <AnimateIn>
         <div className="glass-card rounded-xl p-4 flex flex-col sm:flex-row gap-4">
@@ -244,25 +209,6 @@ export function PortfolioPageContent() {
                   </span>
                 </div>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-4 gap-3 pt-4 border-t border-border/50">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground">Conversión</span>
-                    <span className="text-sm font-bold font-display text-chart-3">{project.metrics.conversion}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground">Tráfico</span>
-                    <span className="text-sm font-bold font-display text-foreground">{project.metrics.traffic}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground">ROI</span>
-                    <span className="text-sm font-bold font-display text-chart-3">{project.metrics.roi}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-muted-foreground">Leads</span>
-                    <span className="text-sm font-bold font-display text-foreground">{project.metrics.leads}</span>
-                  </div>
-                </div>
               </div>
             </div>
           </AnimateIn>

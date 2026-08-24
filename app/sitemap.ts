@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { getSiteSettings, safeBaseUrl } from "@/lib/site-settings"
 import { getAllPublished } from "@/lib/blog-posts"
 import { HREFLANG_PAIRS } from "@/lib/seo"
+import { PERSONA_LANDINGS } from "@/lib/persona-landings"
 
 export const revalidate = 300
 
@@ -50,7 +51,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const staticEntries: MetadataRoute.Sitemap = [...STATIC_ROUTES, ...US_ROUTES].map((r) => ({
+  // Landings por buyer persona (indexables, tráfico pago + orgánico).
+  const landingRoutes = Object.values(PERSONA_LANDINGS).map((l) => ({
+    path: `/${l.slug}`,
+    priority: 0.85,
+    changeFrequency: "monthly" as MetadataRoute.Sitemap[number]["changeFrequency"],
+  }))
+
+  const staticEntries: MetadataRoute.Sitemap = [...STATIC_ROUTES, ...US_ROUTES, ...landingRoutes].map((r) => ({
     url: `${base}${r.path || "/"}` ,
     lastModified: now,
     changeFrequency: r.changeFrequency,

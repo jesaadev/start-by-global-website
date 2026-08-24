@@ -293,10 +293,10 @@ export function OutsourcingContent() {
               <div className="relative p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8 backdrop-blur-sm">
                 <div className="grid grid-cols-2 gap-px bg-foreground/8 rounded-xl overflow-hidden">
                   {[
-                    { value: "+120", label: "Proyectos entregados", color: "text-[#0074D9]" },
+                    { value: "White-label", label: "Entregables bajo tu marca", color: "text-[#0074D9]" },
                     { value: "100%", label: "Confidencialidad", color: "text-[#0E7490] dark:text-[#00C9C8]" },
                     { value: "3-21", label: "Días de entrega", color: "text-[#7B61FF]" },
-                    { value: "5+", label: "Países con partners", color: "text-[#0074D9]" },
+                    { value: "Lighthouse 90+", label: "Rendimiento garantizado", color: "text-[#0074D9]" },
                   ].map((s) => (
                     <div key={s.label} className="bg-background p-6">
                       <div className={`font-display text-4xl font-bold mb-1 ${s.color}`}>{s.value}</div>

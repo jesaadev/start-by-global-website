@@ -44,7 +44,7 @@ const services = [
       "Automatización de onboarding de clientes",
     ],
     stack: ["OpenAI GPT-4o", "Anthropic Claude", "LangChain", "WhatsApp API", "Slack / Teams"],
-    metric: "80% reducción en tickets de soporte",
+    metric: "Menos tickets de soporte repetitivos",
     color: "#7B61FF",
     bg: "from-[#7B61FF]/8 to-transparent",
     border: "border-[#7B61FF]/20 hover:border-[#7B61FF]/50",
@@ -65,7 +65,7 @@ const services = [
       "Pipelines de marketing completamente automatizados",
     ],
     stack: ["Make (Integromat)", "N8N self-hosted", "Zapier", "Webhooks", "APIs REST"],
-    metric: "12h/semana devueltas a tu equipo",
+    metric: "Horas de trabajo manual devueltas a tu equipo",
     color: "#00C9C8",
     bg: "from-[#00C9C8]/8 to-transparent",
     border: "border-[#00C9C8]/20 hover:border-[#00C9C8]/50",
@@ -86,7 +86,7 @@ const services = [
       "Análisis de sentimiento de redes sociales",
     ],
     stack: ["Python + Pandas", "Supabase / BigQuery", "Recharts / Metabase", "Scikit-learn", "OpenAI Embeddings"],
-    metric: "3x más rápido en toma de decisiones",
+    metric: "Decisiones más rápidas con datos al día",
     color: "#0074D9",
     bg: "from-[#0074D9]/8 to-transparent",
     border: "border-[#0074D9]/20 hover:border-[#0074D9]/50",
@@ -107,7 +107,7 @@ const services = [
       "Subtitulos y transcripciones automáticas para video",
     ],
     stack: ["GPT-4o + Fine-tuning", "Perplexity API", "Notion / WordPress", "Resend", "Buffer / Hootsuite"],
-    metric: "10x más contenido al mismo costo",
+    metric: "Más contenido con el mismo equipo",
     color: "#F4A261",
     bg: "from-[#F4A261]/8 to-transparent",
     border: "border-[#F4A261]/20 hover:border-[#F4A261]/50",
@@ -188,7 +188,7 @@ const plans = [
       "Flujos ilimitados",
       "Modelos fine-tuned con tus datos",
       "Infraestructura dedicada",
-      "SLA 99.9% uptime garantizado",
+      "Alta disponibilidad (SLA)",
       "Equipo dedicado asignado",
       "Onboarding ejecutivo incluido",
     ],
@@ -209,7 +209,7 @@ const faqs = [
   },
   {
     q: "Cuanto tiempo tarda en verse el ROI?",
-    a: "La mayoria de nuestros clientes reportan retorno en el primer mes. Las automatizaciones simples suelen pagarse en la primera semana de funcionamiento.",
+    a: "Depende del proceso. Priorizamos primero las automatizaciones simples, que suelen ser las de retorno más rápido, y lo definimos contigo en el diagnóstico antes de comprometer nada.",
   },
   {
     q: "Pueden integrarse con mi CRM / ERP actual?",
@@ -401,7 +401,7 @@ export function IaContent() {
                 {[
                   { icon: Zap, label: "Prototipo en 7 días" },
                   { icon: Shield, label: "Datos 100% seguros" },
-                  { icon: TrendingUp, label: "ROI en el primer mes" },
+                  { icon: TrendingUp, label: "Enfoque en retorno" },
                 ].map((t) => (
                   <div key={t.label} className="flex items-center gap-2 text-sm text-foreground/35">
                     <t.icon className="w-4 h-4 text-[#7B61FF]" />
@@ -483,27 +483,6 @@ export function IaContent() {
               </div>
             </div>
           </AnimateIn>
-        </div>
-      </section>
-
-      {/* ── NUMBERS STRIP ───────────────────────────── */}
-      <section className="border-y border-foreground/5 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-foreground/5 rounded-2xl overflow-hidden">
-            {[
-              { value: "+80", suffix: "%", label: "Reducción en tareas manuales", color: "text-[#7B61FF]" },
-              { value: "7", suffix: " días", label: "De diagnostico a primer prototipo", color: "text-[#0E7490] dark:text-[#00C9C8]" },
-              { value: "10x", suffix: "", label: "Más contenido con el mismo equipo", color: "text-[#0074D9]" },
-              { value: "-41", suffix: "%", label: "Costo promedio por lead en clientes IA", color: "text-[#B45309] dark:text-[#F4A261]" },
-            ].map((s) => (
-              <div key={s.label} className="bg-background px-6 py-8 text-center">
-                <div className={`font-display text-4xl lg:text-5xl font-bold mb-2 ${s.color}`}>
-                  {s.value}<span className="text-2xl">{s.suffix}</span>
-                </div>
-                <p className="text-xs text-foreground/35 leading-relaxed">{s.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
