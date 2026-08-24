@@ -28,9 +28,9 @@ const STEPS = [
 ]
 
 const RESULTS = [
-  { value: "300%", label: "ROI promedio" },
-  { value: "-35%", label: "CPA tras optimizar" },
-  { value: "+4", label: "Países" },
+  { value: "$400", label: "Gestión desde /mes" },
+  { value: "Pixel + CAPI", label: "Medición real de conversiones" },
+  { value: "Multi-red", label: "Google · Meta · TikTok" },
   { value: "24/7", label: "Medición y reportes" },
 ]
 

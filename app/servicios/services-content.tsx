@@ -36,7 +36,6 @@ const services = [
     ],
     tech: ["Next.js", "React", "Node.js", "TypeScript", "Tailwind CSS", "PostgreSQL"],
     color: "primary",
-    stats: { projects: "85+", satisfaction: "99%", avgDelivery: "6 sem" },
   },
   {
     icon: Search,
@@ -54,7 +53,6 @@ const services = [
     ],
     tech: ["Google Search Console", "Ahrefs", "SEMrush", "Screaming Frog", "GA4"],
     color: "chart-2",
-    stats: { projects: "120+", satisfaction: "97%", avgDelivery: "3 meses" },
   },
   {
     icon: Megaphone,
@@ -72,7 +70,6 @@ const services = [
     ],
     tech: ["Google Ads", "Meta Business", "TikTok Ads", "LinkedIn Ads", "Hotjar"],
     color: "chart-4",
-    stats: { projects: "200+", satisfaction: "98%", avgDelivery: "2 sem" },
   },
   {
     icon: Palette,
@@ -90,7 +87,6 @@ const services = [
     ],
     tech: ["Figma", "Adobe CC", "Illustrator", "After Effects", "Blender"],
     color: "chart-3",
-    stats: { projects: "95+", satisfaction: "100%", avgDelivery: "4 sem" },
   },
   {
     icon: BarChart3,
@@ -108,7 +104,6 @@ const services = [
     ],
     tech: ["GA4", "Looker Studio", "BigQuery", "Tag Manager", "Mixpanel"],
     color: "primary",
-    stats: { projects: "70+", satisfaction: "98%", avgDelivery: "3 sem" },
   },
   {
     icon: Code,
@@ -126,13 +121,12 @@ const services = [
     ],
     tech: ["HubSpot", "Zapier", "Make", "n8n", "API REST", "Webhooks"],
     color: "chart-2",
-    stats: { projects: "55+", satisfaction: "97%", avgDelivery: "4 sem" },
   },
 ]
 
 const whyUs = [
   { icon: Zap, title: "Velocidad", description: "Entregamos proyectos en tiempo record sin sacrificar calidad." },
-  { icon: Shield, title: "Confianza", description: "Más de 150 clientes satisfechos en 4 regiones internacionales." },
+  { icon: Shield, title: "Confianza", description: "Accesos, dominio y datos siempre a tu nombre. Sin retención de accesos." },
   { icon: Clock, title: "Soporte 24/7", description: "Equipo distribuido que asegura cobertura en todas las zonas horarias." },
   { icon: Users, title: "Equipo Experto", description: "Profesionales certificados en cada área de especialidad." },
 ]
@@ -189,22 +183,6 @@ export function ServicesPageContent() {
                       </div>
 
                       <p className="text-sm text-muted-foreground leading-relaxed">{service.longDescription}</p>
-
-                      {/* Stats */}
-                      <div className="flex items-center gap-6 py-4 border-y border-border/50">
-                        <div className="flex flex-col">
-                          <span className="font-display text-lg font-bold text-foreground">{service.stats.projects}</span>
-                          <span className="text-[10px] text-muted-foreground">Proyectos</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-display text-lg font-bold text-chart-3">{service.stats.satisfaction}</span>
-                          <span className="text-[10px] text-muted-foreground">Satisfacción</span>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-display text-lg font-bold text-foreground">{service.stats.avgDelivery}</span>
-                          <span className="text-[10px] text-muted-foreground">Entrega promedio</span>
-                        </div>
-                      </div>
 
                       {/* Tech stack */}
                       <div className="flex flex-wrap gap-2">

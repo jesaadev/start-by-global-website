@@ -41,38 +41,17 @@ const values = [
 ]
 
 const milestones = [
-  { year: "2020", title: "Fundacion", description: "Start By Global nace en Santo Domingo con 3 personas y una visión." },
-  { year: "2021", title: "Expansion a España", description: "Abrimos oficina en Madrid y comenzamos operaciones en el mercado europeo." },
-  { year: "2022", title: "50 Clientes", description: "Alcanzamos los 50 clientes activos y expandimos a México y Colombia." },
-  { year: "2023", title: "Oficina Miami", description: "Establecemos presencia en EE.UU. para atender el mercado norteamericano." },
-  { year: "2024", title: "100 Proyectos", description: "Superamos los 100 proyectos entregados con un 98% de satisfacción." },
-  { year: "2025", title: "150+ Proyectos", description: "12 países, 4 oficinas y un equipo de 30+ profesionales certificados." },
-]
-
-const bigNumbers = [
-  { value: "150+", label: "Proyectos Entregados" },
-  { value: "30+", label: "Profesionales" },
-  { value: "4", label: "Oficinas" },
-  { value: "12", label: "Países" },
-  { value: "98%", label: "Satisfacción" },
-  { value: "$2M+", label: "Ads Gestionados" },
+  { year: "2020", title: "Fundación", description: "Start By Global nace en Santo Domingo con una visión clara." },
+  { year: "2021", title: "Expansión a España", description: "Comenzamos operaciones con clientes en el mercado europeo." },
+  { year: "2022", title: "Crecimiento regional", description: "Ampliamos operaciones a más mercados de Latinoamérica." },
+  { year: "2023", title: "Presencia en EE.UU.", description: "Empezamos a atender clientes en el mercado norteamericano." },
+  { year: "2024", title: "Nuevos servicios", description: "Sumamos capacidades de medición y automatización con IA." },
+  { year: "2025", title: "Enfoque nearshore", description: "Consolidamos nuestra propuesta para el mercado de EE.UU. con la versión en inglés." },
 ]
 
 export function AboutPageContent() {
   return (
     <DashboardLayout title="Nosotros" subtitle="Conoce al equipo que impulsa tu éxito digital">
-      {/* Big numbers */}
-      <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-        {bigNumbers.map((stat, i) => (
-          <AnimateIn key={stat.label} delay={i * 60}>
-            <div className="glass-card rounded-xl p-4 text-center">
-              <p className="font-display text-xl font-bold text-primary">{stat.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-1">{stat.label}</p>
-            </div>
-          </AnimateIn>
-        ))}
-      </div>
-
       {/* Mission & Story */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <AnimateIn direction="left" className="lg:col-span-3">
@@ -91,8 +70,8 @@ export function AboutPageContent() {
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Fundada en 2020 en Santo Domingo, Rep. Dominicana, nacimos con la conviccion de que el
-              talento hispanohablante puede competir con las mejores agencias del mundo. Hoy, con presencia
-              en 4 ciudades y un equipo de más de 30 profesionales, seguimos comprometidos con esa visión.
+              talento hispanohablante puede competir con las mejores agencias del mundo. Hoy, con un
+              equipo distribuido y clientes en varios mercados, seguimos comprometidos con esa visión.
             </p>
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm font-medium text-foreground italic">

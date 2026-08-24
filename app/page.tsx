@@ -7,10 +7,8 @@ import { FunnelMethod } from "@/components/home/funnel-method"
 import { ProcessSteps } from "@/components/home/process-steps"
 import { OutsourcingBlock } from "@/components/home/outsourcing-block"
 import { GuaranteeFaq } from "@/components/home/guarantee-faq"
-import { MetricsSection } from "@/components/metrics-section"
 import { ServicesSection } from "@/components/services-section"
 import { PortfolioSection } from "@/components/portfolio-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
 import { ContactSection } from "@/components/contact-section"
 import { CtaBanner } from "@/components/cta-banner"
 import { Footer } from "@/components/footer"
@@ -25,11 +23,9 @@ export default async function Page() {
       <ProblemSection />
       <FunnelMethod />
       <ServicesSection />
-      <MetricsSection />
       <ProcessSteps />
       <PortfolioSection />
       <OutsourcingBlock />
-      <TestimonialsSection />
       <GuaranteeFaq />
       <ContactSection />
       <CtaBanner />

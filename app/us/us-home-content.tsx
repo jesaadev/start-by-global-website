@@ -49,9 +49,9 @@ const WHY_US = [
 ]
 
 const RESULTS = [
-  { value: "380%", label: "Average campaign ROI" },
+  { value: "Nearshore", label: "U.S. time zones" },
   { value: "< 2s", label: "Site load targets" },
-  { value: "4", label: "Countries served" },
+  { value: "Pixel + CAPI", label: "Real conversion tracking" },
   { value: "24/7", label: "Tracking & reporting" },
 ]
 

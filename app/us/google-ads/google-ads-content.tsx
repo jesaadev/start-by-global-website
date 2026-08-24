@@ -28,8 +28,8 @@ const STEPS = [
 ]
 
 const RESULTS = [
-  { value: "380%", label: "Average ROI" },
-  { value: "-35%", label: "CPA after optimization" },
+  { value: "$400", label: "From, monthly management" },
+  { value: "Pixel + CAPI", label: "Real conversion tracking" },
   { value: "100%", label: "Account ownership stays with you" },
   { value: "24/7", label: "Tracking & reporting" },
 ]
