@@ -1,5 +1,8 @@
 'use client';
 
+// React Bits · SpotlightCard (MIT + Commons Clause). Adaptado: colores con los
+// tokens del tema (border-border, bg-card) en lugar de neutral-800/900 fijos.
+
 import React, { useRef, useState } from 'react';
 
 interface Position {
@@ -55,7 +58,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
       onBlur={handleBlur}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative rounded-3xl border border-neutral-800 bg-neutral-900 overflow-hidden p-8 ${className}`}
+      className={`relative rounded-3xl border border-border/60 bg-card overflow-hidden p-8 ${className}`}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out"
