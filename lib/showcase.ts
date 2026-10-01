@@ -43,6 +43,16 @@ function cleanImage(v: unknown): string | null | undefined {
   return url.startsWith(bucketPublicPrefix()) || url.startsWith("/") ? url : undefined
 }
 
+/** "https://www.cliente.com/inicio" → "www.cliente.com" (lo que va en la barra). */
+function normalizeDomain(raw: string): string {
+  const s = raw.trim()
+  try {
+    return new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`).host.slice(0, 80)
+  } catch {
+    return s.replace(/^https?:\/\//i, "").replace(/\/.*$/, "").slice(0, 80)
+  }
+}
+
 const str = (v: unknown, max: number) =>
   v === undefined ? undefined : v === null ? null : typeof v === "string" ? v.trim().slice(0, max) || null : undefined
 
@@ -53,8 +63,8 @@ export function pickShowcaseFields(obj: Record<string, unknown>): Partial<Showca
   const title = str(obj.title, 120)
   if (title) out.title = title
   for (const k of ["client_name", "domain", "persona"] as const) {
-    const v = str(obj[k], k === "domain" ? 80 : 120)
-    if (v !== undefined) out[k] = v
+    const v = str(obj[k], k === "domain" ? 200 : 120)
+    if (v !== undefined) out[k] = k === "domain" && v ? normalizeDomain(v) : v
   }
   for (const k of ["desktop_image", "mobile_image"] as const) {
     const v = cleanImage(obj[k])

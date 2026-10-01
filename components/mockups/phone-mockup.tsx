@@ -1,20 +1,24 @@
+import type { ReactNode } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 interface PhoneMockupProps {
   /** Captura móvil (ancho ~390px, idealmente página completa). */
-  src: string
-  alt: string
+  src?: string
+  alt?: string
+  /** Contenido HTML a mostrar en pantalla en lugar de una captura. */
+  children?: ReactNode
   scrollOnHover?: boolean
   priority?: boolean
   sizes?: string
   className?: string
 }
 
-/** Marco de teléfono con la versión móvil de la web (mismo "scroll" CSS). */
+/** Marco de teléfono con la versión móvil de la web (o contenido HTML). */
 export function PhoneMockup({
   src,
-  alt,
+  alt = "",
+  children,
   scrollOnHover = true,
   priority = false,
   sizes = "200px",
@@ -30,18 +34,22 @@ export function PhoneMockup({
       {/* Isla / notch */}
       <span aria-hidden className="absolute top-2.5 left-1/2 -translate-x-1/2 z-10 h-4 w-16 rounded-full bg-black" />
       <div className="relative aspect-[9/19.5] overflow-hidden rounded-[1.7rem]">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority={priority}
-          sizes={sizes}
-          className={cn(
-            "object-cover object-top",
-            scrollOnHover &&
-              "transition-[object-position] [transition-duration:5000ms] ease-in-out group-hover/phone:object-bottom motion-reduce:transition-none"
-          )}
-        />
+        {src ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority={priority}
+            sizes={sizes}
+            className={cn(
+              "object-cover object-top",
+              scrollOnHover &&
+                "transition-[object-position] [transition-duration:5000ms] ease-in-out group-hover/phone:object-bottom motion-reduce:transition-none"
+            )}
+          />
+        ) : (
+          children
+        )}
       </div>
     </div>
   )

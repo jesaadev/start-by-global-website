@@ -1,33 +1,34 @@
 import { MarketingLayout } from "@/components/layout/marketing-layout"
-import { HeroSegmented } from "@/components/home/hero-segmented"
-import { ProblemSection } from "@/components/home/problem-section"
-import { FunnelMethod } from "@/components/home/funnel-method"
-import { ProcessSteps } from "@/components/home/process-steps"
-import { OutsourcingBlock } from "@/components/home/outsourcing-block"
-import { GuaranteeFaq } from "@/components/home/guarantee-faq"
-import { ServicesSection } from "@/components/services-section"
+import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
+import { HomeHero } from "@/components/home-v2/hero"
+import { PlatformsStrip } from "@/components/home-v2/platforms-strip"
+import { PersonaRouter } from "@/components/home-v2/persona-router"
 import { ShowcaseSection } from "@/components/showcase/showcase-section"
-import { ContactSection } from "@/components/contact-section"
-import { CtaBanner } from "@/components/cta-banner"
+import { AdFlow } from "@/components/home-v2/ad-flow"
+import { HomeProcess } from "@/components/home-v2/process"
+import { HomeIncluded } from "@/components/home-v2/included"
+import { HomeFaq } from "@/components/home-v2/faq"
+import { HomeFinalCTA } from "@/components/home-v2/final-cta"
 
-// El A/B de navegación terminó: una sola versión con navegación superior.
-// Sin lectura de cookies en el servidor, la home vuelve a ser estática/ISR.
+// Home v2 orientada a conversión: un CTA principal (WhatsApp), textos grandes,
+// trabajo real en mockups, enrutado a las landings por persona y el recorrido
+// animado de una campaña. Estática/ISR (sin cookies en el servidor).
 export default function Page() {
   return (
     <MarketingLayout ctaSegment="home_sticky">
-      <div className="flex flex-col gap-10 sm:gap-12 px-4 sm:px-6 lg:px-8 pt-4 pb-6 max-w-7xl mx-auto w-full">
-        <HeroSegmented />
-        <ProblemSection />
-        <FunnelMethod />
-        <ServicesSection />
-        <ProcessSteps />
-        {/* Trabajo real del admin (Showcase); reemplaza los proyectos ficticios */}
-        <ShowcaseSection />
-        <OutsourcingBlock />
-        <GuaranteeFaq />
-        <ContactSection />
-        <CtaBanner />
+      <PageFunnelTracker landingKey="home" />
+      <HomeHero />
+      <PlatformsStrip />
+      <PersonaRouter />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Trabajo real del admin (Showcase); se oculta si no hay nada publicado */}
+        <ShowcaseSection minItems={2} />
       </div>
+      <AdFlow />
+      <HomeProcess />
+      <HomeIncluded />
+      <HomeFaq />
+      <HomeFinalCTA />
     </MarketingLayout>
   )
 }

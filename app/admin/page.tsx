@@ -1470,7 +1470,7 @@ function LandingsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     return () => { active = false }
   }, [api, days])
 
-  const label = (seg: string) => LANDING_LABELS[seg]?.persona ?? seg
+  const label = (seg: string) => (seg === "home" ? "Home (página principal)" : LANDING_LABELS[seg]?.persona ?? seg)
   const slug = (seg: string) => LANDING_LABELS[seg]?.slug
 
   return (

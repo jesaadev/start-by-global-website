@@ -9,12 +9,14 @@ import { ShowcaseSwap, type ShowcaseCardData } from "@/components/showcase/showc
  * lo autorizado por el cliente. Si todavía no hay nada publicado, no se muestra
  * (nunca rellenamos con proyectos inventados).
  */
-export async function ShowcaseSection() {
+export async function ShowcaseSection({ minItems = 1 }: { minItems?: number } = {}) {
   const items = await listPublishedShowcase("web", 6)
   const cards: ShowcaseCardData[] = items
     .filter((it) => it.desktop_image)
     .map((it) => ({ id: it.id, title: it.title, domain: it.domain, desktop_image: it.desktop_image as string }))
-  if (!cards.length) return null
+  // En la home el trabajo más reciente ya se luce en el hero: con uno solo no
+  // repetimos la sección (minItems=2).
+  if (cards.length < Math.max(1, minItems)) return null
 
   return (
     <section id="trabajo" className="grid grid-cols-1 lg:grid-cols-[1fr_1.25fr] gap-10 lg:gap-14 items-center py-6">
