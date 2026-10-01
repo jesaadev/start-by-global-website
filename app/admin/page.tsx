@@ -9,9 +9,12 @@ import {
   Search, Building2, Activity, Megaphone,
   FileText, Share2, MousePointerClick, Download, Target, Sparkles, Wand2, ExternalLink,
   Rocket, Users, MousePointer, ArrowDownWideNarrow,
+  MonitorSmartphone, Upload, ArrowUp, ArrowDown, ShieldCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LANDING_LABELS } from "@/lib/persona-landings"
+import { BrowserMockup } from "@/components/mockups/browser-mockup"
+import { PhoneMockup } from "@/components/mockups/phone-mockup"
 import type { SiteSettings } from "@/lib/site-settings"
 import type { CapiTestResult } from "@/lib/meta-capi"
 import { blogPostsData } from "@/app/insights/[slug]/blog-data"
@@ -1117,6 +1120,310 @@ const SEGMENT_LABELS: Record<string, string> = {
   hero_cta: "Hero (CTA principal)",
   nav: "Navegación",
   form: "Formulario",
+}
+
+// ─── Showcase Tab ─────────────────────────────────────────────────────────────
+
+interface AdminShowcaseItem {
+  id: string
+  kind: "web" | "ad"
+  title: string
+  client_name: string | null
+  domain: string | null
+  persona: string | null
+  desktop_image: string | null
+  mobile_image: string | null
+  authorized: boolean
+  published: boolean
+  sort_order: number
+}
+
+type ShowcaseForm = {
+  kind: "web" | "ad"
+  title: string
+  client_name: string
+  domain: string
+  persona: string
+  desktop_image: string
+  mobile_image: string
+  authorized: boolean
+  published: boolean
+}
+
+const emptyShowcaseForm: ShowcaseForm = {
+  kind: "web", title: "", client_name: "", domain: "", persona: "",
+  desktop_image: "", mobile_image: "", authorized: false, published: false,
+}
+
+const SHOWCASE_MAX_MB = 8
+const SHOWCASE_TYPES = ["image/png", "image/jpeg", "image/webp"]
+
+function ShowcaseTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
+  const [items, setItems] = useState<AdminShowcaseItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [open, setOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [form, setForm] = useState<ShowcaseForm>(emptyShowcaseForm)
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState<"desktop_image" | "mobile_image" | null>(null)
+  const [error, setError] = useState("")
+  const [notice, setNotice] = useState("")
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    const res = await api.get({ resource: "showcase" })
+    if (res.error) setError(res.error)
+    setItems(res.data ?? [])
+    setLoading(false)
+  }, [api])
+
+  useEffect(() => { load() }, [load])
+
+  const startCreate = () => {
+    setForm(emptyShowcaseForm); setEditingId(null); setOpen(true); setError(""); setNotice("")
+  }
+  const startEdit = (it: AdminShowcaseItem) => {
+    setForm({
+      kind: it.kind, title: it.title, client_name: it.client_name ?? "", domain: it.domain ?? "",
+      persona: it.persona ?? "", desktop_image: it.desktop_image ?? "", mobile_image: it.mobile_image ?? "",
+      authorized: it.authorized, published: it.published,
+    })
+    setEditingId(it.id); setOpen(true); setError(""); setNotice("")
+  }
+
+  // Sube la imagen directo a Storage con una URL firmada (no pasa por Vercel).
+  const upload = async (field: "desktop_image" | "mobile_image", file: File | undefined) => {
+    if (!file) return
+    setError("")
+    if (!SHOWCASE_TYPES.includes(file.type)) { setError("Formato no permitido: usa PNG, JPG o WebP."); return }
+    if (file.size > SHOWCASE_MAX_MB * 1024 * 1024) { setError(`La imagen supera ${SHOWCASE_MAX_MB} MB.`); return }
+    setUploading(field)
+    try {
+      const res = await api.post({ resource: "showcase-upload-url", contentType: file.type, size: file.size })
+      if (res.error || !res.data) throw new Error(res.error || "No se pudo preparar la subida.")
+      const put = await fetch(res.data.signedUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file })
+      if (!put.ok) throw new Error(`La subida falló (${put.status}).`)
+      setForm((f) => ({ ...f, [field]: res.data.publicUrl }))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al subir la imagen.")
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  const save = async () => {
+    if (!form.title.trim()) { setError("El título es obligatorio."); return }
+    if (form.published && !form.authorized) { setError("Para publicar necesitas la autorización del cliente."); return }
+    setSaving(true); setError("")
+    const payload = { ...form, sort_order: editingId ? undefined : items.length * 10 }
+    try {
+      const res = editingId
+        ? await api.patch({ resource: "showcase", id: editingId, ...payload })
+        : await api.post({ resource: "showcase", ...payload })
+      if (res.error || !res.data) throw new Error(res.error || "No se pudo guardar.")
+      setNotice(form.published ? "Guardado y publicado: ya aparece en el sitio." : "Guardado como borrador (no visible en el sitio).")
+      setOpen(false)
+      await load()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al guardar.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const togglePublish = async (it: AdminShowcaseItem) => {
+    setError(""); setNotice("")
+    if (!it.published && !it.authorized) { setError("Marca primero la autorización del cliente (edítalo)."); return }
+    const res = await api.patch({ resource: "showcase", id: it.id, published: !it.published })
+    if (res.error) { setError(res.error); return }
+    await load()
+  }
+
+  // Intercambia el orden con el vecino y renumera de 10 en 10.
+  const move = async (index: number, dir: -1 | 1) => {
+    const j = index + dir
+    if (j < 0 || j >= items.length) return
+    const next = [...items]
+    ;[next[index], next[j]] = [next[j], next[index]]
+    setItems(next)
+    await Promise.all(
+      next.map((it, i) => (it.sort_order === i * 10 ? null : api.patch({ resource: "showcase", id: it.id, sort_order: i * 10 })))
+    )
+    await load()
+  }
+
+  const remove = async (it: AdminShowcaseItem) => {
+    if (!confirm(`¿Eliminar "${it.title}" y sus imágenes? No se puede deshacer.`)) return
+    await api.del({ resource: "showcase", id: it.id })
+    await load()
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <p className="text-xs text-muted-foreground max-w-2xl">
+          Trabajos reales que se muestran en los mockups del sitio (navegador + móvil). Sube capturas de página completa
+          (desktop ~1440px de ancho, móvil ~390px). <strong className="text-foreground">Solo se publica con la autorización
+          escrita del cliente.</strong>
+        </p>
+        <button type="button" onClick={startCreate}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:shadow-md transition-all">
+          <Plus className="w-4 h-4" /> Nuevo trabajo
+        </button>
+      </div>
+
+      {notice && <div className="glass-card rounded-xl p-3 text-xs text-chart-3 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" />{notice}</div>}
+      {error && !open && <div className="glass-card rounded-xl p-3 text-xs text-destructive">{error}</div>}
+
+      {open && (
+        <div className="glass-card rounded-xl p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-foreground">{editingId ? "Editar trabajo" : "Nuevo trabajo"}</h3>
+              <button type="button" onClick={() => setOpen(false)} className="p-1 rounded-md text-muted-foreground hover:text-foreground" aria-label="Cerrar">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2">
+                <FieldLabel>Título *</FieldLabel>
+                <input className={fieldInputCls} value={form.title} maxLength={120} placeholder="Ej: Web de captación para clínica dental"
+                  onChange={(e) => setForm({ ...form, title: e.target.value })} />
+              </div>
+              <div>
+                <FieldLabel>Cliente</FieldLabel>
+                <input className={fieldInputCls} value={form.client_name} maxLength={120}
+                  onChange={(e) => setForm({ ...form, client_name: e.target.value })} />
+              </div>
+              <div>
+                <FieldLabel>Dominio (barra del navegador)</FieldLabel>
+                <input className={fieldInputCls} value={form.domain} maxLength={80} placeholder="cliente.com"
+                  onChange={(e) => setForm({ ...form, domain: e.target.value })} />
+              </div>
+              <div>
+                <FieldLabel>Tipo</FieldLabel>
+                <select className={fieldInputCls} value={form.kind}
+                  onChange={(e) => setForm({ ...form, kind: e.target.value as "web" | "ad" })}>
+                  <option value="web" className="bg-card">Web</option>
+                  <option value="ad" className="bg-card">Creativo de anuncio</option>
+                </select>
+              </div>
+              <div>
+                <FieldLabel>Landing relacionada (opcional)</FieldLabel>
+                <select className={fieldInputCls} value={form.persona}
+                  onChange={(e) => setForm({ ...form, persona: e.target.value })}>
+                  <option value="" className="bg-card">— Ninguna —</option>
+                  {Object.entries(LANDING_LABELS).map(([key, l]) => (
+                    <option key={key} value={key} className="bg-card">{l.persona}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {(["desktop_image", "mobile_image"] as const).map((field) => (
+              <div key={field}>
+                <FieldLabel>{field === "desktop_image" ? (form.kind === "ad" ? "Creativo *" : "Captura escritorio *") : "Captura móvil (opcional)"}</FieldLabel>
+                <label className={cn(
+                  "flex items-center justify-center gap-2 w-full px-3 py-3 rounded-lg border border-dashed border-border/60 text-xs cursor-pointer transition-colors hover:border-primary/50 hover:bg-primary/5",
+                  form[field] ? "text-chart-3" : "text-muted-foreground"
+                )}>
+                  {uploading === field
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Subiendo…</>
+                    : form[field]
+                      ? <><CheckCircle2 className="w-4 h-4" /> Imagen subida — clic para reemplazar</>
+                      : <><Upload className="w-4 h-4" /> Subir PNG / JPG / WebP (máx. {SHOWCASE_MAX_MB} MB)</>}
+                  <input type="file" accept={SHOWCASE_TYPES.join(",")} className="sr-only" disabled={uploading !== null}
+                    onChange={(e) => { upload(field, e.target.files?.[0]); e.target.value = "" }} />
+                </label>
+              </div>
+            ))}
+
+            <label className="flex items-start gap-2.5 p-3 rounded-lg bg-secondary/30 cursor-pointer">
+              <input type="checkbox" className="mt-0.5" checked={form.authorized}
+                onChange={(e) => setForm({ ...form, authorized: e.target.checked, published: e.target.checked ? form.published : false })} />
+              <span className="text-xs text-foreground">
+                <span className="font-semibold flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-chart-3" /> Tengo autorización escrita del cliente</span>
+                <span className="text-muted-foreground">Requisito para mostrar su trabajo públicamente.</span>
+              </span>
+            </label>
+            <label className={cn("flex items-center gap-2.5 px-3 text-xs", !form.authorized && "opacity-40")}>
+              <input type="checkbox" checked={form.published} disabled={!form.authorized}
+                onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+              Publicar en el sitio
+            </label>
+
+            {error && <p className="text-xs text-destructive">{error}</p>}
+            <div className="flex justify-end gap-2 pt-1">
+              <button type="button" onClick={() => setOpen(false)} className="px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground">Cancelar</button>
+              <button type="button" onClick={save} disabled={saving || uploading !== null || !form.title.trim() || !form.desktop_image}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-40">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Guardar
+              </button>
+            </div>
+          </div>
+
+          {/* Vista previa con los mockups reales del sitio */}
+          <div className="flex flex-col gap-3">
+            <FieldLabel>Vista previa</FieldLabel>
+            {form.desktop_image ? (
+              <div className="relative pr-[12%] pb-[9%]">
+                <BrowserMockup src={form.desktop_image} alt={form.title || "Vista previa"} domain={form.domain || undefined} sizes="560px" />
+                {form.mobile_image && (
+                  <PhoneMockup src={form.mobile_image} alt="Vista previa móvil" className="absolute bottom-0 right-0 w-[27%] min-w-[80px]" />
+                )}
+              </div>
+            ) : (
+              <div className="aspect-[16/10] rounded-xl border border-dashed border-border/50 flex items-center justify-center text-xs text-muted-foreground">
+                Sube la captura para ver el mockup
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground">Pasa el cursor sobre el mockup: la captura se desplaza como si se hiciera scroll.</p>
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+      ) : items.length === 0 ? (
+        <div className="glass-card rounded-xl p-8 text-center text-sm text-muted-foreground">
+          Aún no hay trabajos. Sube el primero con «Nuevo trabajo».
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {items.map((it, i) => (
+            <div key={it.id} className="glass-card rounded-xl p-3 flex flex-col gap-3">
+              {it.desktop_image
+                ? <BrowserMockup src={it.desktop_image} alt={it.title} domain={it.domain ?? undefined} sizes="360px" />
+                : <div className="aspect-[16/10] rounded-lg bg-secondary/40" />}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{it.title}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{[it.client_name, it.domain].filter(Boolean).join(" · ") || "—"}</p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground">{it.kind === "ad" ? "Anuncio" : "Web"}</span>
+                <span className={cn("text-[10px] px-2 py-0.5 rounded-full", it.authorized ? "bg-chart-3/10 text-chart-3" : "bg-destructive/10 text-destructive")}>
+                  {it.authorized ? "Autorizado" : "Sin autorización"}
+                </span>
+                <span className={cn("text-[10px] px-2 py-0.5 rounded-full", it.published ? "bg-primary/10 text-primary" : "bg-secondary/60 text-muted-foreground")}>
+                  {it.published ? "Publicado" : "Borrador"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 pt-2 border-t border-border/40">
+                <button type="button" onClick={() => move(i, -1)} disabled={i === 0} title="Subir" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground disabled:opacity-30"><ArrowUp className="w-3.5 h-3.5" /></button>
+                <button type="button" onClick={() => move(i, 1)} disabled={i === items.length - 1} title="Bajar" className="p-1.5 rounded-md text-muted-foreground hover:text-foreground disabled:opacity-30"><ArrowDown className="w-3.5 h-3.5" /></button>
+                <button type="button" onClick={() => togglePublish(it)} title={it.published ? "Despublicar" : "Publicar"}
+                  className="ml-auto px-2.5 py-1 rounded-md text-[11px] font-semibold border border-border/60 text-foreground hover:bg-secondary/60">
+                  {it.published ? "Despublicar" : "Publicar"}
+                </button>
+                <button type="button" onClick={() => startEdit(it)} title="Editar" className="p-1.5 rounded-md text-muted-foreground hover:text-primary"><Pencil className="w-3.5 h-3.5" /></button>
+                <button type="button" onClick={() => remove(it)} title="Eliminar" className="p-1.5 rounded-md text-muted-foreground hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ─── Landings Tab ─────────────────────────────────────────────────────────────
@@ -2473,7 +2780,7 @@ function ContentTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "landings" | "blog" | "content">("conversations")
+  const [activeTab, setActiveTab] = useState<"conversations" | "insights" | "overrides" | "seo" | "attribution" | "landings" | "showcase" | "blog" | "content">("conversations")
   const [stats, setStats] = useState<Stats | null>(null)
   const [loadingStats, setLoadingStats] = useState(false)
 
@@ -2500,6 +2807,7 @@ export default function AdminDashboard() {
     { id: "seo" as const, label: "SEO & Métricas", icon: Search },
     { id: "attribution" as const, label: "Atribución", icon: Megaphone },
     { id: "landings" as const, label: "Landings", icon: Rocket },
+    { id: "showcase" as const, label: "Showcase", icon: MonitorSmartphone },
     { id: "blog" as const, label: "Blog / Orgánico", icon: FileText },
     { id: "content" as const, label: "Contenido", icon: Pencil },
   ]
@@ -2592,6 +2900,7 @@ export default function AdminDashboard() {
         {activeTab === "seo" && <SeoTab api={api} />}
         {activeTab === "attribution" && <AttributionTab api={api} />}
         {activeTab === "landings" && <LandingsTab api={api} />}
+        {activeTab === "showcase" && <ShowcaseTab api={api} />}
         {activeTab === "blog" && <BlogTab api={api} />}
         {activeTab === "content" && <ContentTab api={api} />}
       </main>

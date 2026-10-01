@@ -6,7 +6,7 @@ import { ProcessSteps } from "@/components/home/process-steps"
 import { OutsourcingBlock } from "@/components/home/outsourcing-block"
 import { GuaranteeFaq } from "@/components/home/guarantee-faq"
 import { ServicesSection } from "@/components/services-section"
-import { PortfolioSection } from "@/components/portfolio-section"
+import { ShowcaseSection } from "@/components/showcase/showcase-section"
 import { ContactSection } from "@/components/contact-section"
 import { CtaBanner } from "@/components/cta-banner"
 
@@ -21,7 +21,8 @@ export default function Page() {
         <FunnelMethod />
         <ServicesSection />
         <ProcessSteps />
-        <PortfolioSection />
+        {/* Trabajo real del admin (Showcase); reemplaza los proyectos ficticios */}
+        <ShowcaseSection />
         <OutsourcingBlock />
         <GuaranteeFaq />
         <ContactSection />

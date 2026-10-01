@@ -61,7 +61,7 @@ export function BrowserMockup({
           className={cn(
             "object-cover object-top",
             scrollOnHover &&
-              "transition-[object-position] duration-[6000ms] ease-in-out group-hover/mock:object-bottom motion-reduce:transition-none"
+              "transition-[object-position] [transition-duration:6000ms] ease-in-out group-hover/mock:object-bottom motion-reduce:transition-none"
           )}
         />
       </div>
