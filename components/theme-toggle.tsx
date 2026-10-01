@@ -12,13 +12,17 @@ export function ThemeToggle({ className }: { className?: string }) {
   useEffect(() => setMounted(true), [])
 
   const isDark = resolvedTheme === "dark"
+  // El tema real solo se conoce en el cliente: hasta montar, textos neutros
+  // (iguales en SSR y en la hidratación) para evitar el mismatch.
+  const label = !mounted ? "Cambiar tema" : isDark ? "Activar modo claro" : "Activar modo oscuro"
+  const title = !mounted ? "Cambiar tema" : isDark ? "Modo claro" : "Modo oscuro"
 
   return (
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
-      title={isDark ? "Modo claro" : "Modo oscuro"}
+      aria-label={label}
+      title={title}
       className={cn(
         "flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors",
         className

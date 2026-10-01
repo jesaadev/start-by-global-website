@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { Sparkles, MessageCircle, Search, ArrowRight, Rocket, Layers, LineChart } from "lucide-react"
+import { Sparkles, ArrowRight, Rocket, Layers, LineChart } from "lucide-react"
 import { WhatsAppLink } from "@/components/whatsapp-link"
 import { ClientLogos } from "@/components/client-logos"
-
-// Diagnóstico gratuito = formulario de 3 campos de la landing de PYMES.
-const DIAGNOSTIC_HREF = "/web-que-genera-clientes#contacto"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { HeroBackground } from "@/components/backgrounds/hero-background"
 
 // Cada camino corresponde a un dolor del avatar B2B.
 const PATHS = [
@@ -42,8 +42,7 @@ const PATHS = [
 export function HeroSegmented() {
   return (
     <section id="hero" className="relative overflow-hidden rounded-2xl glass-card glow-accent-lg">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
+      <HeroBackground />
 
       <div className="relative flex flex-col gap-8 p-5 sm:p-8 lg:p-12">
         {/* Encabezado: renderizado en SSR y visible desde el primer paint (sin
@@ -66,17 +65,8 @@ export function HeroSegmented() {
 
           {/* CTA principal único (WhatsApp) + secundario (diagnóstico gratis) */}
           <div className="flex flex-wrap items-center gap-3">
-            <WhatsAppLink segment="hero_cta" className="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#25D366] text-white font-bold text-base transition-all duration-300 hover:bg-[#25D366]/90 hover:shadow-lg hover:shadow-[#25D366]/25 hover:-translate-y-0.5">
-              <MessageCircle className="w-5 h-5" />
-              Hablar por WhatsApp
-            </WhatsAppLink>
-            <Link
-              href={DIAGNOSTIC_HREF}
-              className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-transparent border border-border text-foreground font-semibold text-sm transition-all duration-200 hover:bg-secondary hover:border-border/80"
-            >
-              <Search className="w-4 h-4" />
-              Diagnóstico gratis
-            </Link>
+            <PrimaryCTA segment="hero_cta" />
+            <SecondaryCTA />
           </div>
 
           {/* Filtro de calificación por precio */}
