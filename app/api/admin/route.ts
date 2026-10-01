@@ -18,6 +18,16 @@ import { improveArticle, applyImprovement, proposeTopics, generateArticle, type 
 import { configuredProviders, getActiveProvider, type AiProvider } from "@/lib/ai"
 import { generateArticleImage, imageProviderConfigured } from "@/lib/ai-image"
 import { testCapiEvent } from "@/lib/meta-capi"
+import {
+  listShowcase, createShowcaseItem, updateShowcaseItem, deleteShowcaseItem,
+  createShowcaseUploadUrl, pickShowcaseFields,
+} from "@/lib/showcase"
+
+// Páginas que muestran el showcase (webs de clientes en mockups).
+function revalidateShowcase() {
+  revalidatePath("/")
+  revalidatePath("/portafolio")
+}
 
 // Columnas escribibles de blog_posts vía API (allowlist).
 const POST_FIELDS = [
@@ -142,6 +152,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ data })
     }
 
+    if (resource === "showcase") {
+      const data = await listShowcase()
+      return NextResponse.json({ data })
+    }
+
     if (resource === "blog") {
       const days = parseInt(searchParams.get("days") ?? "30")
       const data = await getBlogStats(Number.isFinite(days) ? days : 30)
@@ -233,6 +248,18 @@ export async function PATCH(request: Request) {
     if (resource === "seo") {
       const saved = await saveSiteSettings(updates.data)
       return NextResponse.json({ data: saved })
+    }
+
+    if (resource === "showcase") {
+      if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
+      try {
+        const data = await updateShowcaseItem(id, pickShowcaseFields(updates))
+        revalidateShowcase()
+        return NextResponse.json({ data })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "No se pudo actualizar."
+        return NextResponse.json({ error: message }, { status: 400 })
+      }
     }
 
     // Cambiar el proveedor de IA activo (claude | gemini) sin tocar el resto
@@ -397,6 +424,29 @@ export async function POST(request: Request) {
 
     // Envía un evento Lead de prueba a Meta CAPI y devuelve su respuesta cruda
     // (diagnóstico del par pixel + token). Usa test_event_code, no contamina.
+    // Showcase: crear un trabajo (sin publicar por defecto).
+    if (resource === "showcase") {
+      try {
+        const data = await createShowcaseItem(pickShowcaseFields(payload))
+        revalidateShowcase()
+        return NextResponse.json({ data })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "No se pudo crear."
+        return NextResponse.json({ error: message }, { status: 400 })
+      }
+    }
+
+    // URL firmada para que el navegador suba la captura directo a Storage.
+    if (resource === "showcase-upload-url") {
+      try {
+        const data = await createShowcaseUploadUrl(String(payload.contentType ?? ""), Number(payload.size))
+        return NextResponse.json({ data })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "No se pudo preparar la subida."
+        return NextResponse.json({ error: message }, { status: 400 })
+      }
+    }
+
     if (resource === "test-capi") {
       const result = await testCapiEvent(
         payload.sourceUrl as string | undefined,
@@ -539,6 +589,13 @@ export async function DELETE(request: Request) {
   try {
     const body = await request.json()
     const { resource, id } = body
+
+    if (resource === "showcase") {
+      if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })
+      await deleteShowcaseItem(id)
+      revalidateShowcase()
+      return NextResponse.json({ success: true })
+    }
 
     if (resource === "post") {
       if (!id) return NextResponse.json({ error: "ID requerido." }, { status: 400 })

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase"
 import type { PostLocale } from "@/lib/blog-posts"
 import { getSiteSettings, DEFAULT_IMAGE_PROMPT } from "@/lib/site-settings"
+import { ensurePublicBucket, imageExt } from "@/lib/storage"
 
 // Generación de la imagen destacada de cada artículo con Gemini (modelo de
 // imagen, "Nano Banana") y almacenamiento en Supabase Storage. Reutiliza la
@@ -120,31 +121,10 @@ async function generateImageBytes(prompt: string): Promise<GeneratedImage> {
   throw new Error(`Gemini no devolvió una imagen (motivo: ${reason}).`)
 }
 
-/** Crea el bucket público la primera vez; ignora el error si ya existe. */
-async function ensureBucket(): Promise<void> {
-  const { data } = await supabaseAdmin.storage.getBucket(BUCKET)
-  if (data) return
-  const { error } = await supabaseAdmin.storage.createBucket(BUCKET, {
-    public: true,
-    fileSizeLimit: "5MB",
-    allowedMimeTypes: ["image/png", "image/jpeg", "image/webp"],
-  })
-  // Otra invocación concurrente pudo crearlo entre el get y el create.
-  if (error && !/exists/i.test(error.message)) {
-    throw new Error(`No se pudo preparar el almacenamiento: ${error.message}`)
-  }
-}
-
-function extFor(mimeType: string): string {
-  if (mimeType.includes("jpeg") || mimeType.includes("jpg")) return "jpg"
-  if (mimeType.includes("webp")) return "webp"
-  return "png"
-}
-
 /** Sube la imagen y devuelve su URL pública (versionada por timestamp). */
 async function uploadImage(slug: string, img: GeneratedImage): Promise<string> {
-  await ensureBucket()
-  const path = `${slug || "articulo"}/${Date.now().toString(36)}.${extFor(img.mimeType)}`
+  await ensurePublicBucket(BUCKET)
+  const path = `${slug || "articulo"}/${Date.now().toString(36)}.${imageExt(img.mimeType)}`
   const { error } = await supabaseAdmin.storage
     .from(BUCKET)
     .upload(path, img.buffer, { contentType: img.mimeType, upsert: true })

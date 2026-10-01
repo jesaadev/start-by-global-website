@@ -39,7 +39,7 @@ export function PhoneMockup({
           className={cn(
             "object-cover object-top",
             scrollOnHover &&
-              "transition-[object-position] duration-[5000ms] ease-in-out group-hover/phone:object-bottom motion-reduce:transition-none"
+              "transition-[object-position] [transition-duration:5000ms] ease-in-out group-hover/phone:object-bottom motion-reduce:transition-none"
           )}
         />
       </div>

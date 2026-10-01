@@ -1,5 +1,8 @@
 'use client';
 
+// React Bits · CardSwap (MIT + Commons Clause). Adaptado: perspective como propiedad
+// arbitraria (Tailwind v3) y containerClassName para posicionarlo libremente.
+
 import React, {
   Children,
   cloneElement,
@@ -24,6 +27,8 @@ export interface CardSwapProps {
   onCardClick?: (idx: number) => void;
   skewAmount?: number;
   easing?: 'linear' | 'elastic';
+  /** (Adaptación SBG) Reemplaza el posicionamiento por defecto del contenedor. */
+  containerClassName?: string;
   children: ReactNode;
 }
 
@@ -78,6 +83,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
   onCardClick,
   skewAmount = 6,
   easing = 'elastic',
+  containerClassName,
   children
 }) => {
   const config =
@@ -211,7 +217,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
   return (
     <div
       ref={container}
-      className="absolute bottom-0 right-0 transform translate-x-[5%] translate-y-[20%] origin-bottom-right perspective-[900px] overflow-visible max-[768px]:translate-x-[25%] max-[768px]:translate-y-[25%] max-[768px]:scale-[0.75] max-[480px]:translate-x-[25%] max-[480px]:translate-y-[25%] max-[480px]:scale-[0.55]"
+      className={`[perspective:900px] overflow-visible ${containerClassName ?? "absolute bottom-0 right-0 transform translate-x-[5%] translate-y-[20%] origin-bottom-right max-[768px]:translate-x-[25%] max-[768px]:translate-y-[25%] max-[768px]:scale-[0.75] max-[480px]:translate-x-[25%] max-[480px]:translate-y-[25%] max-[480px]:scale-[0.55]"}`}
       style={{ width, height }}
     >
       {rendered}
