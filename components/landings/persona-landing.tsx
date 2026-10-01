@@ -1,323 +1,274 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { ArrowRight, Check, Plus, Send, Lock } from "lucide-react"
-import { fireLandingLead, fireViewContent, fireScroll75, landingSession } from "@/lib/track-client"
+import { Check, Lock, MessageCircle, Plus } from "lucide-react"
 import type { PersonaLandingData } from "@/lib/persona-landings"
+import { listPublishedShowcase } from "@/lib/showcase"
+import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
+import { HeroBackground } from "@/components/backgrounds/hero-background"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { StickyMobileCTA } from "@/components/cta/sticky-mobile-cta"
+import { LeadForm } from "@/components/forms/lead-form"
+import { AnimateIn } from "@/components/animate-in"
+import { AdFlow } from "@/components/home-v2/ad-flow"
+import { BrowserMockup } from "@/components/mockups/browser-mockup"
+import SpotlightCard from "@/components/reactbits/SpotlightCard"
+import { WhatsAppLink } from "@/components/whatsapp-link"
+import { PersonaVisual, relevantWork } from "@/components/landings/persona-visual"
+import { LeadMagnet } from "@/components/landings/lead-magnet"
 
-// Plantilla común de las landings por persona: arquitectura fija de 9 bloques.
-// Navegación reducida (logo + 1 CTA), un solo camino de salida, indexable.
+// Plantilla común de las landings por persona: arquitectura fija de 9 bloques
+// del spec, con el sistema visual de venta (v2). Navegación reducida (logo + 1
+// CTA), un solo camino de salida, indexable. Server component: solo los islotes
+// interactivos (CTAs, formularios, animación) llevan JavaScript.
 
-export function PersonaLanding({ data }: { data: PersonaLandingData }) {
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+const H2 = "font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance"
 
-  // Bloque 1: ViewContent al cargar. Bloque de medición: Scroll75 una vez.
-  useEffect(() => {
-    fireViewContent(data.segment)
-    let fired = false
-    const onScroll = () => {
-      if (fired) return
-      const scrolled = window.scrollY + window.innerHeight
-      const total = document.documentElement.scrollHeight
-      if (total > 0 && scrolled / total >= 0.75) {
-        fired = true
-        fireScroll75(data.segment)
-        window.removeEventListener("scroll", onScroll)
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [data.segment])
+/** H1 con la frase destacada en color y un subrayado que se dibuja al cargar. */
+function HeroTitle({ h1, highlight }: { h1: string; highlight?: string }) {
+  if (!highlight || !h1.includes(highlight)) return <>{h1}</>
+  const i = h1.indexOf(highlight)
+  return (
+    <>
+      {h1.slice(0, i)}
+      <span className="text-primary bg-gradient-to-r from-primary/45 to-primary/45 bg-no-repeat bg-left-bottom [background-size:0%_0.14em] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] animate-underline-grow motion-reduce:animate-none motion-reduce:[background-size:100%_0.14em]">
+        {highlight}
+      </span>
+      {h1.slice(i + highlight.length)}
+    </>
+  )
+}
+
+export async function PersonaLanding({ data }: { data: PersonaLandingData }) {
+  const seg = data.segment
+  const work = relevantWork(data, await listPublishedShowcase("web", 12))
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
-      {/* NAVBAR reducido: logo + un solo CTA, sin menú */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-border/60 bg-background/90 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center" aria-label="Start By Global">
+    <div className="min-h-screen bg-background text-foreground overflow-x-clip">
+      <PageFunnelTracker landingKey={seg} />
+
+      {/* NAV reducido: logo + un solo CTA, sin menú */}
+      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/85 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center" aria-label="Start By Global — inicio">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-black.svg" alt="Start By Global" className="h-7 dark:invert" />
           </Link>
-          <a href="#contacto" className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all">
-            {data.hero.ctaLabel} <ArrowRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
-      </nav>
-
-      {/* BLOQUE 1 — Encabezado */}
-      <header className="relative overflow-hidden pt-32 pb-20 px-6">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] bg-primary/20" />
-        <div className="absolute -top-10 left-0 w-[380px] h-[380px] rounded-full blur-[120px] bg-chart-2/10" />
-        <div className="relative max-w-4xl mx-auto text-center flex flex-col items-center gap-7">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary/15 text-primary border border-primary/25 uppercase tracking-wide">
-            {data.hero.badge}
-          </span>
-          <h1 className="font-display text-[2.6rem] leading-[1.03] sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-balance">
-            {data.hero.h1}
-          </h1>
-          <p className="text-lg sm:text-2xl text-foreground/80 max-w-2xl leading-relaxed font-medium">
-            {data.hero.subtitle}
-          </p>
-          <a href="#contacto" className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
-            {data.hero.ctaLabel} <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-          </a>
-          <p className="text-sm text-muted-foreground max-w-md">{data.hero.microcopy}</p>
+          <WhatsAppLink
+            segment={`${seg}_nav`}
+            defaultService={data.whatsappService}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] text-white text-sm font-bold hover:shadow-lg hover:shadow-[#25D366]/25 transition-shadow"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Hablar por WhatsApp</span>
+            <span className="sm:hidden">WhatsApp</span>
+          </WhatsAppLink>
         </div>
       </header>
 
-      {/* BLOQUE 2 — Espejo del dolor */}
-      <section className="px-6 py-16">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.pain.h2}</h2>
-          <ul className="flex flex-col gap-4">
-            {data.pain.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-3.5 text-base sm:text-lg text-foreground/85 leading-relaxed">
-                <span className="mt-2.5 w-2 h-2 rounded-full bg-primary shrink-0" />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-          {data.pain.closing && (
-            <p className="mt-8 text-lg sm:text-xl font-semibold text-foreground bg-primary/[0.06] border-l-4 border-primary rounded-r-xl py-4 pl-5 pr-4 text-balance">{data.pain.closing}</p>
-          )}
+      {/* BLOQUE 1 — Encabezado */}
+      <section className="relative overflow-hidden">
+        <HeroBackground />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 lg:pt-20 pb-14 sm:pb-20 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-10 items-center">
+          <div className="flex flex-col gap-6">
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse motion-reduce:animate-none" />
+              {data.hero.badge}
+            </span>
+            <h1 className="font-display font-bold tracking-tight leading-[1.04] text-[2.4rem] sm:text-6xl xl:text-[4.25rem] text-balance">
+              <HeroTitle h1={data.hero.h1} highlight={data.hero.highlight} />
+            </h1>
+            <p className="text-lg sm:text-xl text-foreground/75 leading-relaxed max-w-xl">{data.hero.subtitle}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <PrimaryCTA label={data.hero.ctaLabel} segment={`${seg}_hero`} service={data.whatsappService} />
+              <SecondaryCTA label="Prefiero dejar mis datos" href="#contacto" />
+            </div>
+            <p className="text-sm text-muted-foreground max-w-md">{data.hero.microcopy}</p>
+          </div>
+          <PersonaVisual data={data} work={work} />
         </div>
+      </section>
+
+      {/* BLOQUE 2 — Espejo del dolor */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <h2 className={H2}>{data.pain.h2}</h2>
+        <ul className="mt-8 flex flex-col gap-3">
+          {data.pain.bullets.map((b, i) => (
+            <li key={b}>
+              <AnimateIn delay={i * 70}>
+                <div className="flex items-start gap-4 rounded-2xl border border-border/50 bg-card/60 p-5 text-base sm:text-lg text-foreground/85 leading-relaxed">
+                  <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
+                  {b}
+                </div>
+              </AnimateIn>
+            </li>
+          ))}
+        </ul>
+        {data.pain.closing && (
+          <p className="mt-8 rounded-r-2xl border-l-4 border-primary bg-primary/[0.07] py-5 pl-6 pr-5 text-xl sm:text-2xl font-semibold text-foreground text-balance">
+            {data.pain.closing}
+          </p>
+        )}
       </section>
 
       {/* BLOQUE 3 — Mecanismo */}
-      <section className="px-6 py-14 border-y border-border/50">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10 max-w-2xl tracking-tight text-balance">{data.mechanism.h2}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.mechanism.items.map((it) => (
-              <div key={it.title} className="glass-card rounded-2xl p-7 hover:border-primary/30 transition-colors">
-                <h3 className="font-display text-lg font-bold text-foreground">{it.title}</h3>
-                <p className="text-base text-foreground/70 mt-2 leading-relaxed">{it.desc}</p>
-              </div>
+      <section className="border-y border-border/40 bg-secondary/[0.15]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+          <h2 className={`${H2} max-w-3xl`}>{data.mechanism.h2}</h2>
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data.mechanism.items.map((it, i) => (
+              <AnimateIn key={it.title} delay={i * 80} className="h-full">
+                <SpotlightCard spotlightColor="rgba(242, 109, 61, 0.18)" className="h-full !p-7">
+                  <span className="font-display text-sm font-bold text-primary">0{i + 1}</span>
+                  <h3 className="font-display text-xl font-bold mt-2">{it.title}</h3>
+                  <p className="text-base text-foreground/70 leading-relaxed mt-2">{it.desc}</p>
+                </SpotlightCard>
+              </AnimateIn>
             ))}
           </div>
-          {/* CTA repetido */}
           <div className="mt-10 flex justify-center">
-            <a href="#contacto" className="group flex items-center gap-2 px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-bold text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
-              {data.hero.ctaLabel} <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-            </a>
+            <PrimaryCTA label={data.hero.ctaLabel} segment={`${seg}_mechanism`} service={data.whatsappService} />
           </div>
         </div>
       </section>
 
+      {/* Recorrido de una campaña (personas donde la publicidad es parte del dolor) */}
+      {data.showAdFlow && (
+        <AdFlow
+          id="como-convierte"
+          segment={`${seg}_adflow`}
+          service={data.whatsappService}
+          ctaLabel={data.hero.ctaLabel}
+          showLink={false}
+        />
+      )}
+
       {/* BLOQUE 4 — Qué incluye */}
-      <section className="px-6 py-14">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.includes.h2}</h2>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="rounded-3xl border border-border/50 bg-card/60 p-7 sm:p-10">
+          <h2 className={H2}>{data.includes.h2}</h2>
+          <ul className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             {data.includes.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-base text-foreground/85">
-                <Check className="w-5 h-5 mt-0.5 shrink-0 text-primary" />
-                <span className="leading-relaxed">{b}</span>
+              <li key={b} className="flex items-start gap-3 text-base sm:text-lg text-foreground/85">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-chart-3/15">
+                  <Check className="h-4 w-4 text-chart-3" />
+                </span>
+                {b}
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* BLOQUE 5 — Prueba (de método, bloqueada hasta dato real) */}
-      <section className="px-6 py-14 border-y border-border/50">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <Lock className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Prueba de método</span>
-          </div>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">{data.proof.h2}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {data.proof.bullets.map((b) => (
-              <div key={b} className="glass-card rounded-xl p-6 text-base text-foreground/80 leading-relaxed">{b}</div>
-            ))}
-          </div>
-        </div>
+      {/* BLOQUE 5 — Prueba: trabajo real autorizado o, mientras tanto, prueba de método */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        {work.length > 0 ? (
+          <>
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Trabajo real</span>
+            <h2 className={`${H2} mt-2`}>{data.proof.h2}</h2>
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {work.slice(0, 3).map((w) => (
+                <figure key={w.id}>
+                  <BrowserMockup src={w.desktop_image ?? undefined} alt={w.title} domain={w.domain ?? undefined} sizes="(max-width: 768px) 92vw, 400px" />
+                  <figcaption className="mt-3 text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{w.client_name ?? w.title}</span> · pasa el cursor para recorrerla
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <Lock className="h-3.5 w-3.5" /> Prueba de método
+            </span>
+            <h2 className={`${H2} mt-2`}>{data.proof.h2}</h2>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {data.proof.bullets.map((b) => (
+                <div key={b} className="rounded-2xl border border-border/50 bg-card/60 p-6 text-base text-foreground/80 leading-relaxed">{b}</div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
-      {/* BLOQUE 6 — Objeciones / FAQ */}
-      <section className="px-6 py-14">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8 tracking-tight text-balance">Preguntas frecuentes</h2>
-          <div className="flex flex-col gap-2.5">
-            {data.faqs.map((f, i) => (
-              <div key={f.q} className="glass-card rounded-xl overflow-hidden">
-                <button type="button" onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left">
-                  <span className="text-base font-semibold text-foreground">{f.q}</span>
-                  <Plus className={`w-4 h-4 shrink-0 text-primary transition-transform ${openFaq === i ? "rotate-45" : ""}`} />
-                </button>
-                {openFaq === i && <p className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">{f.a}</p>}
-              </div>
-            ))}
-          </div>
+      {/* BLOQUE 6 — Objeciones / FAQ (JSON-LD en la página) */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <h2 className={`${H2} text-center`}>Preguntas frecuentes</h2>
+        <div className="mt-10 flex flex-col gap-3">
+          {data.faqs.map((f) => (
+            <details key={f.q} className="group rounded-2xl border border-border/50 bg-card/60 px-5 sm:px-6 py-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                <span className="text-base sm:text-lg font-semibold text-foreground">{f.q}</span>
+                <Plus className="h-5 w-5 shrink-0 text-primary transition-transform group-open:rotate-45 motion-reduce:transition-none" />
+              </summary>
+              <p className="mt-3 text-base text-muted-foreground leading-relaxed">{f.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 
       {/* BLOQUE 7 — Cómo trabajamos */}
-      <section className="px-6 py-14 border-y border-border/50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10 tracking-tight text-balance">Cómo trabajamos</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {data.process.steps.map((s, i) => (
-              <div key={s.title} className="glass-card rounded-xl p-5">
-                <span className="font-display text-2xl font-bold text-primary">0{i + 1}</span>
-                <h3 className="font-semibold text-foreground mt-1">{s.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{s.desc}</p>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <h2 className={H2}>Cómo trabajamos</h2>
+        <ol className={`mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 ${data.process.steps.length > 4 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
+          {data.process.steps.map((s, i) => (
+            <li key={s.title}>
+              <AnimateIn delay={i * 80} className="h-full">
+                <div className="h-full rounded-2xl border border-border/50 bg-card/60 p-6">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary font-display text-lg font-bold text-primary-foreground shadow-lg shadow-primary/25">
+                    0{i + 1}
+                  </span>
+                  <h3 className="font-display text-lg font-bold mt-4">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-1.5">{s.desc}</p>
+                </div>
+              </AnimateIn>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* BLOQUE 8 — CTA final + formulario de 3 campos */}
+      <section id="contacto" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 scroll-mt-20">
+        <div className="relative overflow-hidden rounded-[2rem] border border-primary/25 bg-gradient-to-br from-primary/20 via-primary/[0.06] to-transparent p-7 sm:p-12">
+          <div aria-hidden className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/25 blur-[100px]" />
+          <div className="relative grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+            <div className="flex flex-col gap-5">
+              <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight leading-[1.04] text-balance">{data.form.h2}</h2>
+              <p className="text-lg text-foreground/80 leading-relaxed max-w-lg">{data.form.text}</p>
+              <div>
+                <PrimaryCTA label="Prefiero WhatsApp" segment={`${seg}_final`} service={data.whatsappService} />
               </div>
-            ))}
+            </div>
+            <LeadForm
+              landingKey={seg}
+              landingName={data.persona}
+              button={data.form.button}
+              nameLabel={data.form.nameLabel}
+              contactLabel={data.form.contactLabel}
+              qualifierLabel={data.form.qualifierLabel}
+            />
           </div>
         </div>
       </section>
 
-      {/* BLOQUE 8 — CTA final + formulario */}
-      <AgendaForm data={data} />
-
-      {/* BLOQUE 9 — Descargable (lead magnet) */}
+      {/* BLOQUE 9 — Descargable (jerarquía menor) */}
       <LeadMagnet data={data} />
 
-      {/* FOOTER minimal */}
-      <footer className="px-6 py-10 border-t border-border/50">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* FOOTER mínimo */}
+      <footer className="border-t border-border/50 px-4 sm:px-6 pt-8 pb-24 md:pb-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-60 hover:opacity-100 transition-opacity" />
           </Link>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/privacidad" className="hover:text-foreground transition-colors">Privacidad</Link>
-            <span>© 2026 Start By Global</span>
+            <span>© {new Date().getFullYear()} Start By Global</span>
           </div>
         </div>
       </footer>
+
+      <StickyMobileCTA segment={`${seg}_sticky`} secondaryHref="#contacto" secondaryLabel="Formulario" service={data.whatsappService} />
     </div>
-  )
-}
-
-// ── Bloque 8: formulario de agenda (3 campos: nombre, contacto, calificación) ──
-function AgendaForm({ data }: { data: PersonaLandingData }) {
-  const [name, setName] = useState("")
-  const [contact, setContact] = useState("")
-  const [qualifier, setQualifier] = useState("")
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState("")
-  const hp = useRef<HTMLInputElement>(null)
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSending(true); setError("")
-    try {
-      const tracking = fireLandingLead("agenda", `landing:${data.segment}`)
-      const res = await fetch("/api/landing-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "agenda", landing: data.persona, landingKey: data.segment,
-          session_id: landingSession(),
-          name, contact, qualifier, qualifierLabel: data.form.qualifierLabel,
-          company_website: hp.current?.value ?? "",
-          ...tracking,
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setSent(true)
-    } catch {
-      setError("No se pudo enviar. Escribinos a info@startbyglobal.com")
-    } finally {
-      setSending(false)
-    }
-  }
-
-  return (
-    <section id="contacto" className="px-6 py-16 scroll-mt-20">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-balance">{data.form.h2}</h2>
-          <p className="text-base sm:text-lg text-foreground/75 mt-3 leading-relaxed">{data.form.text}</p>
-        </div>
-        {sent ? (
-          <div className="glass-card rounded-2xl p-8 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-3 bg-primary/10">
-              <Check className="w-7 h-7 text-primary" />
-            </div>
-            <h3 className="font-display text-xl font-bold">¡Recibido!</h3>
-            <p className="text-sm text-muted-foreground mt-2">Te contactamos en las próximas 24 horas para coordinar el diagnóstico.</p>
-          </div>
-        ) : (
-          <form onSubmit={submit} className="glass-card rounded-2xl p-6 flex flex-col gap-4">
-            <input ref={hp} type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-            <input required aria-label={data.form.nameLabel} placeholder={data.form.nameLabel} value={name} onChange={(e) => setName(e.target.value)}
-              className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
-            <input required aria-label={data.form.contactLabel} placeholder={data.form.contactLabel} value={contact} onChange={(e) => setContact(e.target.value)}
-              className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
-            <input required aria-label={data.form.qualifierLabel} placeholder={data.form.qualifierLabel} value={qualifier} onChange={(e) => setQualifier(e.target.value)}
-              className="px-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
-            {error && <p className="text-xs text-destructive">{error}</p>}
-            <button type="submit" disabled={sending} className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all disabled:opacity-60">
-              {sending ? "Enviando..." : <>{data.form.button} <Send className="w-4 h-4" /></>}
-            </button>
-            <p className="text-[11px] text-muted-foreground text-center">
-              Al enviar aceptás nuestra <Link href="/privacidad" className="underline hover:text-foreground">política de privacidad</Link>.
-            </p>
-          </form>
-        )}
-      </div>
-    </section>
-  )
-}
-
-// ── Bloque 9: lead magnet (captura de correo, jerarquía visual menor) ──
-function LeadMagnet({ data }: { data: PersonaLandingData }) {
-  const [email, setEmail] = useState("")
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState("")
-  const hp = useRef<HTMLInputElement>(null)
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSending(true); setError("")
-    try {
-      const tracking = fireLandingLead("lead_magnet", `lead_magnet:${data.segment}`)
-      const res = await fetch("/api/landing-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "lead_magnet", landing: data.persona, landingKey: data.segment,
-          session_id: landingSession(), contact: email,
-          asset: data.leadMagnet.asset,
-          company_website: hp.current?.value ?? "",
-          ...tracking,
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setSent(true)
-    } catch {
-      setError("No se pudo enviar. Intentá de nuevo.")
-    } finally {
-      setSending(false)
-    }
-  }
-
-  return (
-    <section className="px-6 pb-16">
-      <div className="max-w-2xl mx-auto rounded-2xl border border-border/60 bg-secondary/20 p-6 sm:p-7">
-        <h3 className="font-semibold text-foreground">{data.leadMagnet.h3}</h3>
-        <p className="text-sm text-muted-foreground mt-1 mb-4">{data.leadMagnet.desc}</p>
-        {sent ? (
-          <p className="text-sm text-primary font-medium flex items-center gap-2">
-            <Check className="w-4 h-4" /> ¡Listo! Te lo enviamos a tu correo en breve.
-          </p>
-        ) : (
-          <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3">
-            <input ref={hp} type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-            <input required type="email" aria-label="Correo" placeholder="Tu correo" value={email} onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-background border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" />
-            <button type="submit" disabled={sending} className="px-5 py-2.5 rounded-lg border border-border text-foreground font-medium text-sm hover:bg-secondary/60 transition-colors disabled:opacity-60 whitespace-nowrap">
-              {sending ? "Enviando..." : data.leadMagnet.button}
-            </button>
-          </form>
-        )}
-        {error && <p className="text-xs text-destructive mt-2">{error}</p>}
-      </div>
-    </section>
   )
 }

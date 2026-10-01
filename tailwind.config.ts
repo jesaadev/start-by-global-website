@@ -97,12 +97,18 @@ const config: Config = {
           '0%': { transform: 'translate(0%, 0%)', opacity: '1' },
           '100%': { transform: 'translate(100%, 0%)', opacity: '0' },
         },
+        // Subrayado que se dibuja bajo la frase destacada del H1 de las landings
+        'underline-grow': {
+          from: { backgroundSize: '0% 0.14em' },
+          to: { backgroundSize: '100% 0.14em' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'star-movement-bottom': 'star-movement-bottom linear infinite alternate',
         'star-movement-top': 'star-movement-top linear infinite alternate',
+        'underline-grow': 'underline-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both',
       },
     },
   },

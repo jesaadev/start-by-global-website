@@ -28,7 +28,21 @@ const STEPS: { title: string; desc: string; icon: LucideIcon }[] = [
  * sección está en pantalla; con "reducir movimiento" no avanza solo y las
  * transiciones son instantáneas.
  */
-export function AdFlow() {
+export function AdFlow({
+  segment = "adflow_cta",
+  service = "Marketing Digital",
+  ctaLabel = "Quiero campañas así",
+  showLink = true,
+  id = "anuncios",
+}: {
+  /** Segmento de tracking del CTA de WhatsApp. */
+  segment?: string
+  service?: string
+  ctaLabel?: string
+  /** Enlace a /publicidad-ads (desactivar en landings: un solo camino de salida). */
+  showLink?: boolean
+  id?: string
+} = {}) {
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { amount: 0.35 })
   const reduced = useReducedMotion()
@@ -47,7 +61,7 @@ export function AdFlow() {
   }
 
   return (
-    <section ref={ref} id="anuncios" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 scroll-mt-20">
+    <section ref={ref} id={id} className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 scroll-mt-20">
       {/* Móvil: título → teléfono → pasos. Desktop: título y pasos a la izquierda, teléfono a la derecha. */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:grid-rows-[auto_1fr] gap-x-20 gap-y-8">
         <div className="lg:col-start-1 lg:row-start-1">
@@ -112,10 +126,12 @@ export function AdFlow() {
           </ol>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <PrimaryCTA label="Quiero campañas así" segment="adflow_cta" service="Marketing Digital" />
-            <Link href="/publicidad-ads" className="inline-flex items-center gap-1 text-sm font-semibold hover:text-primary transition-colors">
-              Ver publicidad <ArrowUpRight className="h-4 w-4" />
-            </Link>
+            <PrimaryCTA label={ctaLabel} segment={segment} service={service} />
+            {showLink && (
+              <Link href="/publicidad-ads" className="inline-flex items-center gap-1 text-sm font-semibold hover:text-primary transition-colors">
+                Ver publicidad <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            )}
           </div>
         </div>
 

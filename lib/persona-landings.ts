@@ -8,12 +8,19 @@ export interface PersonaLandingData {
   slug: string // sin barra inicial: "web-que-genera-clientes"
   persona: string
   segment: string // etiqueta de tracking: "landing_a"…
+  /** Visual ilustrativo del hero cuando no hay trabajo real vinculado en el Showcase. */
+  visual: "web" | "store" | "dashboard" | "personal" | "agency"
+  /** Servicio preseleccionado en el modal de WhatsApp. */
+  whatsappService: string
+  /** Muestra la animación "Así convierte una campaña" tras el mecanismo. */
+  showAdFlow: boolean
   seo: { title: string; description: string; keywords?: string[] }
   breadcrumb: string // nombre corto para el breadcrumb JSON-LD
   serviceName: string // para el Service JSON-LD
   serviceType: string // tipo de servicio (Service JSON-LD)
   // Bloque 1
-  hero: { badge: string; h1: string; subtitle: string; ctaLabel: string; microcopy: string }
+  // highlight: fragmento literal del h1 que se resalta (color + subrayado animado)
+  hero: { badge: string; h1: string; highlight?: string; subtitle: string; ctaLabel: string; microcopy: string }
   // Bloque 2
   pain: { h2: string; bullets: string[]; closing?: string }
   // Bloque 3
@@ -43,6 +50,9 @@ const LANDING_A: PersonaLandingData = {
   slug: "web-que-genera-clientes",
   persona: "Dueño de PYME",
   segment: "landing_a",
+  visual: "web",
+  whatsappService: "Desarrollo Web",
+  showAdFlow: true,
   seo: {
     // Sin la marca: la plantilla del layout añade "| Start By Global".
     title: "Diseño web que genera clientes para PYMES",
@@ -61,16 +71,17 @@ const LANDING_A: PersonaLandingData = {
   hero: {
     badge: "Diseño y desarrollo web",
     h1: "Tu web puede traerte clientes. Hoy solo te está informando.",
+    highlight: "Hoy solo te está informando.",
     subtitle:
       "Construimos sitios pensados como canal de captación: rápidos, medidos y con un camino claro desde la visita hasta la conversación de WhatsApp.",
     ctaLabel: "Pedir diagnóstico gratuito",
-    microcopy: "30 minutos. Sin compromiso. Salís con el diagnóstico aunque no trabajemos juntos.",
+    microcopy: "30 minutos. Sin compromiso. Sales con el diagnóstico aunque no trabajemos juntos.",
   },
   pain: {
     h2: "Si te suena familiar, no es tu impresión",
     bullets: [
-      "Pagaste por una web hace un tiempo y no sabés cuántas personas la visitan.",
-      "Tenés servicios listados, pero nadie escribe desde ahí.",
+      "Pagaste por una web hace un tiempo y no sabes cuántas personas la visitan.",
+      "Tienes servicios listados, pero nadie escribe desde ahí.",
       "En el celular tarda en cargar y el botón de contacto está escondido.",
       "Cuando alguien te busca en Google, aparece antes tu competencia.",
       "Los clientes siguen llegando por referidos, y los meses buenos dependen de la suerte.",
@@ -87,7 +98,7 @@ const LANDING_A: PersonaLandingData = {
     ],
   },
   includes: {
-    h2: "Qué recibís",
+    h2: "Qué recibes",
     bullets: [
       "Sitio desarrollado a medida, optimizado para velocidad en móvil.",
       "Estructura de conversión: llamadas a la acción, formularios y enlace directo a WhatsApp Business.",
@@ -108,10 +119,10 @@ const LANDING_A: PersonaLandingData = {
   },
   faqs: [
     { q: "¿Cuánto cuesta?", a: "Depende del alcance. Un sitio de captación para un negocio de servicios y una plataforma con integraciones no son el mismo proyecto. En el diagnóstico te damos un rango concreto antes de cualquier propuesta formal." },
-    { q: "Ya tengo una web. ¿Hay que empezar de cero?", a: "No siempre. En bastantes casos el problema es de estructura y velocidad, no de plataforma. El diagnóstico define si conviene corregir o reconstruir, y te decimos cuál de las dos es más barata para vos." },
+    { q: "Ya tengo una web. ¿Hay que empezar de cero?", a: "No siempre. En bastantes casos el problema es de estructura y velocidad, no de plataforma. El diagnóstico define si conviene corregir o reconstruir, y te decimos cuál de las dos es más barata para ti." },
     { q: "¿Cuánto tarda?", a: "Los proyectos de captación estándar se entregan en semanas, no en meses. En el diagnóstico definimos fecha concreta y queda por escrito." },
     { q: "¿Y si no quiero invertir en publicidad todavía?", a: "Perfecto. El sitio queda preparado para cuando decidas. No es un requisito." },
-    { q: "¿Quién queda dueño de todo?", a: "Vos. Dominio, hosting, accesos y contenido a tu nombre desde el inicio. No trabajamos con retención de accesos." },
+    { q: "¿Quién queda dueño de todo?", a: "Tú. Dominio, hosting, accesos y contenido a tu nombre desde el inicio. No trabajamos con retención de accesos." },
   ],
   process: {
     steps: [
@@ -122,16 +133,16 @@ const LANDING_A: PersonaLandingData = {
     ],
   },
   form: {
-    h2: "Empezá por saber qué está fallando",
-    text: "El diagnóstico es gratuito y no depende de que contrates nada. Salís con una lista concreta de qué corregir en tu sitio, la apliques con nosotros o por tu cuenta.",
+    h2: "Empieza por saber qué está fallando",
+    text: "El diagnóstico es gratuito y no depende de que contrates nada. Sales con una lista concreta de qué corregir en tu sitio, la apliques con nosotros o por tu cuenta.",
     button: "Agendar mi diagnóstico",
     nameLabel: "Nombre",
     contactLabel: "WhatsApp",
     qualifierLabel: "¿A qué se dedica tu negocio?",
   },
   leadMagnet: {
-    h3: "¿Todavía no querés hablar con nadie?",
-    desc: "Descargá el checklist de 12 puntos para revisar tu web hoy mismo.",
+    h3: "¿Todavía no quieres hablar con nadie?",
+    desc: "Descarga el checklist de 12 puntos para revisar tu web hoy mismo.",
     button: "Descargar checklist",
     asset: "Checklist de web (12 puntos)",
   },
@@ -141,6 +152,9 @@ const LANDING_D: PersonaLandingData = {
   slug: "optimizacion-ecommerce",
   persona: "E-commerce",
   segment: "landing_d",
+  visual: "store",
+  whatsappService: "Desarrollo Web",
+  showAdFlow: true,
   seo: {
     title: "Optimización de conversión para e-commerce",
     description:
@@ -158,17 +172,18 @@ const LANDING_D: PersonaLandingData = {
   hero: {
     badge: "Optimización de conversión",
     h1: "Ya estás pagando por ese tráfico. Recuperemos el que se te está yendo.",
+    highlight: "Recuperemos el que se te está yendo.",
     subtitle:
       "Auditamos velocidad, checkout y ficha de producto para encontrar dónde se pierden las visitas que ya compraste. Antes de que subas el presupuesto.",
     ctaLabel: "Pedir auditoría de conversión",
-    microcopy: "Recibís una auditoría grabada de tu tienda con las correcciones priorizadas.",
+    microcopy: "Recibes una auditoría grabada de tu tienda con las correcciones priorizadas.",
   },
   pain: {
-    h2: "Los síntomas que ya conocés",
+    h2: "Los síntomas que ya conoces",
     bullets: [
       "El tráfico sube y las ventas no acompañan.",
       "El carrito se llena y el checkout se abandona.",
-      "Subís presupuesto y el retorno baja en lugar de escalar.",
+      "Subes presupuesto y el retorno baja en lugar de escalar.",
       "Media docena de anuncios “distintos” que en realidad son el mismo concepto compitiendo entre sí.",
       "Cierres que se hacen a mano por mensajería, sin registro ni seguimiento.",
     ],
@@ -177,7 +192,7 @@ const LANDING_D: PersonaLandingData = {
   mechanism: {
     h2: "Dónde se pierde el dinero, en orden de impacto",
     items: [
-      { title: "Velocidad en móvil", desc: "El costo doble: perdés la visita y encarecés el CPA, porque la plataforma optimiza sobre menos conversiones registradas." },
+      { title: "Velocidad en móvil", desc: "El costo doble: pierdes la visita y encareces el CPA, porque la plataforma optimiza sobre menos conversiones registradas." },
       { title: "Fricción de checkout", desc: "Costo de envío revelado tarde, campos innecesarios, compra como invitado deshabilitada. Cada uno es una caída medible." },
       { title: "Ficha de producto que no responde objeciones", desc: "Sin prueba social, sin política de devolución visible, sin las respuestas que el comprador busca antes de pagar." },
       { title: "Estructura de creativos", desc: "El algoritmo de Meta decide a quién mostrar el anuncio leyendo el creativo. Varias piezas semejantes se agrupan como una sola y compiten entre ellas en vez de ampliar alcance. La palanca es diversidad real de conceptos, no más inversión." },
@@ -185,12 +200,12 @@ const LANDING_D: PersonaLandingData = {
     ],
   },
   includes: {
-    h2: "Qué recibís en la auditoría",
+    h2: "Qué recibes en la auditoría",
     bullets: [
       "Video grabado recorriendo tu tienda en móvil, con las fugas señaladas en pantalla.",
       "Reporte de velocidad con las correcciones priorizadas por impacto y esfuerzo.",
       "Revisión del checkout paso a paso, con los puntos de abandono identificados.",
-      "Diagnóstico de estructura de creativos: cuántos conceptos genuinamente distintos tenés vivos.",
+      "Diagnóstico de estructura de creativos: cuántos conceptos genuinamente distintos tienes vivos.",
       "Verificación de eventos y de la API de Conversiones.",
       "Plan de corrección con estimación de esfuerzo por punto.",
     ],
@@ -218,8 +233,8 @@ const LANDING_D: PersonaLandingData = {
     ],
   },
   form: {
-    h2: "Antes de subir el presupuesto, arreglá la ruta",
-    text: "Pedí la auditoría, mirá el video y decidí qué corregir. Si lo hacés con tu equipo, también está bien.",
+    h2: "Antes de subir el presupuesto, arregla la ruta",
+    text: "Pide la auditoría, mira el video y decide qué corregir. Si lo haces con tu equipo, también está bien.",
     button: "Pedir mi auditoría",
     nameLabel: "Nombre",
     contactLabel: "WhatsApp o correo",
@@ -237,6 +252,9 @@ const LANDING_B: PersonaLandingData = {
   slug: "marketing-para-empresas",
   persona: "Gerente de Marketing",
   segment: "landing_b",
+  visual: "dashboard",
+  whatsappService: "Analítica & Data",
+  showAdFlow: true,
   seo: {
     title: "Marketing digital medible para empresas",
     description:
@@ -254,6 +272,7 @@ const LANDING_B: PersonaLandingData = {
   hero: {
     badge: "Marketing medible",
     h1: "Marketing que se puede defender en una reunión de dirección",
+    highlight: "en una reunión de dirección",
     subtitle:
       "Unificamos web, campañas y analítica bajo un solo equipo responsable, con un modelo de medición que conecta la inversión con el pipeline real.",
     ctaLabel: "Solicitar revisión de medición",
@@ -265,7 +284,7 @@ const LANDING_B: PersonaLandingData = {
       "Tres plataformas reportan tres números distintos para la misma campaña.",
       "El CRM y las herramientas de marketing no se hablan, y la reconciliación es manual.",
       "Cada proveedor reporta su tramo y ninguno responde por el resultado completo.",
-      "El reporte mensual consume días de trabajo y aun así genera preguntas que no podés responder en el momento.",
+      "El reporte mensual consume días de trabajo y aun así genera preguntas que no puedes responder en el momento.",
       "Cuando algo no funciona, no hay forma limpia de saber en qué etapa se rompió.",
     ],
   },
@@ -315,8 +334,8 @@ const LANDING_B: PersonaLandingData = {
     ],
   },
   form: {
-    h2: "Empecemos por auditar lo que ya tenés",
-    text: "La sesión técnica es una revisión real de tu arquitectura de medición, no una llamada comercial. Salís con los hallazgos priorizados, decidas o no avanzar.",
+    h2: "Empecemos por auditar lo que ya tienes",
+    text: "La sesión técnica es una revisión real de tu arquitectura de medición, no una llamada comercial. Sales con los hallazgos priorizados, decidas o no avanzar.",
     button: "Agendar sesión técnica",
     nameLabel: "Nombre y cargo",
     contactLabel: "Correo corporativo",
@@ -334,6 +353,9 @@ const LANDING_C: PersonaLandingData = {
   slug: "presencia-profesional",
   persona: "Marca personal",
   segment: "landing_c",
+  visual: "personal",
+  whatsappService: "Branding & Diseño",
+  showAdFlow: false,
   seo: {
     title: "Presencia profesional para expertos y consultores",
     description:
@@ -351,33 +373,34 @@ const LANDING_C: PersonaLandingData = {
   hero: {
     badge: "Presencia profesional",
     h1: "Te googlean antes de escribirte. Que encuentren algo a tu altura.",
+    highlight: "Que encuentren algo a tu altura.",
     subtitle:
       "Construimos la presencia profesional que convierte tu reputación entre colegas en clientes que llegan solos: sitio propio, contenido que posiciona y un camino claro para agendar.",
     ctaLabel: "Pedir diagnóstico de presencia",
     microcopy: "Revisamos qué aparece hoy cuando alguien busca tu nombre.",
   },
   pain: {
-    h2: "Sos bueno en lo tuyo. Eso no está en discusión.",
+    h2: "Eres bueno en lo tuyo. Eso no está en discusión.",
     bullets: [
       "Tus colegas te recomiendan, pero quien no te conoce no encuentra razones para elegirte.",
       "Tu presencia digital es un perfil de red social y, con suerte, un enlace agrupado.",
-      "Cotizás por debajo de lo que vale tu trabajo porque tenés que justificarlo en cada llamada.",
-      "Publicás con constancia y ese esfuerzo no se acumula en ningún lado.",
-      "Si mañana perdés el acceso a tu cuenta, perdés el canal completo.",
+      "Cotizas por debajo de lo que vale tu trabajo porque tienes que justificarlo en cada llamada.",
+      "Publicas con constancia y ese esfuerzo no se acumula en ningún lado.",
+      "Si mañana pierdes el acceso a tu cuenta, pierdes el canal completo.",
     ],
   },
   mechanism: {
     h2: "Qué construye autoridad consultable",
     items: [
-      { title: "Sitio propio como sede", desc: "No un portafolio decorativo: una página que explica a quién ayudás, cómo trabajás y qué pasa si te contratan. Es el activo que sostiene la tarifa." },
-      { title: "Contenido que responde lo que se busca", desc: "Los artículos indexados que responden dudas reales del cliente trabajan cuando vos no estás. Es el trabajo que se acumula, a diferencia del contenido efímero." },
+      { title: "Sitio propio como sede", desc: "No un portafolio decorativo: una página que explica a quién ayudas, cómo trabajas y qué pasa si te contratan. Es el activo que sostiene la tarifa." },
+      { title: "Contenido que responde lo que se busca", desc: "Los artículos indexados que responden dudas reales del cliente trabajan cuando tú no estás. Es el trabajo que se acumula, a diferencia del contenido efímero." },
       { title: "Prueba visible", desc: "Casos, credenciales y resultados presentados de forma verificable, no como declaración de principios." },
       { title: "Base de contactos propia", desc: "Los seguidores son audiencia alquilada. Una lista de correos es patrimonio recuperable." },
       { title: "Camino de agenda sin fricción", desc: "Del interés a la reunión en un clic, sin negociar horarios por mensaje." },
     ],
   },
   includes: {
-    h2: "Qué recibís",
+    h2: "Qué recibes",
     bullets: [
       "Sitio profesional a medida, optimizado para móvil y para búsqueda por tu nombre.",
       "Arquitectura de contenido: qué escribir, en qué orden y para qué búsqueda.",
@@ -396,16 +419,16 @@ const LANDING_C: PersonaLandingData = {
     ],
   },
   faqs: [
-    { q: "No tengo tiempo para producir contenido.", a: "Es la objeción más frecuente y es válida. La arquitectura define un volumen sostenible, no un calendario ambicioso que abandonás en tres semanas. Menos piezas bien posicionadas rinden más que publicar todos los días sin criterio." },
-    { q: "¿Necesito un sitio si ya tengo buena presencia en redes?", a: "Necesitás algo que sea tuyo. Las redes son excelentes para descubrimiento y pésimas como único canal: no controlás el alcance, ni el algoritmo, ni la permanencia de tu cuenta." },
-    { q: "¿Esto me va a traer clientes?", a: "Te va a hacer visible y consultable para quien te busca, y te da un canal propio para capitalizar el trabajo que ya hacés. El cierre sigue dependiendo de tu propuesta y de tu conversación. No vendemos resultados garantizados." },
+    { q: "No tengo tiempo para producir contenido.", a: "Es la objeción más frecuente y es válida. La arquitectura define un volumen sostenible, no un calendario ambicioso que abandonas en tres semanas. Menos piezas bien posicionadas rinden más que publicar todos los días sin criterio." },
+    { q: "¿Necesito un sitio si ya tengo buena presencia en redes?", a: "Necesitas algo que sea tuyo. Las redes son excelentes para descubrimiento y pésimas como único canal: no controlas el alcance, ni el algoritmo, ni la permanencia de tu cuenta." },
+    { q: "¿Esto me va a traer clientes?", a: "Te va a hacer visible y consultable para quien te busca, y te da un canal propio para capitalizar el trabajo que ya haces. El cierre sigue dependiendo de tu propuesta y de tu conversación. No vendemos resultados garantizados." },
     { q: "Ya tengo un sitio hecho con una plantilla.", a: "Puede servir como base. En el diagnóstico revisamos si conviene corregirlo o rehacerlo, y te decimos cuál sale más barato." },
     { q: "¿Puedo mantenerlo yo después?", a: "Sí. Se entrega con capacitación grabada y accesos a tu nombre." },
   ],
   process: {
     steps: [
       { title: "Diagnóstico de presencia", desc: "Buscamos tu nombre y revisamos qué encuentra un desconocido." },
-      { title: "Definición de posicionamiento", desc: "A quién servís, qué te diferencia, qué tarifa sostiene ese posicionamiento." },
+      { title: "Definición de posicionamiento", desc: "A quién sirves, qué te diferencia, qué tarifa sostiene ese posicionamiento." },
       { title: "Construcción", desc: "Del sitio y la arquitectura de contenido." },
       { title: "Entrega con capacitación", desc: "Para que el activo siga creciendo sin depender de un proveedor." },
     ],
@@ -430,6 +453,9 @@ const LANDING_E: PersonaLandingData = {
   slug: "agencias-white-label",
   persona: "Agencia white-label",
   segment: "landing_e",
+  visual: "agency",
+  whatsappService: "Outsourcing / Marca Blanca",
+  showAdFlow: false,
   seo: {
     title: "Desarrollo web white-label para agencias",
     description:
@@ -446,20 +472,21 @@ const LANDING_E: PersonaLandingData = {
   serviceType: "Desarrollo web white-label",
   hero: {
     badge: "Desarrollo white-label",
-    h1: "Vendé desarrollo sin contratar un equipo de desarrollo",
+    h1: "Vende desarrollo sin contratar un equipo de desarrollo",
+    highlight: "sin contratar un equipo",
     subtitle:
-      "Ejecutamos en modalidad white-label: tu marca al frente, nuestro equipo detrás, con plazos y documentación que podés comprometer ante tu cliente.",
+      "Ejecutamos en modalidad white-label: tu marca al frente, nuestro equipo detrás, con plazos y documentación que puedes comprometer ante tu cliente.",
     ctaLabel: "Agendar llamada de evaluación",
     microcopy: "Conversación entre equipos. Sin presentación comercial.",
   },
   pain: {
     h2: "La escena que ya viviste",
     bullets: [
-      "El cliente pide una integración y tenés que decir “déjame ver”.",
-      "Rechazás proyectos que estaban a tu alcance comercial pero no técnico.",
-      "Subcontrataste y el freelance entregó tarde. El reclamo te llegó a vos.",
-      "Alguien desapareció a mitad de proyecto y tuviste que explicarlo vos.",
-      "Ganás el proyecto y el margen se evapora coordinando a un tercero.",
+      "El cliente pide una integración y tienes que decir “déjame ver”.",
+      "Rechazas proyectos que estaban a tu alcance comercial pero no técnico.",
+      "Subcontrataste y el freelance entregó tarde. El reclamo te llegó a ti.",
+      "Alguien desapareció a mitad de proyecto y tuviste que explicarlo tú.",
+      "Ganas el proyecto y el margen se evapora coordinando a un tercero.",
     ],
     closing: "En subcontratación, el riesgo reputacional no se delega. Se elige mejor.",
   },
@@ -468,7 +495,7 @@ const LANDING_E: PersonaLandingData = {
     items: [
       { title: "Tu marca es la que se ve", desc: "Entregables, documentación y comunicación bajo tu identidad. Definimos por escrito quién habla con tu cliente y quién no." },
       { title: "Equipo, no una persona", desc: "Si alguien se enferma o se va, el proyecto sigue. Es la diferencia estructural frente a subcontratar a un freelance." },
-      { title: "Alcance cerrado antes de empezar", desc: "Qué entra, qué no, qué pasa si el cliente pide algo fuera de alcance. El documento existe para protegerte a vos, no a nosotros." },
+      { title: "Alcance cerrado antes de empezar", desc: "Qué entra, qué no, qué pasa si el cliente pide algo fuera de alcance. El documento existe para protegerte a ti, no a nosotros." },
       { title: "Comunicación con cadencia fija", desc: "Un punto de contacto y una actualización pautada. Sin perseguir respuestas." },
       { title: "Documentación de traspaso", desc: "Todo lo que se construye se entrega documentado para que puedas mantenerlo o traspasarlo sin dependencia." },
     ],
@@ -493,10 +520,10 @@ const LANDING_E: PersonaLandingData = {
     ],
   },
   faqs: [
-    { q: "¿Van a intentar quedarse con mi cliente?", a: "No, y está por escrito. El acuerdo incluye cláusula de no captación. Si tu cliente nos contacta directo, te lo derivamos a vos." },
+    { q: "¿Van a intentar quedarse con mi cliente?", a: "No, y está por escrito. El acuerdo incluye cláusula de no captación. Si tu cliente nos contacta directo, te lo derivamos a ti." },
     { q: "¿Cómo manejan los márgenes?", a: "Cotizamos costo neto. El margen que le sumes a tu cliente es tuyo y no lo conocemos ni lo discutimos." },
     { q: "¿Qué pasa si el cliente pide algo fuera del alcance?", a: "Se cotiza aparte. El documento de alcance está diseñado para que esa conversación no te caiga encima a mitad de proyecto." },
-    { q: "¿Puedo llevarlos a una reunión con mi cliente?", a: "Sí, como parte de tu equipo y con tu identidad. También podemos quedarnos completamente detrás. Lo definís vos." },
+    { q: "¿Puedo llevarlos a una reunión con mi cliente?", a: "Sí, como parte de tu equipo y con tu identidad. También podemos quedarnos completamente detrás. Lo defines tú." },
     { q: "¿Trabajan con proyectos chicos?", a: "Sí. Buena parte de las relaciones de partnership empiezan con un proyecto pequeño para probar el proceso antes de comprometer algo grande." },
     { q: "¿Qué pasa si dejamos de trabajar juntos?", a: "Todo queda documentado y traspasable. No retenemos accesos ni conocimiento como mecanismo de retención." },
   ],
@@ -510,14 +537,14 @@ const LANDING_E: PersonaLandingData = {
   },
   form: {
     h2: "Hablemos como equipos, no como proveedor y cliente",
-    text: "Contanos qué proyectos estás dejando pasar. Si podemos ejecutarlos, te decimos cómo y cuánto. Si no, te lo decimos también.",
+    text: "Cuéntanos qué proyectos estás dejando pasar. Si podemos ejecutarlos, te decimos cómo y cuánto. Si no, te lo decimos también.",
     button: "Agendar llamada de evaluación",
     nameLabel: "Nombre",
     contactLabel: "WhatsApp o correo",
     qualifierLabel: "Agencia",
   },
   leadMagnet: {
-    h3: "Cómo cotizar un proyecto técnico que no vas a ejecutar vos",
+    h3: "Cómo cotizar un proyecto técnico que no vas a ejecutar tú",
     desc: "Guía de levantamiento de requerimientos y estructura de márgenes en subcontratación.",
     button: "Descargar la guía",
     asset: "Guía de cotización técnica (subcontratación)",
