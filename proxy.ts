@@ -10,7 +10,11 @@ const CONSENT_REQUIRED_COUNTRIES = new Set([
 ])
 
 const REGION_COOKIE = "sbg_region"
-const NAV_COOKIE = "sbg_nav" // A/B de navegación de la home: 'a' (sidebar) | 'b' (top nav)
+// Versión del diseño vigente. El A/B de navegación (a: sidebar, b: top nav)
+// terminó: todos ven el rediseño "v2". Los leads se etiquetan con este valor
+// (nav_variant) para comparar antes/después en Atribución.
+const NAV_COOKIE = "sbg_nav"
+const NAV_VERSION = "v2"
 const GEO_SUGGEST_COOKIE = "sbg_geo_us" // visitante de EE.UU. en la versión ES → sugerir /us
 
 export function proxy(request: NextRequest) {
@@ -25,19 +29,9 @@ export function proxy(request: NextRequest) {
     ? CONSENT_REQUIRED_COUNTRIES.has(country) ? "eu" : "row"
     : "eu"
 
-  // Asignación A/B sticky: una sola vez por visitante (50/50).
   const existingNav = request.cookies.get(NAV_COOKIE)?.value
-  const navVariant = existingNav ?? (Math.random() < 0.5 ? "a" : "b")
 
-  // Si la variante es nueva, inyectarla en los headers de la PETICIÓN para que
-  // los Server Components la lean en este mismo render. Las cookies de la
-  // respuesta no se reflejan en la request inicial, lo que provocaría un flash
-  // de variante 'a' y datos A/B corruptos en la primera visita.
   const requestHeaders = new Headers(request.headers)
-  if (!existingNav) {
-    const existing = requestHeaders.get("cookie") || ""
-    requestHeaders.set("cookie", `${existing}${existing ? "; " : ""}${NAV_COOKIE}=${navVariant}`)
-  }
   // Locale de la petición (lo pueden leer Server Components sin re-derivarlo).
   requestHeaders.set("x-locale", isUsSection ? "en" : "es")
 
@@ -60,8 +54,10 @@ export function proxy(request: NextRequest) {
     })
   }
 
-  if (!existingNav) {
-    response.cookies.set(NAV_COOKIE, navVariant, {
+  // Solo lo lee el cliente (track-client → nav_variant del lead), que ya recibe
+  // la cookie con la respuesta: no hace falta inyectarla en la request.
+  if (existingNav !== NAV_VERSION) {
+    response.cookies.set(NAV_COOKIE, NAV_VERSION, {
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 días
       sameSite: "lax",
