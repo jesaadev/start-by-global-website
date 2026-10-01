@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { Sparkles, MessageCircle, Calendar, ArrowRight, Rocket, Layers, LineChart } from "lucide-react"
-import { AnimateIn } from "@/components/animate-in"
+import { Sparkles, MessageCircle, Search, ArrowRight, Rocket, Layers, LineChart } from "lucide-react"
 import { WhatsAppLink } from "@/components/whatsapp-link"
 import { ClientLogos } from "@/components/client-logos"
 
-const CALENDLY_URL = "https://calendly.com/startbyglobal"
+// Diagnóstico gratuito = formulario de 3 campos de la landing de PYMES.
+const DIAGNOSTIC_HREF = "/web-que-genera-clientes#contacto"
 
 // Cada camino corresponde a un dolor del avatar B2B.
 const PATHS = [
@@ -46,66 +46,48 @@ export function HeroSegmented() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
 
       <div className="relative flex flex-col gap-8 p-5 sm:p-8 lg:p-12">
-        {/* Encabezado */}
+        {/* Encabezado: renderizado en SSR y visible desde el primer paint (sin
+            wrappers de animación: es el LCP y lo primero que ve el tráfico pago). */}
         <div className="flex flex-col gap-5 max-w-3xl">
-          <AnimateIn delay={0}>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium w-fit">
-              <Sparkles className="w-3 h-3" />
-              Agencia de marketing y desarrollo web · RD · ES · LATAM · EE.UU.
-            </span>
-          </AnimateIn>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium w-fit">
+            <Sparkles className="w-3 h-3" />
+            Agencia de marketing y desarrollo web · RD · ES · LATAM · EE.UU.
+          </span>
 
-          <AnimateIn delay={100}>
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-balance text-foreground">
-              Webs y marketing que convierten{" "}
-              <span className="text-primary">visitantes en clientes</span>
-            </h1>
-          </AnimateIn>
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.08] tracking-tight text-balance text-foreground">
+            Webs y marketing que convierten{" "}
+            <span className="text-primary">visitantes en clientes</span>
+          </h1>
 
-          <AnimateIn delay={200}>
-            <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-xl">
-              Una mala web cuesta clientes; una buena los multiplica. Diseñamos,
-              desarrollamos y posicionamos activos digitales que generan ventas reales.
-            </p>
-          </AnimateIn>
+          <p className="text-muted-foreground text-base lg:text-lg leading-relaxed max-w-xl">
+            Una mala web cuesta clientes; una buena los multiplica. Diseñamos,
+            desarrollamos y posicionamos activos digitales que generan ventas reales.
+          </p>
 
-          {/* Jerarquía de CTAs: WhatsApp → Agenda → Formulario */}
-          <AnimateIn delay={300}>
-            <div className="flex flex-wrap items-center gap-3">
-              <WhatsAppLink segment="hero_cta" className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#25D366] text-white font-semibold text-sm transition-all duration-300 hover:bg-[#25D366]/90 hover:shadow-lg hover:shadow-[#25D366]/25">
-                <MessageCircle className="w-4 h-4" />
-                Hablar por WhatsApp
-              </WhatsAppLink>
-              <a
-                href={CALENDLY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25"
-              >
-                <Calendar className="w-4 h-4" />
-                Agendar consultoría
-              </a>
-              <Link
-                href="/contacto"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-border text-foreground font-semibold text-sm transition-all duration-200 hover:bg-secondary hover:border-border/80"
-              >
-                Solicitar propuesta
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </AnimateIn>
+          {/* CTA principal único (WhatsApp) + secundario (diagnóstico gratis) */}
+          <div className="flex flex-wrap items-center gap-3">
+            <WhatsAppLink segment="hero_cta" className="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#25D366] text-white font-bold text-base transition-all duration-300 hover:bg-[#25D366]/90 hover:shadow-lg hover:shadow-[#25D366]/25 hover:-translate-y-0.5">
+              <MessageCircle className="w-5 h-5" />
+              Hablar por WhatsApp
+            </WhatsAppLink>
+            <Link
+              href={DIAGNOSTIC_HREF}
+              className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-transparent border border-border text-foreground font-semibold text-sm transition-all duration-200 hover:bg-secondary hover:border-border/80"
+            >
+              <Search className="w-4 h-4" />
+              Diagnóstico gratis
+            </Link>
+          </div>
 
           {/* Filtro de calificación por precio */}
-          <AnimateIn delay={350}>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-foreground font-semibold">Proyectos desde $400.</span>{" "}
-              Trabajamos con empresas listas para invertir en crecer.
-            </p>
-          </AnimateIn>
+          <p className="text-xs text-muted-foreground">
+            <span className="text-foreground font-semibold">Proyectos desde $400.</span>{" "}
+            Trabajamos con empresas listas para invertir en crecer.
+          </p>
         </div>
 
         {/* Selector de caminos por avatar */}
-        <AnimateIn delay={400}>
+        <div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {PATHS.map((p) => {
               const Icon = p.icon
@@ -140,7 +122,7 @@ export function HeroSegmented() {
               )
             })}
           </div>
-        </AnimateIn>
+        </div>
 
         {/* Prueba social */}
         <ClientLogos />
