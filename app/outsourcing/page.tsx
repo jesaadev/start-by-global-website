@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { pageMetadata } from "@/lib/seo"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { OutsourcingContent } from "./outsourcing-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -17,5 +18,9 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default function OutsourcingPage() {
-  return <OutsourcingContent />
+  return (
+    <MarketingLayout ctaSegment="outsourcing_sticky" ctaService="Outsourcing / Marca Blanca" ctaSecondary={{ href: "#contacto", label: "Formulario" }}>
+      <OutsourcingContent />
+    </MarketingLayout>
+  )
 }

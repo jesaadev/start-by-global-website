@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { fireLead } from "@/lib/track-client"
 import {
   ArrowRight,
   CheckCircle2,
   ChevronDown,
-  Menu,
-  X,
   Send,
   Zap,
   Bot,
@@ -225,7 +225,6 @@ const faqs = [
 
 export function IaContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -237,11 +236,14 @@ export function IaContent() {
   const [sent, setSent] = useState(false)
   const [formError, setFormError] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // Honeypot: leer de forma síncrona antes de cualquier await.
+    const company_website = (new FormData(e.currentTarget).get("company_website") as string) ?? ""
     setSending(true)
     setFormError("")
     try {
+      const tracking = fireLead("contact_form", "ia")
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -251,6 +253,8 @@ export function IaContent() {
           company: formData.company,
           service: "IA & Automatización",
           message: `Proceso a automatizar: ${formData.process}\n\n${formData.message}`,
+          company_website,
+          ...tracking,
         }),
       })
       if (!res.ok) throw new Error()
@@ -263,78 +267,11 @@ export function IaContent() {
     }
   }
 
-  const navLinks = [
-    { href: "#soluciones", label: "Soluciones" },
-    { href: "#proceso", label: "Proceso" },
-    { href: "#planes", label: "Planes" },
-    { href: "#faq", label: "FAQ" },
-  ]
-
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
 
-      {/* ── NAVBAR ──────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-foreground/5 bg-background/90 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-7 dark:invert" />
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground/70 transition-colors"
-            >
-              Volver al sitio
-            </Link>
-            <a
-              href="#contacto"
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#7B61FF] text-white text-sm font-semibold hover:bg-[#7B61FF]/85 transition-all hover:shadow-lg hover:shadow-[#7B61FF]/30"
-            >
-              Agendar Demo
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-lg bg-foreground/5 text-foreground/70"
-              aria-label="Menu"
-            >
-              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {mobileNavOpen && (
-          <div className="md:hidden absolute top-16 inset-x-0 bg-background/98 border-b border-foreground/5 px-6 py-4 flex flex-col gap-4">
-            {[...navLinks, { href: "#contacto", label: "Agendar Demo" }].map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setMobileNavOpen(false)}
-                className="text-sm text-foreground/70 hover:text-foreground py-2 transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </nav>
-
       {/* ── HERO ────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      <section className="relative flex items-center overflow-hidden">
         {/* Dot grid */}
         <div
           className="absolute inset-0 opacity-[0.06]"
@@ -348,7 +285,7 @@ export function IaContent() {
         <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-[#00C9C8]/6 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-[#0074D9]/8 rounded-full blur-[80px] pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-24 lg:py-32 grid lg:grid-cols-[1fr_420px] gap-16 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-24 grid lg:grid-cols-[1fr_420px] gap-16 items-center">
           {/* Left */}
           <div>
             <AnimateIn delay={0.05}>
@@ -374,25 +311,14 @@ export function IaContent() {
 
             <AnimateIn delay={0.2}>
               <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
-                Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa opere 10x más rápido. Sin cambiar tu equipo — potenciandolo.
+                Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa haga más con el mismo equipo. Sin reemplazarlo: potenciándolo.
               </p>
             </AnimateIn>
 
             <AnimateIn delay={0.3}>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="#contacto"
-                  className="group inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-[#7B61FF] text-white font-semibold text-base hover:bg-[#7B61FF]/85 hover:shadow-2xl hover:shadow-[#7B61FF]/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                >
-                  Agendar Demo Gratuita
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
-                <a
-                  href="#soluciones"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-foreground/10 text-foreground/70 font-semibold text-base hover:bg-foreground/5 hover:text-foreground hover:border-foreground/20 transition-all"
-                >
-                  Ver soluciones
-                </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <PrimaryCTA label="Agendar demo por WhatsApp" segment="ia_hero" service="Automatización e IA" />
+                <SecondaryCTA label="Prefiero el formulario" href="#contacto" />
               </div>
             </AnimateIn>
 
@@ -423,10 +349,9 @@ export function IaContent() {
                       <p className="text-xs text-foreground/30 uppercase tracking-widest mb-1">IA Activa</p>
                       <p className="font-display text-lg font-bold">Panel de Impacto</p>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00C9C8]/10 border border-[#00C9C8]/20">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#00C9C8] animate-pulse" />
-                      <span className="text-[10px] text-[#0E7490] dark:text-[#00C9C8] font-semibold">En vivo</span>
-                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-[#F4A261]/15 text-[10px] font-semibold text-[#b45309] dark:text-[#F4A261]">
+                      Datos de ejemplo
+                    </span>
                   </div>
 
                   {/* Metrics */}
@@ -529,7 +454,7 @@ export function IaContent() {
                 <p className="text-[#7B61FF] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global IA</p>
                 <ul className="space-y-4">
                   {[
-                    "Agente IA responde el 80% de consultas sin humano",
+                    "Un agente IA responde las consultas frecuentes sin intervención humana",
                     "Datos sincronizados automáticamente entre sistemas",
                     "Reportes generados y enviados solos cada lunes",
                     "Follow-up automático en minutos, no días",
@@ -853,6 +778,8 @@ export function IaContent() {
                 onSubmit={handleSubmit}
                 className="p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8 space-y-5"
               >
+                {/* Honeypot anti-bots: oculto para usuarios reales */}
+                <input type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs text-muted-foreground uppercase tracking-wide">Nombre *</label>
@@ -948,20 +875,6 @@ export function IaContent() {
         </div>
       </section>
 
-      {/* ── FOOTER ──────────────────────────────────── */}
-      <footer className="border-t border-foreground/5 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-40 hover:opacity-70 transition-opacity" />
-          </Link>
-          <div className="flex items-center gap-6 text-xs text-foreground/25">
-            <Link href="/outsourcing" className="hover:text-muted-foreground transition-colors">Outsourcing Web</Link>
-            <Link href="/servicios" className="hover:text-muted-foreground transition-colors">Servicios</Link>
-            <a href="mailto:info@startbyglobal.com" className="hover:text-muted-foreground transition-colors">info@startbyglobal.com</a>
-          </div>
-          <p className="text-xs text-foreground/20">2026 Start By Global</p>
-        </div>
-      </footer>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { GoogleAdsContent } from "./google-ads-content"
 import { US_ADS_FAQS } from "./faqs"
 
@@ -36,7 +37,9 @@ export default function GoogleAdsPage() {
         ]}
       />
       <FaqJsonLd faqs={US_ADS_FAQS} />
-      <GoogleAdsContent />
+      <MarketingLayout ctaSegment="us_ads_sticky" locale="en">
+        <GoogleAdsContent />
+      </MarketingLayout>
     </>
   )
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { Footer } from "@/components/footer"
+import { LegalPage } from "@/components/layout/legal-page"
 
 export const metadata: Metadata = {
   title: "Aviso Legal",
@@ -10,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function AvisoLegalPage() {
   return (
-    <DashboardLayout title="Aviso Legal" subtitle="Última actualización: 13 de junio de 2026">
-      <article className="glass-card rounded-xl p-6 sm:p-8 max-w-3xl space-y-6">
+    <LegalPage title="Aviso Legal" subtitle="Última actualización: 13 de junio de 2026">
+      <article className="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
         <section className="space-y-2">
           <h2 className="font-display text-lg font-bold text-foreground">1. Titular del sitio</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -77,7 +76,6 @@ export default function AvisoLegalPage() {
           </p>
         </section>
       </article>
-      <Footer />
-    </DashboardLayout>
+    </LegalPage>
   )
 }

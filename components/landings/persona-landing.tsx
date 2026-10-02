@@ -15,6 +15,7 @@ import SpotlightCard from "@/components/reactbits/SpotlightCard"
 import { WhatsAppLink } from "@/components/whatsapp-link"
 import { PersonaVisual, relevantWork } from "@/components/landings/persona-visual"
 import { LeadMagnet } from "@/components/landings/lead-magnet"
+import { HighlightTitle } from "@/components/typography/highlight-title"
 
 // Plantilla común de las landings por persona: arquitectura fija de 9 bloques
 // del spec, con el sistema visual de venta (v2). Navegación reducida (logo + 1
@@ -22,21 +23,6 @@ import { LeadMagnet } from "@/components/landings/lead-magnet"
 // interactivos (CTAs, formularios, animación) llevan JavaScript.
 
 const H2 = "font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance"
-
-/** H1 con la frase destacada en color y un subrayado que se dibuja al cargar. */
-function HeroTitle({ h1, highlight }: { h1: string; highlight?: string }) {
-  if (!highlight || !h1.includes(highlight)) return <>{h1}</>
-  const i = h1.indexOf(highlight)
-  return (
-    <>
-      {h1.slice(0, i)}
-      <span className="text-primary bg-gradient-to-r from-primary/45 to-primary/45 bg-no-repeat bg-left-bottom [background-size:0%_0.14em] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] animate-underline-grow motion-reduce:animate-none motion-reduce:[background-size:100%_0.14em]">
-        {highlight}
-      </span>
-      {h1.slice(i + highlight.length)}
-    </>
-  )
-}
 
 export async function PersonaLanding({ data }: { data: PersonaLandingData }) {
   const seg = data.segment
@@ -75,7 +61,7 @@ export async function PersonaLanding({ data }: { data: PersonaLandingData }) {
               {data.hero.badge}
             </span>
             <h1 className="font-display font-bold tracking-tight leading-[1.04] text-[2.4rem] sm:text-6xl xl:text-[4.25rem] text-balance">
-              <HeroTitle h1={data.hero.h1} highlight={data.hero.highlight} />
+              <HighlightTitle text={data.hero.h1} highlight={data.hero.highlight} />
             </h1>
             <p className="text-lg sm:text-xl text-foreground/75 leading-relaxed max-w-xl">{data.hero.subtitle}</p>
             <div className="flex flex-wrap items-center gap-3">
@@ -84,7 +70,7 @@ export async function PersonaLanding({ data }: { data: PersonaLandingData }) {
             </div>
             <p className="text-sm text-muted-foreground max-w-md">{data.hero.microcopy}</p>
           </div>
-          <PersonaVisual data={data} work={work} />
+          <PersonaVisual visual={data.visual} work={work} />
         </div>
       </section>
 

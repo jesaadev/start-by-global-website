@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { pageMetadata } from "@/lib/seo"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { IaContent } from "./ia-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -17,5 +18,9 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default function IaPage() {
-  return <IaContent />
+  return (
+    <MarketingLayout ctaSegment="ia_sticky" ctaService="Automatización e IA" ctaSecondary={{ href: "#contacto", label: "Demo" }}>
+      <IaContent />
+    </MarketingLayout>
+  )
 }

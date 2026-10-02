@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { BreadcrumbJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { UsHomeContent } from "./us-home-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -23,7 +24,9 @@ export default function UsHomePage() {
   return (
     <>
       <BreadcrumbJsonLd items={[{ name: "US Home", path: "/us" }]} />
-      <UsHomeContent />
+      <MarketingLayout ctaSegment="us_sticky" locale="en">
+        <UsHomeContent />
+      </MarketingLayout>
     </>
   )
 }

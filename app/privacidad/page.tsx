@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { Footer } from "@/components/footer"
+import { LegalPage } from "@/components/layout/legal-page"
 
 export const metadata: Metadata = {
   title: "Política de Privacidad",
@@ -10,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function PrivacidadPage() {
   return (
-    <DashboardLayout title="Política de Privacidad" subtitle="Última actualización: 13 de junio de 2026">
-      <article className="glass-card rounded-xl p-6 sm:p-8 max-w-3xl space-y-6 legal-prose">
+    <LegalPage title="Política de Privacidad" subtitle="Última actualización: 13 de junio de 2026">
+      <article className="glass-card rounded-2xl p-6 sm:p-8 space-y-6 legal-prose">
         <p className="text-sm text-muted-foreground leading-relaxed">
           En <strong className="text-foreground">START BY GLOBAL</strong> ("nosotros") nos tomamos en serio la
           privacidad de quienes visitan nuestro sitio y contactan con nosotros. Esta política explica qué datos
@@ -92,7 +91,6 @@ export default function PrivacidadPage() {
           </p>
         </section>
       </article>
-      <Footer />
-    </DashboardLayout>
+    </LegalPage>
   )
 }

@@ -1,9 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
 import { ContactSection } from "@/components/contact-section"
 import {
   ArrowRight, Code2, Megaphone, Search, Cpu, ShieldCheck, Clock3,
@@ -57,7 +55,7 @@ const RESULTS = [
 
 export function UsHomeContent() {
   return (
-    <DashboardLayout>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-6">
       {/* Hero */}
       <AnimateIn>
         <section id="hero" className="glass-card rounded-2xl p-8 sm:p-12 relative overflow-hidden">
@@ -70,7 +68,7 @@ export function UsHomeContent() {
               <TrendingUp className="w-3.5 h-3.5" />
               For U.S. businesses
             </span>
-            <h1 className="font-display text-3xl sm:text-5xl font-bold text-balance leading-[1.12] tracking-tight">
+            <h1 className="font-display text-4xl sm:text-6xl font-bold text-balance leading-[1.04] tracking-tight">
               Websites and ads that turn visitors into customers
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
@@ -178,7 +176,6 @@ export function UsHomeContent() {
         <ContactSection />
       </AnimateIn>
 
-      <Footer locale="en" />
-    </DashboardLayout>
+    </div>
   )
 }

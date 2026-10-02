@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { ServicesPageContent } from "./services-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -32,7 +33,9 @@ export default function ServiciosPage() {
           { name: "Servicios", path: "/servicios" },
         ]}
       />
-      <ServicesPageContent />
+      <MarketingLayout ctaSegment="servicios_sticky">
+        <ServicesPageContent />
+      </MarketingLayout>
     </>
   )
 }

@@ -1,249 +1,144 @@
-"use client"
-
-import { useState } from "react"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
-import {
-  ExternalLink,
-  TrendingUp,
-  Globe,
-  Users,
-  Filter,
-  BarChart3,
-  ArrowRight,
-} from "lucide-react"
 import Link from "next/link"
+import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react"
+import type { ShowcaseItem } from "@/lib/showcase"
+import { LANDING_LABELS } from "@/lib/persona-landings"
+import { AnimateIn } from "@/components/animate-in"
+import { PageHero } from "@/components/layout/page-hero"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { DeviceDuo } from "@/components/mockups/device-duo"
+import { BrowserMockup } from "@/components/mockups/browser-mockup"
+import { PhoneMockup } from "@/components/mockups/phone-mockup"
 
-const categories = ["Todos", "Web", "E-commerce", "Branding", "Marketing"]
-const regions = ["Todas", "Rep. Dominicana", "España", "Latinoamérica", "EE.UU."]
+// Portafolio = Showcase del admin: solo trabajo real, publicado con la
+// autorización del cliente. Nunca se rellena con proyectos de ejemplo.
 
-const allProjects = [
-  {
-    title: "Resort Punta Cana",
-    category: "Web",
-    description: "Sitio web de lujo para resort 5 estrellas con sistema de reservas integrado y experiencia inmersiva. Implementamos un sistema de booking personalizado que incremento las reservas directas.",
-    region: "Rep. Dominicana",
-    color: "primary",
-    tech: ["Next.js", "Stripe", "Sanity CMS", "Vercel"],
-    year: "2025",
-    duration: "8 semanas",
-  },
-  {
-    title: "Fintech Barcelona",
-    category: "E-commerce",
-    description: "Plataforma de pagos digitales con interfaz intuitiva y procesamiento en tiempo real para el mercado europeo. Diseño centrado en seguridad y experiencia del usuario.",
-    region: "España",
-    color: "chart-2",
-    tech: ["React", "Node.js", "PostgreSQL", "AWS"],
-    year: "2025",
-    duration: "12 semanas",
-  },
-  {
-    title: "Restaurante CDMX",
-    category: "Branding",
-    description: "Rebranding completo y presencia digital para cadena de restaurantes gourmet. Incluyo identidad visual, redes sociales y estrategia de contenido.",
-    region: "Latinoamérica",
-    color: "chart-4",
-    tech: ["Figma", "WordPress", "Instagram", "TikTok"],
-    year: "2024",
-    duration: "6 semanas",
-  },
-  {
-    title: "SaaS Miami",
-    category: "Marketing",
-    description: "Estrategia integral de growth marketing para startup SaaS B2B. Campañas multicanal que posicionaron la marca en el mercado norteamericano.",
-    region: "EE.UU.",
-    color: "chart-3",
-    tech: ["HubSpot", "Google Ads", "GA4", "Mixpanel"],
-    year: "2025",
-    duration: "Ongoing",
-  },
-  {
-    title: "E-commerce Bogota",
-    category: "E-commerce",
-    description: "Tienda en línea de moda sostenible con integración de pasarelas de pago locales e internacionales. Estrategia omnicanal con email marketing avanzado.",
-    region: "Latinoamérica",
-    color: "primary",
-    tech: ["Shopify", "Klaviyo", "Meta Ads", "Google Ads"],
-    year: "2024",
-    duration: "10 semanas",
-  },
-  {
-    title: "Clinica Madrid",
-    category: "Web",
-    description: "Portal medico con reserva de citas online, telemedicina y gestión de pacientes. Plataforma integral para clinica privada con multiples especialidades.",
-    region: "España",
-    color: "chart-2",
-    tech: ["Next.js", "Supabase", "Tailwind", "Vercel"],
-    year: "2025",
-    duration: "10 semanas",
-  },
-  {
-    title: "Hotel Bavaro Collection",
-    category: "Web",
-    description: "Experiencia digital premium para grupo hotelero con 5 propiedades. Sistema de reservas unificado con soporte multilingue y multi-moneda.",
-    region: "Rep. Dominicana",
-    color: "chart-4",
-    tech: ["Next.js", "Contentful", "Stripe", "i18n"],
-    year: "2024",
-    duration: "14 semanas",
-  },
-  {
-    title: "Legal Tech Santiago",
-    category: "Marketing",
-    description: "Estrategia de posicionamiento digital para firma de abogados. SEO especializado y campañas de Google Ads en mercado competitivo.",
-    region: "Latinoamérica",
-    color: "chart-3",
-    tech: ["Google Ads", "SEMrush", "WordPress", "HubSpot"],
-    year: "2025",
-    duration: "Ongoing",
-  },
-]
+const displayDomain = (d: string) => d.replace(/^https?:\/\//i, "").replace(/\/+$/, "")
+const siteUrl = (d: string) => (/^https?:\/\//i.test(d) ? d : `https://${d}`)
 
-export function PortfolioPageContent() {
-  const [activeCategory, setActiveCategory] = useState("Todos")
-  const [activeRegion, setActiveRegion] = useState("Todas")
+/** Ficha bajo cada mockup: cliente, dominio y la solución equivalente para el visitante. */
+function WorkMeta({ item, large }: { item: ShowcaseItem; large?: boolean }) {
+  const persona = item.persona ? LANDING_LABELS[item.persona] : undefined
+  return (
+    <div className="flex flex-col gap-3">
+      {item.client_name && (
+        <span className="text-xs font-semibold uppercase tracking-widest text-primary">{item.client_name}</span>
+      )}
+      <h2 className={large ? "font-display text-3xl sm:text-4xl font-bold tracking-tight text-balance" : "font-display text-2xl font-bold tracking-tight text-balance"}>
+        {item.title}
+      </h2>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {item.domain && (
+          <a href={siteUrl(item.domain)} target="_blank" rel="noopener" className="group inline-flex items-center gap-1 text-sm font-semibold text-foreground hover:text-primary transition-colors">
+            {displayDomain(item.domain)}
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </a>
+        )}
+        {persona && (
+          <Link href={`/${persona.slug}`} className="group inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            Solución para {persona.persona}
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </Link>
+        )}
+      </div>
+    </div>
+  )
+}
 
-  const filtered = allProjects.filter((p) => {
-    const catMatch = activeCategory === "Todos" || p.category === activeCategory
-    const regMatch = activeRegion === "Todas" || p.region === activeRegion
-    return catMatch && regMatch
-  })
+export function PortfolioPageContent({ webs, ads }: { webs: ShowcaseItem[]; ads: ShowcaseItem[] }) {
+  const [featured, ...rest] = webs
 
   return (
-    <DashboardLayout title="Portafolio" subtitle="Ejemplos del tipo de proyectos que desarrollamos">
-      {/* Filters */}
-      <AnimateIn>
-        <div className="glass-card rounded-xl p-4 flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium">Categoría</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    activeCategory === cat
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+    <>
+      <PageHero
+        badge="Portafolio"
+        title="Trabajo real que puedes recorrer"
+        highlight="puedes recorrer"
+        size="lg"
+        subtitle="Cada proyecto se publica con permiso del cliente. Pasa el cursor por las capturas y recórrelas de arriba abajo."
+      >
+        <PrimaryCTA label="Quiero una web así" segment="portafolio_hero" service="Desarrollo Web" />
+        <SecondaryCTA />
+      </PageHero>
+
+      {featured ? (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-16 flex flex-col gap-16 sm:gap-20">
+          {/* Destacado: escritorio + móvil */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-10 lg:gap-14 items-center">
+            <DeviceDuo
+              desktopSrc={featured.desktop_image as string}
+              mobileSrc={featured.mobile_image ?? undefined}
+              alt={featured.title}
+              domain={featured.domain ?? undefined}
+              priority
+            />
+            <WorkMeta item={featured} large />
           </div>
-          <div className="w-px bg-border/50 hidden sm:block" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium">Región</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              {regions.map((reg) => (
-                <button
-                  key={reg}
-                  type="button"
-                  onClick={() => setActiveRegion(reg)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    activeRegion === reg
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
-                >
-                  {reg}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </AnimateIn>
 
-      {/* Results count */}
-      <p className="text-sm text-muted-foreground">
-        Mostrando <span className="text-foreground font-semibold">{filtered.length}</span> proyectos
-      </p>
-
-      {/* Project grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filtered.map((project, i) => (
-          <AnimateIn key={project.title} delay={i * 80}>
-            <div className="glass-card-hover rounded-xl overflow-hidden group h-full flex flex-col">
-              <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, hsl(var(--${project.color})), hsl(var(--${project.color}) / 0.3))` }} />
-
-              <div className="p-6 flex flex-col gap-4 flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{project.region}</span>
-                      <span className="text-[10px] text-muted-foreground/60">|</span>
-                      <span className="text-[10px] text-muted-foreground">{project.year}</span>
+          {rest.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-14">
+              {rest.map((item, i) => (
+                <AnimateIn key={item.id} delay={(i % 2) * 90}>
+                  <article className="flex flex-col gap-6">
+                    <div className={item.mobile_image ? "relative pr-[10%] pb-[8%]" : undefined}>
+                      <BrowserMockup
+                        src={item.desktop_image as string}
+                        alt={item.title}
+                        domain={item.domain ?? undefined}
+                        sizes="(max-width: 768px) 92vw, 600px"
+                      />
+                      {item.mobile_image && (
+                        <PhoneMockup
+                          src={item.mobile_image}
+                          alt={`${item.title} — versión móvil`}
+                          className="absolute bottom-0 right-0 w-[24%] min-w-[84px]"
+                        />
+                      )}
                     </div>
-                    <h3 className="font-display text-lg font-bold text-foreground">{project.title}</h3>
-                  </div>
-                  <button
-                    type="button"
-                    className="flex items-center justify-center w-9 h-9 rounded-lg bg-secondary/60 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-200 opacity-0 group-hover:opacity-100"
-                    aria-label={`Ver proyecto ${project.title}`}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{project.description}</p>
-
-                {/* Tech stack */}
-                <div className="flex flex-wrap gap-1.5">
-                  {project.tech.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded-md bg-secondary/60 text-[10px] text-muted-foreground font-medium">
-                      {t}
-                    </span>
-                  ))}
-                  <span className="px-2 py-0.5 rounded-md bg-primary/10 text-[10px] text-primary font-medium">
-                    {project.duration}
-                  </span>
-                </div>
-
-              </div>
+                    <WorkMeta item={item} />
+                  </article>
+                </AnimateIn>
+              ))}
             </div>
-          </AnimateIn>
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="glass-card rounded-xl p-12 text-center">
-          <p className="text-muted-foreground">No se encontraron proyectos con los filtros seleccionados.</p>
-        </div>
+          )}
+        </section>
+      ) : (
+        <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-12">
+          <div className="rounded-3xl border border-dashed border-border/70 bg-card/40 p-8 sm:p-12 text-center">
+            <Sparkles className="mx-auto h-9 w-9 text-primary" />
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mt-4">Estamos preparando los casos</h2>
+            <p className="text-base text-muted-foreground mt-3 leading-relaxed">
+              Solo mostramos proyectos con permiso del cliente. Mientras tanto, escríbenos y te enseñamos trabajos
+              similares al tuyo en una llamada.
+            </p>
+          </div>
+        </section>
       )}
 
-      {/* CTA */}
-      <AnimateIn>
-        <div className="glass-card rounded-xl p-8 lg:p-12 text-center flex flex-col items-center gap-6 glow-accent relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5" />
-          <div className="relative flex flex-col items-center gap-4">
-            <h2 className="font-display text-2xl font-bold text-foreground text-balance">
-              Tu proyecto puede ser el siguiente
-            </h2>
-            <p className="text-muted-foreground max-w-lg">
-              Cuéntanos tu idea y la convertimos en resultados medibles.
-            </p>
-            <Link
-              href="/contacto"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] mt-2"
-            >
-              Iniciar Proyecto
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+      {ads.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary">Publicidad</span>
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight mt-2 text-balance">Anuncios que creamos</h2>
+          <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            {ads.map((ad) => (
+              <figure key={ad.id} className="flex flex-col gap-3">
+                <PhoneMockup src={(ad.mobile_image ?? ad.desktop_image) as string} alt={ad.title} scrollOnHover={false} sizes="(max-width: 640px) 45vw, 260px" />
+                <figcaption className="text-sm font-medium text-foreground/85 text-center">{ad.client_name ?? ad.title}</figcaption>
+              </figure>
+            ))}
           </div>
-        </div>
-      </AnimateIn>
+        </section>
+      )}
 
-      <Footer />
-    </DashboardLayout>
+      <ClosingCTA
+        title="Tu web puede ser la siguiente"
+        text="Cuéntanos qué vendes y te mostramos cómo se vería una web pensada para que te escriban."
+        segment="portafolio_final"
+        service="Desarrollo Web"
+        ctaLabel="Quiero una web así"
+        extra={<SecondaryCTA label="Prefiero un diagnóstico por formulario" className="w-fit" />}
+      />
+    </>
   )
 }

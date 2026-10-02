@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { AdsContent } from "./ads-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -34,7 +35,13 @@ export default function AdsPage() {
           { name: "Publicidad Digital & Ads", path: "/publicidad-ads" },
         ]}
       />
-      <AdsContent />
+      <MarketingLayout
+        ctaSegment="publicidad_sticky"
+        ctaService="Marketing Digital"
+        ctaSecondary={{ href: "#contacto", label: "Auditoría" }}
+      >
+        <AdsContent />
+      </MarketingLayout>
     </>
   )
 }

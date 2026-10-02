@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { WebsiteDesignContent } from "./website-design-content"
 import { US_WEB_FAQS } from "./faqs"
 
@@ -37,7 +38,9 @@ export default function WebsiteDesignPage() {
         ]}
       />
       <FaqJsonLd faqs={US_WEB_FAQS} />
-      <WebsiteDesignContent />
+      <MarketingLayout ctaSegment="us_web_sticky" locale="en">
+        <WebsiteDesignContent />
+      </MarketingLayout>
     </>
   )
 }

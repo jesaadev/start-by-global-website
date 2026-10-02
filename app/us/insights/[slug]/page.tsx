@@ -1,4 +1,4 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { BlogPostContent } from "@/app/insights/[slug]/blog-post-content"
 import { ArticleTracker } from "@/components/blog/article-tracker"
 import { getPublishedSlugs, getPublishedPostBySlug, getRelatedPublished } from "@/lib/blog-posts"
@@ -94,9 +94,11 @@ export default async function UsBlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ArticleTracker slug={slug} />
-      <DashboardLayout>
-        <BlogPostContent post={post} related={related} locale="en" />
-      </DashboardLayout>
+      <MarketingLayout ctaSegment="us_article_sticky" locale="en">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <BlogPostContent post={post} related={related} locale="en" />
+        </div>
+      </MarketingLayout>
     </>
   )
 }
