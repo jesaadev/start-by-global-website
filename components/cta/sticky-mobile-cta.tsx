@@ -11,7 +11,21 @@ import { cn } from "@/lib/utils"
  * Barra de CTA fija en móvil: aparece al pasar el hero para que el CTA siempre
  * esté a un toque. Deja libre la esquina derecha para la burbuja del chat.
  */
-export function StickyMobileCTA({ segment, showAfter = 560 }: { segment: string; showAfter?: number }) {
+export function StickyMobileCTA({
+  segment,
+  showAfter = 560,
+  secondaryHref = DIAGNOSTIC_HREF,
+  secondaryLabel = "Diagnóstico",
+  service,
+}: {
+  segment: string
+  showAfter?: number
+  /** Destino del botón secundario (en landings: el formulario de la misma página). */
+  secondaryHref?: string
+  secondaryLabel?: string
+  /** Servicio preseleccionado en el modal de WhatsApp. */
+  service?: string
+}) {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -31,17 +45,18 @@ export function StickyMobileCTA({ segment, showAfter = 560 }: { segment: string;
     >
       <WhatsAppLink
         segment={segment}
+        defaultService={service}
         className="flex-[1.6] flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] text-white font-bold text-sm py-3.5 shadow-lg shadow-black/30"
       >
         <MessageCircle className="w-4 h-4" />
         WhatsApp
       </WhatsAppLink>
       <Link
-        href={DIAGNOSTIC_HREF}
+        href={secondaryHref}
         tabIndex={visible ? 0 : -1}
         className="flex-1 flex items-center justify-center rounded-2xl border border-border bg-background/95 backdrop-blur text-foreground font-semibold text-sm py-3.5 shadow-lg shadow-black/30"
       >
-        Diagnóstico
+        {secondaryLabel}
       </Link>
     </div>
   )
