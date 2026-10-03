@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Check, Globe, Megaphone, ShoppingCart } from "lucide-react"
+import { ArrowRight, Globe, Megaphone, ShoppingCart } from "lucide-react"
 import type { ShowcaseItem } from "@/lib/showcase"
 import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
 import { AnimateIn } from "@/components/animate-in"
@@ -13,7 +13,7 @@ import { HomeIncluded } from "@/components/home-v2/included"
 import { ProcessSection } from "@/components/sections/process-section"
 import { FaqSection } from "@/components/sections/faq-section"
 import SpotlightCard from "@/components/reactbits/SpotlightCard"
-import { WhatsAppLink } from "@/components/whatsapp-link"
+import { PlansSection, type Plan } from "@/components/sections/plans-section"
 import { WEB_FAQS } from "./faqs"
 
 const SERVICE = "Desarrollo Web"
@@ -32,10 +32,10 @@ const STEPS = [
   { title: "Lanzamiento", desc: "Publicación, medición conectada y soporte post-entrega." },
 ]
 
-const PLANS = [
-  { name: "Web Básica", price: "$400", points: ["Sitio de 1 a 3 secciones", "Diseño responsive", "SEO on-page básico", "Formulario y botón de WhatsApp"] },
-  { name: "Web Profesional", price: "$900", featured: true, points: ["Sitio corporativo multipágina", "Diseño a medida", "SEO técnico + velocidad", "Blog / Insights", "Integraciones y analítica"] },
-  { name: "Tienda Online", price: "$1,500", points: ["E-commerce completo", "Pasarela de pagos", "Catálogo y gestión", "Optimización de conversión"] },
+const PLANS: Plan[] = [
+  { name: "Web Básica", pricePrefix: "Desde", price: "$400", cta: "Cotizar este plan", points: ["Sitio de 1 a 3 secciones", "Diseño responsive", "SEO on-page básico", "Formulario y botón de WhatsApp"] },
+  { name: "Web Profesional", pricePrefix: "Desde", price: "$900", featured: true, cta: "Cotizar este plan", points: ["Sitio corporativo multipágina", "Diseño a medida", "SEO técnico + velocidad", "Blog / Insights", "Integraciones y analítica"] },
+  { name: "Tienda Online", pricePrefix: "Desde", price: "$1,500", cta: "Cotizar este plan", points: ["E-commerce completo", "Pasarela de pagos", "Catálogo y gestión", "Optimización de conversión"] },
 ]
 
 export function WebContent({ work }: { work: ShowcaseItem[] }) {
@@ -93,54 +93,12 @@ export function WebContent({ work }: { work: ShowcaseItem[] }) {
 
       <ProcessSection title="Tu web en 5 pasos, sin cajas negras" steps={STEPS} />
 
-      {/* Precios */}
-      <section id="precios" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 scroll-mt-20">
-        <div className="max-w-2xl">
-          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance">Planes y precios</h2>
-          <p className="text-lg text-muted-foreground mt-3">Precios de partida. El precio final depende del alcance y te lo damos por escrito antes de empezar.</p>
-        </div>
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLANS.map((p) => (
-            <div
-              key={p.name}
-              className={
-                p.featured
-                  ? "relative flex flex-col rounded-3xl border-2 border-primary/50 bg-primary/[0.06] p-7 shadow-xl shadow-primary/10"
-                  : "flex flex-col rounded-3xl border border-border/60 bg-card/60 p-7"
-              }
-            >
-              {p.featured && (
-                <span className="absolute -top-3 left-7 rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground">
-                  Más popular
-                </span>
-              )}
-              <h3 className="font-display text-xl font-bold">{p.name}</h3>
-              <p className="mt-3 flex items-baseline gap-2">
-                <span className="text-sm text-muted-foreground">Desde</span>
-                <span className="font-display text-5xl font-bold tracking-tight">{p.price}</span>
-              </p>
-              <ul className="mt-6 mb-7 flex flex-col gap-3">
-                {p.points.map((pt) => (
-                  <li key={pt} className="flex items-start gap-2.5 text-base text-foreground/85">
-                    <Check className="h-5 w-5 mt-0.5 shrink-0 text-primary" /> {pt}
-                  </li>
-                ))}
-              </ul>
-              <WhatsAppLink
-                segment={`diseno_web_plan_${p.name.toLowerCase().replace(/\s+/g, "_")}`}
-                defaultService={SERVICE}
-                className={
-                  p.featured
-                    ? "mt-auto rounded-xl bg-[#25D366] px-5 py-3.5 text-center text-base font-bold text-white hover:shadow-lg hover:shadow-[#25D366]/25 transition-shadow"
-                    : "mt-auto rounded-xl border border-border px-5 py-3.5 text-center text-base font-semibold text-foreground hover:bg-secondary/60 transition-colors"
-                }
-              >
-                Cotizar este plan
-              </WhatsAppLink>
-            </div>
-          ))}
-        </div>
-      </section>
+      <PlansSection
+        title="Planes y precios"
+        subtitle="Precios de partida. El precio final depende del alcance y te lo damos por escrito antes de empezar."
+        plans={PLANS}
+        whatsapp={{ service: SERVICE, segment: "diseno_web_plan" }}
+      />
 
       <FaqSection faqs={WEB_FAQS} jsonLd={false} />
 

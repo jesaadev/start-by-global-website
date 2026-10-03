@@ -1,880 +1,223 @@
-"use client"
-
-import { useState } from "react"
+import { Bot, FileText, LineChart, Workflow } from "lucide-react"
+import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
 import { AnimateIn } from "@/components/animate-in"
+import { PageHero } from "@/components/layout/page-hero"
 import { PrimaryCTA } from "@/components/cta/primary-cta"
 import { SecondaryCTA } from "@/components/cta/secondary-cta"
-import { fireLead } from "@/lib/track-client"
-import {
-  ArrowRight,
-  CheckCircle2,
-  ChevronDown,
-  Send,
-  Zap,
-  Bot,
-  GitBranch,
-  LineChart,
-  MessageSquare,
-  Database,
-  RefreshCw,
-  Shield,
-  Clock,
-  TrendingUp,
-  Cpu,
-  Workflow,
-  FileText,
-} from "lucide-react"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { AgentDemo } from "@/components/ia/agent-demo"
+import { ComparisonSection } from "@/components/sections/comparison-section"
+import { ProcessSection } from "@/components/sections/process-section"
+import { PlansSection, type Plan } from "@/components/sections/plans-section"
+import { FaqSection } from "@/components/sections/faq-section"
+import { PlatformsStrip } from "@/components/home-v2/platforms-strip"
+import SpotlightCard from "@/components/reactbits/SpotlightCard"
+import { WhatsAppLink } from "@/components/whatsapp-link"
 
-// ── DATA ──────────────────────────────────────────────────────────────────────
+// Regla de dato real: lo que hacemos y cómo, sin cifras de resultados.
 
-const services = [
+const SERVICE = "Automatización e IA"
+
+const SOLUTIONS = [
   {
-    id: "chatbots",
-    badge: "Servicio 01",
     icon: Bot,
-    title: "Chatbots & Agentes IA",
-    subtitle: "GPT-4o · Claude · Gemini",
-    description:
-      "Diseñamos agentes conversacionales con memoria, herramientas y acceso a tus datos empresariales. Atención 24/7, calificación de leads, soporte de primer nivel y consultas complejas — sin operador humano.",
-    useCases: [
-      "Chatbot de ventas con CRM integrado",
-      "Agente de soporte con base de conocimiento",
-      "Bot de calificacion de leads por WhatsApp",
-      "Asistente interno para equipos de trabajo",
-      "Automatización de onboarding de clientes",
-    ],
-    stack: ["OpenAI GPT-4o", "Anthropic Claude", "LangChain", "WhatsApp API", "Slack / Teams"],
-    metric: "Menos tickets de soporte repetitivos",
+    title: "Chatbots y agentes IA",
+    tag: "GPT · Claude · Gemini",
+    desc: "Agentes con memoria, herramientas y acceso a tus datos: atienden, califican leads y resuelven el soporte de primer nivel sin operador.",
+    uses: ["Bot de ventas por WhatsApp con CRM", "Soporte con tu base de conocimiento", "Calificación de leads", "Asistente interno para tu equipo"],
+    gain: "Menos consultas repetitivas para tu equipo",
     color: "#7B61FF",
-    bg: "from-[#7B61FF]/8 to-transparent",
-    border: "border-[#7B61FF]/20 hover:border-[#7B61FF]/50",
   },
   {
-    id: "automatización",
-    badge: "Servicio 02",
     icon: Workflow,
-    title: "Automatización de Procesos",
-    subtitle: "Make · Zapier · N8N",
-    description:
-      "Conectamos tus herramientas y eliminamos el trabajo repetitivo. Flujos que se ejecutan solos: sincronización de datos, notificaciones, reportes automáticos, facturación y mucho más.",
-    useCases: [
-      "Flujos entre CRM, email y WhatsApp",
-      "Sincronización automática de inventarios",
-      "Generación y envio de reportes periodicos",
-      "Automatización de facturación recurrente",
-      "Pipelines de marketing completamente automatizados",
-    ],
-    stack: ["Make (Integromat)", "N8N self-hosted", "Zapier", "Webhooks", "APIs REST"],
-    metric: "Horas de trabajo manual devueltas a tu equipo",
+    title: "Automatización de procesos",
+    tag: "Make · n8n · Zapier",
+    desc: "Conectamos tus herramientas y quitamos el trabajo manual: datos sincronizados, avisos, reportes y facturación que se hacen solos.",
+    uses: ["Flujos entre CRM, email y WhatsApp", "Inventarios sincronizados", "Reportes periódicos automáticos", "Facturación recurrente"],
+    gain: "Horas de trabajo manual devueltas a tu equipo",
     color: "#00C9C8",
-    bg: "from-[#00C9C8]/8 to-transparent",
-    border: "border-[#00C9C8]/20 hover:border-[#00C9C8]/50",
   },
   {
-    id: "datos",
-    badge: "Servicio 03",
     icon: LineChart,
-    title: "IA para Datos & Reportes",
-    subtitle: "Dashboards · Prediccion · Insights",
-    description:
-      "Convertimos tus datos en decisiones. Implementamos modelos predictivos, dashboards inteligentes y pipelines de datos que te dicen que va a pasar antes de que suceda.",
-    useCases: [
-      "Dashboard de ventas con prediccion de ingresos",
-      "Segmentacion automática de clientes con ML",
-      "Deteccion de anomalias en tiempo real",
-      "Recomendaciones de productos personalizadas",
-      "Análisis de sentimiento de redes sociales",
-    ],
-    stack: ["Python + Pandas", "Supabase / BigQuery", "Recharts / Metabase", "Scikit-learn", "OpenAI Embeddings"],
-    metric: "Decisiones más rápidas con datos al día",
+    title: "IA para datos y reportes",
+    tag: "Paneles · Predicción",
+    desc: "Convertimos tus datos en decisiones: paneles que se actualizan solos, segmentación de clientes y alertas cuando algo se sale de lo normal.",
+    uses: ["Panel de ventas con proyección", "Segmentación automática de clientes", "Alertas de anomalías", "Recomendaciones de productos"],
+    gain: "Decisiones con datos al día",
     color: "#0074D9",
-    bg: "from-[#0074D9]/8 to-transparent",
-    border: "border-[#0074D9]/20 hover:border-[#0074D9]/50",
   },
   {
-    id: "contenido",
-    badge: "Servicio 04",
     icon: FileText,
-    title: "Generación de Contenido con IA",
-    subtitle: "Copy · SEO · Multicanal",
-    description:
-      "Pipelines de contenido que producen blogs, emails, posts y anuncios en escala. Con tu voz de marca, optimizados para SEO y listos para publicar.",
-    useCases: [
-      "Blog SEO automatizado con revision humana",
-      "Newsletter semanal generado y enviado solo",
-      "Anuncios A/B con variantes generadas por IA",
-      "Fichas de producto para ecommerce masivo",
-      "Subtitulos y transcripciones automáticas para video",
-    ],
-    stack: ["GPT-4o + Fine-tuning", "Perplexity API", "Notion / WordPress", "Resend", "Buffer / Hootsuite"],
-    metric: "Más contenido con el mismo equipo",
+    title: "Contenido con IA",
+    tag: "Copy · SEO · Multicanal",
+    desc: "Blogs, emails, publicaciones y anuncios con tu voz de marca, optimizados para SEO y siempre con revisión humana antes de publicar.",
+    uses: ["Blog SEO con revisión humana", "Newsletter semanal", "Variantes de anuncios para pruebas A/B", "Fichas de producto a escala"],
+    gain: "Más contenido con el mismo equipo",
     color: "#F4A261",
-    bg: "from-[#F4A261]/8 to-transparent",
-    border: "border-[#F4A261]/20 hover:border-[#F4A261]/50",
   },
 ]
 
-const processSteps = [
-  {
-    num: "01",
-    title: "Diagnostico IA",
-    description:
-      "Auditamos tus procesos actuales para identificar los 3 puntos de mayor impacto donde la IA puede generar ROI inmediato.",
-    icon: LineChart,
-  },
-  {
-    num: "02",
-    title: "Prototipo en 7 días",
-    description:
-      "Entregamos un primer prototipo funcional en una semana. Nada de PowerPoints: código real corriendo en tu entorno.",
-    icon: Zap,
-  },
-  {
-    num: "03",
-    title: "Integración & Training",
-    description:
-      "Conectamos la solución a tus sistemas existentes y entrenamos a tu equipo para que la adopcion sea inmediata.",
-    icon: GitBranch,
-  },
-  {
-    num: "04",
-    title: "Monitoreo & Mejora continua",
-    description:
-      "Los modelos mejoran con el uso. Monitoreamos, ajustamos y optimizamos cada semana para maximizar el retorno.",
-    icon: RefreshCw,
-  },
+const STEPS = [
+  { title: "Diagnóstico IA", desc: "Revisamos tus procesos y elegimos los 3 puntos donde la IA ahorra más trabajo primero." },
+  { title: "Prototipo en 7 días", desc: "Un primer prototipo funcionando en una semana. Nada de presentaciones: algo que puedes probar." },
+  { title: "Integración y formación", desc: "Lo conectamos a tus sistemas y capacitamos a tu equipo para que lo use desde el primer día." },
+  { title: "Mejora continua", desc: "Revisamos la calidad de las respuestas y los flujos cada semana, y ajustamos." },
 ]
 
-const plans = [
+const PLANS: Plan[] = [
   {
     name: "Starter IA",
     price: "$890",
-    period: "proyecto",
-    description: "Un solo flujo o agente IA para un proceso especifico.",
-    features: [
-      "1 automatización o chatbot",
-      "Integración con 2 herramientas",
-      "Documentacion técnica",
-      "2 semanas de soporte post-entrega",
-      "Acceso al panel de monitoreo",
-    ],
-    cta: "Empezar",
-    color: "#0074D9",
-    popular: false,
+    period: "/ proyecto",
+    desc: "Un flujo o un agente IA para un proceso concreto.",
+    points: ["1 automatización o chatbot", "Integración con 2 herramientas", "Documentación técnica", "2 semanas de soporte post-entrega"],
+    cta: "Empezar con un proceso",
   },
   {
     name: "Growth IA",
     price: "$2,400",
-    period: "mes",
-    description: "Suite completa: automatizaciones, chatbot y dashboard de datos.",
-    features: [
-      "Hasta 5 flujos de automatización",
-      "1 agente conversacional",
-      "Dashboard de métricas en tiempo real",
-      "Soporte prioritario Slack",
-      "Optimización mensual incluida",
-      "Integraciones ilimitadas",
-    ],
-    cta: "Mejor Valor",
-    color: "#7B61FF",
-    popular: true,
+    period: "/ mes",
+    desc: "Automatizaciones, chatbot y panel de datos trabajando juntos.",
+    points: ["Hasta 5 flujos de automatización", "1 agente conversacional", "Panel de métricas", "Soporte prioritario", "Optimización mensual incluida"],
+    featured: true,
+    cta: "Quiero este plan",
   },
   {
     name: "Enterprise IA",
-    price: "Custom",
-    period: "",
-    description: "Transformacion digital completa con IA para empresas y grupos.",
-    features: [
-      "Flujos ilimitados",
-      "Modelos fine-tuned con tus datos",
-      "Infraestructura dedicada",
-      "Alta disponibilidad (SLA)",
-      "Equipo dedicado asignado",
-      "Onboarding ejecutivo incluido",
-    ],
-    cta: "Agendar Llamada",
-    color: "#00C9C8",
-    popular: false,
+    price: "A medida",
+    desc: "Para empresas y grupos que quieren llevar la IA a toda la operación.",
+    points: ["Flujos ilimitados", "Modelos ajustados con tus datos", "Infraestructura dedicada", "Acuerdo de nivel de servicio (SLA)", "Equipo asignado"],
+    cta: "Hablar de mi caso",
   },
 ]
 
-const faqs = [
-  {
-    q: "Necesito conocimientos técnicos para implementar estas soluciones?",
-    a: "No. Nosotros manejamos todo el stack técnico. Tu equipo solo necesita saber usar la herramienta final, que diseñamos para ser lo más intuitiva posible.",
-  },
-  {
-    q: "¿Mis datos están seguros si los uso para entrenar modelos?",
-    a: "Sí. Usamos contratos de procesamiento de datos, modelos con aislamiento por cliente y nunca compartimos datos entre clientes. Podemos firmar DPA o NDA si lo requieres.",
-  },
-  {
-    q: "Cuanto tiempo tarda en verse el ROI?",
-    a: "Depende del proceso. Priorizamos primero las automatizaciones simples, que suelen ser las de retorno más rápido, y lo definimos contigo en el diagnóstico antes de comprometer nada.",
-  },
-  {
-    q: "Pueden integrarse con mi CRM / ERP actual?",
-    a: "Si. Trabajamos con HubSpot, Salesforce, Zoho, SAP, Odoo y practicamente cualquier sistema que tenga API o webhooks disponibles.",
-  },
-  {
-    q: "Que pasa si el modelo da respuestas incorrectas?",
-    a: "Diseñamos circuitos de fallback y revision humana en todos nuestros agentes. Además, monitoreamos la calidad de respuestas semanalmente y ajustamos los prompts y el contexto.",
-  },
-]
+const TOOLS = ["OpenAI", "Anthropic Claude", "Google Gemini", "Make", "n8n", "Zapier", "WhatsApp Business API", "HubSpot", "Supabase", "Vercel AI SDK"]
 
-// ── COMPONENT ─────────────────────────────────────────────────────────────────
+const FAQS = [
+  { q: "¿Necesito conocimientos técnicos?", a: "No. Nos encargamos de toda la parte técnica. Tu equipo solo usa la herramienta final, que diseñamos para que sea lo más simple posible." },
+  { q: "¿Mis datos están seguros?", a: "Sí. Usamos acuerdos de procesamiento de datos, aislamiento por cliente y nunca mezclamos datos entre clientes. Firmamos NDA o DPA si lo necesitas." },
+  { q: "¿Cuándo se nota el retorno?", a: "Depende del proceso. Empezamos por las automatizaciones simples, que suelen ser las de retorno más rápido, y lo definimos contigo en el diagnóstico antes de comprometer nada." },
+  { q: "¿Se integra con mi CRM o ERP?", a: "Sí. Trabajamos con HubSpot, Salesforce, Zoho, Odoo y prácticamente cualquier sistema con API o webhooks." },
+  { q: "¿Qué pasa si la IA responde mal?", a: "Todos nuestros agentes tienen derivación a una persona y límites claros de lo que pueden responder. Además revisamos la calidad cada semana y ajustamos el contexto." },
+]
 
 export function IaContent() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [formData, setFormData] = useState({
-    name: "",
-    company: "",
-    email: "",
-    process: "",
-    message: "",
-  })
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [formError, setFormError] = useState("")
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Honeypot: leer de forma síncrona antes de cualquier await.
-    const company_website = (new FormData(e.currentTarget).get("company_website") as string) ?? ""
-    setSending(true)
-    setFormError("")
-    try {
-      const tracking = fireLead("contact_form", "ia")
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          company: formData.company,
-          service: "IA & Automatización",
-          message: `Proceso a automatizar: ${formData.process}\n\n${formData.message}`,
-          company_website,
-          ...tracking,
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setSent(true)
-      setFormData({ name: "", company: "", email: "", process: "", message: "" })
-    } catch {
-      setFormError("Error al enviar. Intenta de nuevo o escribe a info@startbyglobal.com")
-    } finally {
-      setSending(false)
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
+    <>
+      <PageFunnelTracker landingKey="ia" />
 
-      {/* ── HERO ────────────────────────────────────── */}
-      <section className="relative flex items-center overflow-hidden">
-        {/* Dot grid */}
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-            backgroundSize: "32px 32px",
-          }}
-        />
-        {/* Glow blobs */}
-        <div className="absolute top-1/3 right-1/3 w-[700px] h-[700px] bg-[#7B61FF]/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-[#00C9C8]/6 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/4 left-1/3 w-[300px] h-[300px] bg-[#0074D9]/8 rounded-full blur-[80px] pointer-events-none" />
+      <PageHero
+        badge="IA & Automatización"
+        title="Automatiza lo repetitivo. Amplifica lo humano."
+        highlight="Amplifica lo humano."
+        glow="#7B61FF"
+        subtitle="Agentes de IA que atienden y agendan, flujos que mueven datos solos y reportes que se hacen sin que nadie los arme. Tu equipo hace más sin contratar más."
+        note={<><span className="font-semibold text-foreground">Prototipo funcionando en 7 días.</span> NDA disponible desde el primer contacto.</>}
+        aside={<AgentDemo />}
+      >
+        <PrimaryCTA label="Agendar demo por WhatsApp" segment="ia_hero" service={SERVICE} />
+        <SecondaryCTA label="Prefiero dejar mis datos" href="#contacto" />
+      </PageHero>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-24 grid lg:grid-cols-[1fr_420px] gap-16 items-center">
-          {/* Left */}
-          <div>
-            <AnimateIn delay={0.05}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#7B61FF]/10 border border-[#7B61FF]/25 text-[#7B61FF] text-xs font-semibold mb-8 tracking-wide uppercase">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#7B61FF] animate-pulse" />
-                Inteligencia Artificial & Automatización
-              </div>
-            </AnimateIn>
+      <ComparisonSection
+        eyebrow="El problema"
+        title="Tu equipo pasa horas en tareas que una IA hace en segundos."
+        highlight="una IA hace en segundos."
+        before={{
+          label: "Hoy",
+          items: [
+            "Responder los mismos mensajes todos los días",
+            "Copiar datos a mano entre Excel, CRM y email",
+            "Reportes que tardan medio día en armarse",
+            "Leads que se enfrían por falta de seguimiento",
+            "Contratar más gente para hacer más de lo mismo",
+          ],
+        }}
+        after={{
+          label: "Con IA bien implementada",
+          items: [
+            "Un agente responde las consultas frecuentes al instante",
+            "Datos sincronizados solos entre tus sistemas",
+            "Reportes que llegan armados cada lunes",
+            "Seguimiento automático en minutos, no en días",
+            "Tu equipo se dedica a lo que de verdad necesita una persona",
+          ],
+        }}
+      />
 
-            <AnimateIn delay={0.1}>
-              <h1 className="font-display text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.04] text-balance mb-6">
-                Automatiza lo{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7B61FF] via-[#00C9C8] to-[#0074D9]">
-                  repetitivo.
-                </span>
-                <br />
-                Amplifica lo{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#7B61FF]">
-                  humano.
-                </span>
-              </h1>
-            </AnimateIn>
-
-            <AnimateIn delay={0.2}>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-xl">
-                Implementamos agentes IA, flujos de automatización y pipelines de datos para que tu empresa haga más con el mismo equipo. Sin reemplazarlo: potenciándolo.
-              </p>
-            </AnimateIn>
-
-            <AnimateIn delay={0.3}>
-              <div className="flex flex-wrap items-center gap-3">
-                <PrimaryCTA label="Agendar demo por WhatsApp" segment="ia_hero" service="Automatización e IA" />
-                <SecondaryCTA label="Prefiero el formulario" href="#contacto" />
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.4}>
-              <div className="mt-12 flex flex-wrap gap-6">
-                {[
-                  { icon: Zap, label: "Prototipo en 7 días" },
-                  { icon: Shield, label: "Datos 100% seguros" },
-                  { icon: TrendingUp, label: "Enfoque en retorno" },
-                ].map((t) => (
-                  <div key={t.label} className="flex items-center gap-2 text-sm text-foreground/35">
-                    <t.icon className="w-4 h-4 text-[#7B61FF]" />
-                    {t.label}
-                  </div>
-                ))}
-              </div>
-            </AnimateIn>
-          </div>
-
-          {/* Right — live metrics card */}
-          <AnimateIn delay={0.25}>
-            <div className="hidden lg:block">
-              <div className="relative p-1 rounded-2xl bg-gradient-to-br from-[#7B61FF]/30 via-[#00C9C8]/10 to-transparent">
-                <div className="rounded-[14px] bg-background p-7">
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <p className="text-xs text-foreground/30 uppercase tracking-widest mb-1">IA Activa</p>
-                      <p className="font-display text-lg font-bold">Panel de Impacto</p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#F4A261]/15 text-[10px] font-semibold text-[#b45309] dark:text-[#F4A261]">
-                      Datos de ejemplo
+      {/* Soluciones */}
+      <section id="soluciones" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 scroll-mt-20">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance max-w-3xl">
+          Cuatro líneas de IA, un solo equipo
+        </h2>
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {SOLUTIONS.map((s, i) => {
+            const Icon = s.icon
+            return (
+              <AnimateIn key={s.title} delay={(i % 2) * 90} className="h-full">
+                <SpotlightCard spotlightColor="rgba(123, 97, 255, 0.18)" className="h-full !p-7 sm:!p-8 flex flex-col">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${s.color}1f`, color: s.color }}>
+                      <Icon className="h-6 w-6" />
                     </span>
+                    <span className="rounded-full bg-secondary/70 px-3 py-1 text-xs font-medium text-muted-foreground">{s.tag}</span>
                   </div>
-
-                  {/* Metrics */}
-                  <div className="space-y-3 mb-6">
-                    {[
-                      { label: "Tickets atendidos por bot", value: "2,847", change: "+18%", color: "#7B61FF" },
-                      { label: "Horas ahorradas esta semana", value: "143h", change: "+32%", color: "#00C9C8" },
-                      { label: "Leads calificados por IA", value: "412", change: "+55%", color: "#0074D9" },
-                      { label: "Costo por conversión", value: "$1.20", change: "-41%", color: "#F4A261" },
-                    ].map((m) => (
-                      <div key={m.label} className="flex items-center justify-between p-3 rounded-xl bg-foreground/[0.03] border border-foreground/5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
-                          <span className="text-xs text-muted-foreground">{m.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-display font-bold text-sm">{m.value}</span>
-                          <span
-                            className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                            style={{
-                              color: m.change.startsWith("+") ? "#00C9C8" : "#F4A261",
-                              backgroundColor: (m.change.startsWith("+") ? "#00C9C8" : "#F4A261") + "15",
-                            }}
-                          >
-                            {m.change}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Mini bar chart */}
-                  <div>
-                    <p className="text-[10px] text-foreground/30 uppercase tracking-widest mb-3">Automatizaciones ejecutadas / semana</p>
-                    <div className="flex items-end gap-1.5 h-14">
-                      {[30, 55, 40, 70, 60, 85, 100].map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-sm"
-                          style={{
-                            height: `${h}%`,
-                            backgroundColor: i === 6 ? "#7B61FF" : `rgba(123,97,255,${0.15 + i * 0.06})`,
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <div className="flex justify-between mt-1.5">
-                      {["L", "M", "X", "J", "V", "S", "D"].map((d) => (
-                        <span key={d} className="text-[9px] text-foreground/20 flex-1 text-center">{d}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </AnimateIn>
-        </div>
-      </section>
-
-      {/* ── PROBLEMA ────────────────────────────────── */}
-      <section className="py-24 border-b border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="max-w-3xl mb-16">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">El Problema</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight">
-                Tu equipo pasa horas en tareas que{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7B61FF] to-[#00C9C8]">
-                  una IA puede hacer en segundos.
-                </span>
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-5xl">
-            <AnimateIn delay={0.1}>
-              <div className="p-8 rounded-2xl border border-red-500/15 bg-red-500/3">
-                <p className="text-red-400 text-xs font-semibold uppercase tracking-wider mb-6">Sin IA</p>
-                <ul className="space-y-4">
-                  {[
-                    "Responder los mismos mensajes de soporte cada día",
-                    "Copiar datos entre Excel, CRM y email manualmente",
-                    "Generar reportes que tardan medio día en prepararse",
-                    "Perder leads por falta de seguimiento rápido",
-                    "Contratar más gente para hacer más de lo mismo",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                        <div className="w-1.5 h-1.5 bg-red-400 rounded-full" />
-                      </div>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.15}>
-              <div className="p-8 rounded-2xl border border-[#7B61FF]/20 bg-gradient-to-br from-[#7B61FF]/6 to-transparent">
-                <p className="text-[#7B61FF] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global IA</p>
-                <ul className="space-y-4">
-                  {[
-                    "Un agente IA responde las consultas frecuentes sin intervención humana",
-                    "Datos sincronizados automáticamente entre sistemas",
-                    "Reportes generados y enviados solos cada lunes",
-                    "Follow-up automático en minutos, no días",
-                    "Escala sin contratar — la IA crece contigo",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-foreground/70">
-                      <CheckCircle2 className="w-5 h-5 text-[#0E7490] dark:text-[#00C9C8] shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimateIn>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SOLUCIONES ──────────────────────────────── */}
-      <section id="soluciones" className="py-24 border-b border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Nuestras Soluciones</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                Cuatro líneas de IA.<br />Un solo equipo.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="flex flex-col gap-5">
-            {services.map((svc, i) => {
-              const Icon = svc.icon
-              return (
-                <AnimateIn key={svc.id} delay={0.07 * i}>
-                  <div
-                    className={`group relative p-8 md:p-10 rounded-2xl bg-gradient-to-br ${svc.bg} border ${svc.border} transition-all duration-500`}
-                  >
-                    <div className="grid md:grid-cols-[1fr_auto] gap-8 items-start">
-                      <div>
-                        {/* Header */}
-                        <div className="flex flex-wrap items-center gap-4 mb-6">
-                          <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: svc.color + "15", border: `1px solid ${svc.color}25` }}
-                          >
-                            <Icon className="w-6 h-6" style={{ color: svc.color }} />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/30">{svc.badge}</p>
-                            <h3 className="font-display text-2xl md:text-3xl font-bold">{svc.title}</h3>
-                          </div>
-                          <span
-                            className="px-3 py-1 rounded-full text-xs font-medium font-mono"
-                            style={{ backgroundColor: svc.color + "12", color: svc.color }}
-                          >
-                            {svc.subtitle}
-                          </span>
-                        </div>
-
-                        <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
-
-                        <div className="grid sm:grid-cols-2 gap-8">
-                          {/* Use cases */}
-                          <div>
-                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Casos de Uso</p>
-                            <ul className="space-y-2">
-                              {svc.useCases.map((u) => (
-                                <li key={u} className="flex items-start gap-2 text-xs text-muted-foreground">
-                                  <div className="w-1 h-1 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: svc.color }} />
-                                  {u}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* Stack */}
-                          <div>
-                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Stack</p>
-                            <div className="flex flex-wrap gap-2">
-                              {svc.stack.map((s) => (
-                                <span key={s} className="px-2.5 py-1 rounded-md bg-foreground/5 border border-foreground/8 text-xs text-muted-foreground font-mono">
-                                  {s}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Metric */}
-                      <div
-                        className="shrink-0 self-center px-6 py-5 rounded-2xl text-center min-w-[160px]"
-                        style={{ backgroundColor: svc.color + "10", border: `1px solid ${svc.color}20` }}
-                      >
-                        <TrendingUp className="w-5 h-5 mx-auto mb-2" style={{ color: svc.color }} />
-                        <p className="font-display font-bold text-sm leading-tight" style={{ color: svc.color }}>
-                          {svc.metric}
-                        </p>
-                        <p className="text-[10px] text-foreground/30 mt-1 uppercase tracking-wide">Promedio clientes</p>
-                      </div>
-                    </div>
-                  </div>
-                </AnimateIn>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PROCESO ─────────────────────────────────── */}
-      <section id="proceso" className="py-24 border-b border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Como trabajamos</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                De cero a IA funcionando<br />en 4 semanas.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {processSteps.map((step, i) => {
-              const Icon = step.icon
-              return (
-                <AnimateIn key={step.num} delay={0.1 * i}>
-                  <div className="relative p-6 rounded-2xl bg-foreground/[0.025] border border-foreground/8 group hover:border-[#7B61FF]/30 transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-xl bg-[#7B61FF]/10 border border-[#7B61FF]/20 flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-[#7B61FF]" />
-                      </div>
-                      <span className="font-display text-3xl font-bold text-foreground/8 group-hover:text-[#7B61FF]/20 transition-colors">
-                        {step.num}
-                      </span>
-                    </div>
-                    <h3 className="font-display text-lg font-bold mb-3">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
-                    {i < processSteps.length - 1 && (
-                      <div className="hidden lg:block absolute top-10 -right-3 w-6 h-px bg-foreground/10" />
-                    )}
-                  </div>
-                </AnimateIn>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PLANES ──────────────────────────────────── */}
-      <section id="planes" className="py-24 border-b border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16 text-center">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Inversion</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                Planes claros. Sin sorpresas.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {plans.map((plan, i) => (
-              <AnimateIn key={plan.name} delay={0.1 * i}>
-                <div
-                  className={`relative flex flex-col p-7 rounded-2xl border transition-all duration-300 h-full ${
-                    plan.popular
-                      ? "bg-gradient-to-b from-[#7B61FF]/12 to-transparent border-[#7B61FF]/40"
-                      : "bg-foreground/[0.025] border-foreground/8 hover:border-foreground/15"
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#7B61FF] text-xs font-bold uppercase tracking-wide text-foreground">
-                      Más popular
-                    </div>
-                  )}
-
-                  <div className="mb-6">
-                    <h3 className="font-display text-xl font-bold mb-1">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="font-display text-4xl font-bold" style={{ color: plan.color }}>
-                        {plan.price}
-                      </span>
-                      {plan.period && (
-                        <span className="text-sm text-foreground/35">/ {plan.period}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm text-foreground/65">
-                        <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: plan.color }} />
-                        {f}
+                  <h3 className="font-display text-2xl font-bold mt-5">{s.title}</h3>
+                  <p className="text-base text-foreground/70 leading-relaxed mt-2">{s.desc}</p>
+                  <ul className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                    {s.uses.map((u) => (
+                      <li key={u} className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                        {u}
                       </li>
                     ))}
                   </ul>
-
-                  <a
-                    href="#contacto"
-                    className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                    style={
-                      plan.popular
-                        ? { backgroundColor: plan.color, color: "#fff" }
-                        : { border: `1px solid ${plan.color}40`, color: plan.color, backgroundColor: `${plan.color}08` }
-                    }
-                  >
-                    {plan.cta}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+                  <p className="mt-auto pt-6 text-sm font-semibold" style={{ color: s.color }}>→ {s.gain}</p>
+                </SpotlightCard>
               </AnimateIn>
-            ))}
-          </div>
-
-          <AnimateIn delay={0.3}>
-            <p className="text-center text-xs text-foreground/25 mt-8">
-              Todos los planes incluyen NDA, acceso al panel de monitoreo y soporte por Slack.
-            </p>
-          </AnimateIn>
+            )
+          })}
+        </div>
+        <div className="mt-10 flex flex-wrap items-center gap-4">
+          <WhatsAppLink
+            segment="ia_soluciones"
+            defaultService={SERVICE}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-base font-bold text-white hover:shadow-lg hover:shadow-[#25D366]/25 transition-shadow"
+          >
+            Cuéntanos qué quieres automatizar
+          </WhatsAppLink>
         </div>
       </section>
 
-      {/* ── TECNOLOGIAS ─────────────────────────────── */}
-      <section className="py-16 border-b border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <p className="text-xs uppercase tracking-widest text-foreground/25 text-center mb-8">
-              Trabajamos con las mejores plataformas del mercado
-            </p>
-          </AnimateIn>
-          <div className="flex flex-wrap justify-center gap-3">
-            {[
-              "OpenAI GPT-4o", "Anthropic Claude", "Google Gemini", "LangChain",
-              "Make / Integromat", "N8N", "Zapier", "Supabase",
-              "WhatsApp Business API", "Slack API", "HubSpot", "Salesforce",
-              "Python / FastAPI", "Vercel AI SDK", "Pinecone", "Notion API",
-            ].map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1.5 rounded-lg bg-foreground/[0.04] border border-foreground/8 text-xs text-muted-foreground font-mono hover:text-foreground/70 hover:border-foreground/15 transition-colors cursor-default"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ProcessSection title="De cero a IA funcionando en 4 semanas" steps={STEPS} />
 
-      {/* ── FAQ ─────────────────────────────────────── */}
-      <section id="faq" className="py-24 border-b border-foreground/5">
-        <div className="max-w-3xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-12 text-center">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Preguntas Frecuentes</p>
-              <h2 className="font-display text-4xl font-bold">Todo lo que necesitas saber.</h2>
-            </div>
-          </AnimateIn>
+      <PlansSection
+        id="planes"
+        title="Planes claros, sin sorpresas"
+        subtitle="Todos los planes incluyen NDA, panel de monitoreo y soporte por Slack. El alcance exacto queda por escrito antes de empezar."
+        plans={PLANS}
+        whatsapp={{ service: SERVICE, segment: "ia_plan" }}
+      />
 
-          <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <AnimateIn key={i} delay={0.05 * i}>
-                <div className="rounded-xl border border-foreground/8 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-foreground/[0.02] transition-colors"
-                  >
-                    <span className="text-sm font-medium text-foreground/80">{faq.q}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
-                    />
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-6 pb-5 text-sm text-muted-foreground leading-relaxed border-t border-foreground/5 pt-4">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              </AnimateIn>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="py-6">
+        <PlatformsStrip items={TOOLS} label="Trabajamos con" />
+      </div>
 
-      {/* ── CONTACTO ────────────────────────────────── */}
-      <section id="contacto" className="py-24">
-        <div className="max-w-3xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-12 text-center">
-              <p className="text-[#7B61FF] text-sm font-semibold uppercase tracking-widest mb-4">Empieza Hoy</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance mb-4">
-                Agenda tu demo gratuita.
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                30 minutos para mostrarte exactamente que podemos automatizar en tu empresa — sin compromiso.
-              </p>
-            </div>
-          </AnimateIn>
+      <FaqSection faqs={FAQS} />
 
-          <AnimateIn delay={0.1}>
-            {sent ? (
-              <div className="p-10 rounded-2xl border border-[#00C9C8]/25 bg-[#00C9C8]/5 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#00C9C8]/10 border border-[#00C9C8]/20 flex items-center justify-center mx-auto mb-5">
-                  <CheckCircle2 className="w-7 h-7 text-[#0E7490] dark:text-[#00C9C8]" />
-                </div>
-                <h3 className="font-display text-2xl font-bold mb-2">Solicitud recibida</h3>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Te contactaremos en menos de 24 horas para coordinar la demo. Revisa tu bandeja de entrada.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setSent(false)}
-                  className="text-sm text-[#7B61FF] hover:text-foreground transition-colors"
-                >
-                  Enviar otra solicitud
-                </button>
-              </div>
-            ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8 space-y-5"
-              >
-                {/* Honeypot anti-bots: oculto para usuarios reales */}
-                <input type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Nombre *</label>
-                    <input
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Tu nombre"
-                      className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs text-muted-foreground uppercase tracking-wide">Empresa *</label>
-                    <input
-                      required
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      placeholder="Nombre de tu empresa"
-                      className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Email *</label>
-                  <input
-                    required
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="tu@empresa.com"
-                    className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Que proceso quieres automatizar?</label>
-                  <select
-                    value={formData.process}
-                    onChange={(e) => setFormData({ ...formData, process: e.target.value })}
-                    className="px-4 py-3 rounded-xl bg-background border border-foreground/10 text-sm text-foreground/70 focus:outline-none focus:border-[#7B61FF]/50 transition-colors"
-                  >
-                    <option value="" className="bg-background text-foreground">Selecciona una opción...</option>
-                    <option value="Chatbot / Agente IA" className="bg-background text-foreground">Chatbot / Agente IA</option>
-                    <option value="Flujos de automatización" className="bg-background text-foreground">Flujos de automatización</option>
-                    <option value="Análisis de datos / Reportes IA" className="bg-background text-foreground">Análisis de datos / Reportes IA</option>
-                    <option value="Generación de contenido IA" className="bg-background text-foreground">Generación de contenido IA</option>
-                    <option value="Varios / No estoy seguro" className="bg-background text-foreground">Varios / No estoy seguro</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wide">Cuéntanos más (opcional)</label>
-                  <textarea
-                    rows={4}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Describe brevemente tu proceso actual y el problema que quieres resolver..."
-                    className="px-4 py-3 rounded-xl bg-foreground/5 border border-foreground/10 text-sm text-foreground placeholder-foreground/20 focus:outline-none focus:border-[#7B61FF]/50 transition-colors resize-none"
-                  />
-                </div>
-
-                {formError && (
-                  <p className="text-red-400 text-xs px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
-                    {formError}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#7B61FF] text-white font-semibold text-sm hover:bg-[#7B61FF]/85 hover:shadow-xl hover:shadow-[#7B61FF]/25 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:pointer-events-none"
-                >
-                  {sending ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Agendar Demo Gratuita
-                    </>
-                  )}
-                </button>
-
-                <p className="text-center text-xs text-foreground/20">
-                  Sin spam. Sin compromiso. Solo una conversacion técnica.
-                </p>
-              </form>
-            )}
-          </AnimateIn>
-        </div>
-      </section>
-
-    </div>
+      <ClosingCTA
+        title="Agenda tu demo gratis"
+        text="30 minutos para mostrarte qué podemos automatizar en tu empresa, con ejemplos de tu propio día a día. Sin compromiso."
+        segment="ia_final"
+        service={SERVICE}
+        ctaLabel="Agendar por WhatsApp"
+        form={{
+          landingKey: "ia",
+          landingName: "IA & Automatización (página de servicio)",
+          button: "Quiero mi demo",
+          qualifierLabel: "¿Qué proceso quieres automatizar?",
+        }}
+      />
+    </>
   )
 }

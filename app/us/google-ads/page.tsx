@@ -37,7 +37,7 @@ export default function GoogleAdsPage() {
         ]}
       />
       <FaqJsonLd faqs={US_ADS_FAQS} />
-      <MarketingLayout ctaSegment="us_ads_sticky" locale="en">
+      <MarketingLayout ctaSegment="us_ads_sticky" locale="en" ctaSecondary={{ href: "#contact", label: "Get a free quote" }}>
         <GoogleAdsContent />
       </MarketingLayout>
     </>

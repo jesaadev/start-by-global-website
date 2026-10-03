@@ -1,5 +1,4 @@
-// Módulo plano (sin "use client") para poder importarlo tanto desde la página
-// server (FaqJsonLd) como desde el contenido cliente.
+// Preguntas de /us/google-ads (sección visible + JSON-LD de FAQ).
 export const US_ADS_FAQS = [
   {
     q: "What's the minimum investment?",
