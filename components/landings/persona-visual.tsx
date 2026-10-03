@@ -29,7 +29,7 @@ export function relevantWork(data: PersonaLandingData, items: ShowcaseItem[]): S
 }
 
 /** Visual del hero de la landing: trabajo real si lo hay; si no, ilustración. */
-export function PersonaVisual({ data, work }: { data: PersonaLandingData; work: ShowcaseItem[] }) {
+export function PersonaVisual({ visual, work }: { visual: Visual; work: ShowcaseItem[] }) {
   const real = work.find((i) => i.desktop_image)
   if (real?.desktop_image) {
     return (
@@ -43,19 +43,19 @@ export function PersonaVisual({ data, work }: { data: PersonaLandingData; work: 
         />
         <p className="mt-4 text-xs text-muted-foreground text-center lg:text-left">
           Trabajo real: <span className="font-medium text-foreground">{real.client_name ?? real.title}</span>
-          {data.visual === "agency" && " · así entregamos bajo la marca de tu agencia"}
+          {visual === "agency" && " · así entregamos bajo la marca de tu agencia"}
         </p>
       </div>
     )
   }
 
-  const ill = ILLUSTRATION[data.visual]
+  const ill = ILLUSTRATION[visual]
   return (
     <div className="relative">
       <Tilt>
         <BrowserMockup domain={ill.domain}>{ill.screen}</BrowserMockup>
       </Tilt>
-      {data.visual === "agency" && (
+      {visual === "agency" && (
         <span className="absolute -top-3 right-4 inline-flex items-center gap-1.5 rounded-full border border-[#7B61FF]/30 bg-background/90 px-3 py-1 text-xs font-semibold text-[#9d88ff] shadow-lg backdrop-blur">
           <BadgeCheck className="h-3.5 w-3.5" /> Entregado con tu marca
         </span>

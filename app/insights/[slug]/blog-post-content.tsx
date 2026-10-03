@@ -49,7 +49,7 @@ const ARTICLE_TEXT = {
     readNext: "Leer también",
     aboutAuthor: "Sobre el autor",
     authorBlurb: (category: string) =>
-      `Especialista en ${category} con amplia experiencia ayudando a empresas en República Dominicana, España y Latinoamérica a crecer en el entorno digital.`,
+      `Especialista en ${category} en Start By Global. Ayuda a empresas de República Dominicana, España y Latinoamérica a crecer en el entorno digital.`,
     keepReading: "Sigue leyendo",
     ctaKicker: "Start By Global",
     ctaTitle: "¿Listo para Aplicar Estas Estrategias?",
@@ -63,7 +63,7 @@ const ARTICLE_TEXT = {
     readNext: "Read next",
     aboutAuthor: "About the author",
     authorBlurb: (category: string) =>
-      `${category} specialist with extensive experience helping businesses in the U.S. and Latin America grow online.`,
+      `${category} specialist at Start By Global, helping businesses in the U.S. and Latin America grow online.`,
     keepReading: "Keep reading",
     ctaKicker: "Start By Global",
     ctaTitle: "Ready to Put This Into Practice?",

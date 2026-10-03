@@ -2,9 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
 import { ContactSection } from "@/components/contact-section"
 import {
   ArrowRight, Code2, Gauge, Search, ShoppingCart, LayoutTemplate,
@@ -39,7 +37,7 @@ export function WebsiteDesignContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   return (
-    <DashboardLayout>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-6">
       {/* Hero */}
       <AnimateIn>
         <section className="glass-card rounded-2xl p-8 sm:p-12 relative overflow-hidden">
@@ -52,7 +50,7 @@ export function WebsiteDesignContent() {
               <Code2 className="w-3.5 h-3.5" />
               Website design & development
             </span>
-            <h1 className="font-display text-3xl sm:text-5xl font-bold text-balance leading-[1.12] tracking-tight">
+            <h1 className="font-display text-4xl sm:text-6xl font-bold text-balance leading-[1.04] tracking-tight">
               A website that sells — not just a pretty brochure
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
@@ -172,7 +170,6 @@ export function WebsiteDesignContent() {
         <ContactSection />
       </AnimateIn>
 
-      <Footer locale="en" />
-    </DashboardLayout>
+    </div>
   )
 }

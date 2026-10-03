@@ -1,8 +1,6 @@
 "use client"
 
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
 import { ContactSection } from "@/components/contact-section"
 import { MessageCircle, Calendar, Video } from "lucide-react"
 
@@ -32,7 +30,15 @@ const CONTACT_METHODS = [
 
 export function UsContactContent() {
   return (
-    <DashboardLayout title="Contact" subtitle="Let's talk about growing your business">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-6">
+      <header className="pt-2">
+        <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight leading-[1.04] text-balance">
+          Let&apos;s talk about <span className="text-primary">growing your business</span>
+        </h1>
+        <p className="text-lg sm:text-xl text-foreground/75 mt-4 max-w-2xl">
+          Book a call, chat with us or send a message. We reply within 24 hours, in English.
+        </p>
+      </header>
       {/* Contact methods */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {CONTACT_METHODS.map((method, i) => {
@@ -58,7 +64,6 @@ export function UsContactContent() {
       {/* Formulario + oficinas (ContactSection se auto-localiza a inglés en /us) */}
       <ContactSection />
 
-      <Footer locale="en" />
-    </DashboardLayout>
+    </div>
   )
 }

@@ -4,6 +4,8 @@ import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import type { BlogPostView } from "@/lib/blog-posts"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
 import {
   TrendingUp,
   Code,
@@ -41,10 +43,9 @@ const LISTING_TEXT = {
     searchPh: "Buscar artículos...",
     emptyTitle: "No se encontraron artículos",
     emptyBody: "Intenta con otra búsqueda o categoría",
-    newsTitle: "Mantente al Día",
-    newsBody: "Recibe nuestros mejores insights directamente en tu inbox",
-    newsPh: "tu@email.com",
-    newsCta: "Suscribirme",
+    ctaTitle: "¿Prefieres que lo hagamos por ti?",
+    ctaBody: "Leer ayuda; aplicarlo trae clientes. Escríbenos y te decimos qué cambiarías primero en tu web y tus anuncios.",
+    ctaSecondary: "Prefiero un diagnóstico por formulario",
   },
   en: {
     base: "/us/insights",
@@ -53,10 +54,9 @@ const LISTING_TEXT = {
     searchPh: "Search articles...",
     emptyTitle: "No articles found",
     emptyBody: "Try a different search or category",
-    newsTitle: "Stay in the Loop",
-    newsBody: "Get our best insights straight to your inbox",
-    newsPh: "you@email.com",
-    newsCta: "Subscribe",
+    ctaTitle: "Rather have us do it for you?",
+    ctaBody: "Reading helps; putting it to work brings customers. Tell us about your business and we'll show you what to fix first.",
+    ctaSecondary: "Get a free quote",
   },
 } as const
 
@@ -117,10 +117,10 @@ export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <h1 className="font-display text-4xl sm:text-5xl font-bold text-balance">
-          Insights & Blog
+        <h1 className="font-display text-[2.5rem] sm:text-6xl font-bold tracking-tight leading-[1.04] text-balance">
+          {t.title}
         </h1>
-        <p className="text-muted-foreground text-lg text-balance">
+        <p className="text-foreground/75 text-lg sm:text-xl text-balance">
           {t.sub}
         </p>
       </div>
@@ -285,30 +285,26 @@ export function InsightsContent({ posts, locale = "es" }: { posts: BlogPostView[
         </div>
       )}
 
-      {/* Newsletter CTA */}
-      <div className="glass-card rounded-2xl p-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-chart-2/10 opacity-50" />
-        <div className="relative z-10">
-          <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h3 className="font-display text-2xl font-bold mb-2">
-            Mantente al Día
-          </h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            {t.newsBody}
-          </p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-            <input
-              type="email"
-              placeholder={t.newsPh}
-              className="flex-1 px-4 py-3 rounded-xl bg-background/50 border border-border/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-lg hover:shadow-primary/25 transition-all"
+      {/* CTA: el lector convencido pasa a conversación */}
+      <div className="relative overflow-hidden rounded-[2rem] border border-primary/25 bg-gradient-to-br from-primary/20 via-primary/[0.06] to-transparent p-7 sm:p-12">
+        <div aria-hidden className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/25 blur-[100px]" />
+        <div className="relative max-w-2xl flex flex-col gap-5">
+          <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance">{t.ctaTitle}</h2>
+          <p className="text-lg text-foreground/80 leading-relaxed">{t.ctaBody}</p>
+          {locale === "es" ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <PrimaryCTA segment="insights_listing" />
+              <SecondaryCTA label={t.ctaSecondary} />
+            </div>
+          ) : (
+            <Link
+              href="/us/contact"
+              className="inline-flex w-fit items-center gap-2 rounded-xl bg-primary px-7 py-4 text-base font-bold text-primary-foreground hover:shadow-lg hover:shadow-primary/25 transition-shadow"
             >
-              Suscribirme
-            </button>
-          </form>
+              {t.ctaSecondary}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          )}
         </div>
       </div>
     </div>

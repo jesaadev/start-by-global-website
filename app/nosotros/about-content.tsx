@@ -1,187 +1,130 @@
-"use client"
-
-import { DashboardLayout } from "@/components/dashboard-layout"
+import { Globe, KeyRound, Lightbulb, Target } from "lucide-react"
 import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
-import {
-  Globe,
-  Target,
-  Heart,
-  Lightbulb,
-  Award,
-  MapPin,
-  ArrowRight,
-  TrendingUp,
-  Calendar,
-  Rocket,
-} from "lucide-react"
-import Link from "next/link"
+import { PageHero } from "@/components/layout/page-hero"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { PlatformsStrip } from "@/components/home-v2/platforms-strip"
 
-const values = [
+// Regla de dato real: sin años de trayectoria, conteos de proyectos ni
+// certificaciones que no podamos demostrar. Hablamos de cómo trabajamos.
+
+const VALUES = [
   {
     icon: Target,
-    title: "Orientados a Resultados",
-    description: "Cada accion esta guiada por datos y enfocada en métricas que impactan tu negocio real.",
+    title: "Resultados que se miden",
+    desc: "Cada decisión se toma con datos y se juzga por lo que mueve en tu negocio: conversaciones, citas y ventas, no likes.",
   },
   {
-    icon: Heart,
-    title: "Pasión por lo Digital",
-    description: "Vivimos y respiramos marketing digital. Nos apasiona lo que hacemos y se refleja en cada proyecto.",
+    icon: KeyRound,
+    title: "Transparencia total",
+    desc: "Precio y fecha por escrito antes de empezar. Dominio, accesos y cuentas siempre a tu nombre.",
   },
   {
     icon: Lightbulb,
-    title: "Innovación Constante",
-    description: "Adoptamos las ultimas tecnologías y tendencias para mantener a nuestros clientes a la vanguardia.",
+    title: "Tecnología actual",
+    desc: "Webs rápidas, medición con API de Conversiones y automatización con IA donde de verdad ahorra trabajo.",
   },
   {
     icon: Globe,
-    title: "Visión Global",
-    description: "Pensamos globalmente y actuamos localmente. Entendemos los matices culturales de cada mercado.",
+    title: "Visión global",
+    desc: "Entendemos los matices de cada mercado y trabajamos en tu zona horaria, estés donde estés.",
   },
 ]
 
-const milestones = [
-  { year: "2020", title: "Fundación", description: "Start By Global nace en Santo Domingo con una visión clara." },
-  { year: "2021", title: "Expansión a España", description: "Comenzamos operaciones con clientes en el mercado europeo." },
-  { year: "2022", title: "Crecimiento regional", description: "Ampliamos operaciones a más mercados de Latinoamérica." },
-  { year: "2023", title: "Presencia en EE.UU.", description: "Empezamos a atender clientes en el mercado norteamericano." },
-  { year: "2024", title: "Nuevos servicios", description: "Sumamos capacidades de medición y automatización con IA." },
-  { year: "2025", title: "Enfoque nearshore", description: "Consolidamos nuestra propuesta para el mercado de EE.UU. con la versión en inglés." },
+const MARKETS = [
+  { name: "Rep. Dominicana", note: "Nuestra base, en Santo Domingo", tz: "GMT-4" },
+  { name: "España", note: "Atención en remoto", tz: "GMT+1" },
+  { name: "Latinoamérica", note: "Atención en remoto", tz: "GMT-6 a GMT-3" },
+  { name: "EE.UU.", note: "Atención en remoto, en inglés o español", tz: "GMT-5 a GMT-8" },
 ]
 
 export function AboutPageContent() {
   return (
-    <DashboardLayout title="Nosotros" subtitle="Conoce al equipo que impulsa tu éxito digital">
-      {/* Mission & Story */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <AnimateIn direction="left" className="lg:col-span-3">
-          <div className="glass-card rounded-xl p-6 lg:p-8 h-full flex flex-col gap-5">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                <Rocket className="w-5 h-5 text-primary" />
-              </div>
-              <h2 className="font-display text-xl font-bold text-foreground">Nuestra Misión</h2>
-            </div>
-            <p className="text-muted-foreground leading-relaxed">
-              En Start By Global, nuestra misión es democratizar el acceso a soluciones de marketing digital
-              de clase mundial para empresas en Latinoamérica, el Caribe, España y Estados Unidos. Creemos
-              que cada negocio, sin importar su tamaño o ubicación, merece una presencia digital que
-              impulse su crecimiento.
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Fundada en 2020 en Santo Domingo, Rep. Dominicana, nacimos con la conviccion de que el
-              talento hispanohablante puede competir con las mejores agencias del mundo. Hoy, con un
-              equipo distribuido y clientes en varios mercados, seguimos comprometidos con esa visión.
-            </p>
-            <div className="pt-4 border-t border-border/50">
-              <p className="text-sm font-medium text-foreground italic">
-                &ldquo;Transformamos datos en decisiones, ideas en experiencias y clientes en embajadores de marca.&rdquo;
-              </p>
-            </div>
-          </div>
-        </AnimateIn>
+    <>
+      <PageHero
+        badge="Nosotros"
+        title="Hacemos que tu web trabaje como tu mejor vendedor"
+        highlight="tu mejor vendedor"
+        subtitle="Somos un equipo de diseño, desarrollo y publicidad nacido en Santo Domingo. Trabajamos en remoto con negocios de Rep. Dominicana, España, Latinoamérica y EE.UU."
+      >
+        <PrimaryCTA segment="nosotros_hero" />
+        <SecondaryCTA />
+      </PageHero>
 
-        <AnimateIn direction="right" delay={100} className="lg:col-span-2">
-          <div className="glass-card rounded-xl p-6 h-full flex flex-col gap-4">
-            <h3 className="font-display font-semibold text-foreground flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              Nuestra Historia
-            </h3>
-            <div className="flex flex-col gap-0 relative">
-              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border/50" />
-              {milestones.map((m, i) => (
-                <AnimateIn key={m.year} delay={i * 80}>
-                  <div className="flex items-start gap-4 py-2.5 relative">
-                    <div className={`w-3.5 h-3.5 rounded-full shrink-0 mt-0.5 z-10 border-2 ${
-                      i === milestones.length - 1
-                        ? "bg-primary border-primary"
-                        : "bg-card border-border"
-                    }`} />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold font-display text-primary">{m.year}</span>
-                        <span className="text-xs font-semibold text-foreground">{m.title}</span>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{m.description}</p>
-                    </div>
-                  </div>
-                </AnimateIn>
-              ))}
-            </div>
-          </div>
-        </AnimateIn>
-      </div>
-
-      {/* Values */}
-      <AnimateIn>
-        <h2 className="font-display text-xl font-bold text-foreground">Nuestros Valores</h2>
-      </AnimateIn>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {values.map((value, i) => {
-          const Icon = value.icon
-          return (
-            <AnimateIn key={value.title} delay={i * 80}>
-              <div className="glass-card-hover rounded-xl p-5 flex flex-col gap-3 h-full">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-display font-semibold text-foreground text-sm">{value.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{value.description}</p>
-              </div>
-            </AnimateIn>
-          )
-        })}
-      </div>
-
-      {/* Certifications / Partners */}
-      <AnimateIn>
-        <div className="glass-card rounded-xl p-6 lg:p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Award className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-lg font-bold text-foreground">Certificaciones y Partners</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { name: "Google Partner", desc: "Premier Partner certificado" },
-              { name: "Meta Business", desc: "Partner de Meta for Business" },
-              { name: "HubSpot", desc: "Solutions Partner certificado" },
-              { name: "Shopify", desc: "Partner de desarrollo Shopify" },
-            ].map((cert) => (
-              <div key={cert.name} className="p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-center flex flex-col gap-2">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 mx-auto">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                </div>
-                <p className="text-sm font-semibold text-foreground">{cert.name}</p>
-                <p className="text-[10px] text-muted-foreground">{cert.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnimateIn>
-
-      {/* CTA */}
-      <AnimateIn>
-        <div className="glass-card rounded-xl p-8 lg:p-12 text-center flex flex-col items-center gap-6 glow-accent-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5" />
-          <div className="relative flex flex-col items-center gap-4">
-            <h2 className="font-display text-2xl lg:text-3xl font-bold text-foreground text-balance">
-              Quieres ser parte de nuestro equipo?
+      {/* Misión */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6">
+          <div className="rounded-3xl border border-border/50 bg-card/60 p-7 sm:p-10">
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Nuestra misión</span>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mt-2 text-balance">
+              Marketing digital de primer nivel, al alcance de cualquier negocio
             </h2>
-            <p className="text-muted-foreground max-w-lg">
-              Siempre estamos buscando talento apasionado por el marketing digital.
+            <p className="text-lg text-foreground/75 leading-relaxed mt-5">
+              Creemos que cada negocio, sin importar su tamaño o ubicación, merece una presencia digital que le traiga
+              clientes. Por eso juntamos en un solo equipo lo que normalmente está repartido entre tres proveedores: la
+              web, los anuncios y la medición.
             </p>
-            <Link
-              href="/contacto"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] mt-2"
-            >
-              Contactanos
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <p className="text-lg text-foreground/75 leading-relaxed mt-4">
+              Nacimos con la convicción de que el talento hispanohablante puede competir con las mejores agencias del
+              mundo, y trabajamos para demostrarlo en cada entrega.
+            </p>
+          </div>
+          <div className="relative overflow-hidden rounded-3xl border border-primary/25 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-7 sm:p-10 flex flex-col justify-center">
+            <p className="font-display text-2xl sm:text-3xl font-bold leading-snug text-balance">
+              &ldquo;Transformamos datos en decisiones, ideas en experiencias y clientes en embajadores de marca.&rdquo;
+            </p>
           </div>
         </div>
-      </AnimateIn>
+      </section>
 
-      <Footer />
-    </DashboardLayout>
+      {/* Cómo trabajamos */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-balance max-w-3xl">Así trabajamos</h2>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {VALUES.map((v, i) => {
+            const Icon = v.icon
+            return (
+              <AnimateIn key={v.title} delay={i * 80} className="h-full">
+                <div className="h-full rounded-2xl border border-border/50 bg-card/60 p-6">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <h3 className="font-display text-xl font-bold mt-5">{v.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-2">{v.desc}</p>
+                </div>
+              </AnimateIn>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Dónde trabajamos */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-balance max-w-3xl">
+          Trabajamos en tu zona horaria
+        </h2>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {MARKETS.map((m) => (
+            <div key={m.name} className="rounded-2xl border border-border/50 bg-card/60 p-6">
+              <p className="font-display text-xl font-bold">{m.name}</p>
+              <p className="text-sm text-muted-foreground mt-1">{m.note}</p>
+              <p className="mt-4 inline-flex rounded-full bg-secondary/60 px-3 py-1 text-xs font-medium text-muted-foreground">{m.tz}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="py-6">
+        <PlatformsStrip />
+      </div>
+
+      <ClosingCTA
+        title="¿Hablamos de tu proyecto?"
+        text="Escríbenos por WhatsApp y te respondemos con ideas concretas para tu web y tus anuncios, sin compromiso."
+        segment="nosotros_final"
+        extra={<SecondaryCTA label="Prefiero un diagnóstico por formulario" className="w-fit" />}
+      />
+    </>
   )
 }

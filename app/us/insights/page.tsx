@@ -1,4 +1,4 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { InsightsContent } from "@/app/insights/insights-content"
 import { getAllPublished } from "@/lib/blog-posts"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
@@ -61,9 +61,11 @@ export default async function UsInsightsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <DashboardLayout>
-        <InsightsContent posts={posts} locale="en" />
-      </DashboardLayout>
+      <MarketingLayout ctaSegment="us_insights_sticky" locale="en">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+          <InsightsContent posts={posts} locale="en" />
+        </div>
+      </MarketingLayout>
     </>
   )
 }

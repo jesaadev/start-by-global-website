@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { ServiceJsonLd, BreadcrumbJsonLd, FaqJsonLd } from "@/components/seo-jsonld"
+import { listPublishedShowcase } from "@/lib/showcase"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { WebContent } from "./web-content"
 import { WEB_FAQS } from "./faqs"
 
@@ -20,7 +22,8 @@ export const metadata: Metadata = pageMetadata({
   ],
 })
 
-export default function DisenoPaginasWebPage() {
+export default async function DisenoPaginasWebPage() {
+  const work = await listPublishedShowcase("web", 1)
   return (
     <>
       <ServiceJsonLd
@@ -36,7 +39,13 @@ export default function DisenoPaginasWebPage() {
         ]}
       />
       <FaqJsonLd faqs={WEB_FAQS} />
-      <WebContent />
+      <MarketingLayout
+        ctaSegment="diseno_web_sticky"
+        ctaService="Desarrollo Web"
+        ctaSecondary={{ href: "#contacto", label: "Cotizar" }}
+      >
+        <WebContent work={work} />
+      </MarketingLayout>
     </>
   )
 }

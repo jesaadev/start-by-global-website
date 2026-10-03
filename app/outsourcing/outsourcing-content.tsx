@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { AnimateIn } from "@/components/animate-in"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { fireLead } from "@/lib/track-client"
 import {
   ArrowRight,
   CheckCircle2,
@@ -18,8 +20,6 @@ import {
   Clock,
   Star,
   Send,
-  Menu,
-  X,
 } from "lucide-react"
 
 const services = [
@@ -113,17 +113,19 @@ const faqs = [
 
 export function OutsourcingContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [formData, setFormData] = useState({ name: "", agency: "", email: "", volume: "", message: "" })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [formError, setFormError] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    // Honeypot: leer de forma síncrona antes de cualquier await.
+    const company_website = (new FormData(e.currentTarget).get("company_website") as string) ?? ""
     setSending(true)
     setFormError("")
     try {
+      const tracking = fireLead("contact_form", "outsourcing")
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,6 +135,8 @@ export function OutsourcingContent() {
           company: formData.agency,
           service: "Outsourcing / Marca Blanca",
           message: `Volumen estimado: ${formData.volume} proyectos/mes\n\n${formData.message}`,
+          company_website,
+          ...tracking,
         }),
       })
       if (!res.ok) throw new Error()
@@ -148,72 +152,8 @@ export function OutsourcingContent() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
 
-      {/* ── NAVBAR ─────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-16 border-b border-foreground/5 bg-background/90 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-7 dark:invert" />
-          </Link>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { href: "#servicios", label: "Servicios" },
-              { href: "#proceso", label: "Proceso" },
-              { href: "#precios", label: "Precios" },
-              { href: "#faq", label: "FAQ" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors animated-underline">
-                {l.label}
-              </a>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground/70 transition-colors"
-            >
-              Volver al sitio
-            </Link>
-            <a
-              href="#contacto"
-              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#0074D9] text-white text-sm font-semibold hover:bg-[#0074D9]/85 transition-all hover:shadow-lg hover:shadow-[#0074D9]/30"
-            >
-              Solicitar Info
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="md:hidden p-2 rounded-lg bg-foreground/5 text-foreground/70"
-              aria-label="Menu"
-            >
-              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile nav */}
-        {mobileNavOpen && (
-          <div className="md:hidden absolute top-16 inset-x-0 bg-background/98 border-b border-foreground/5 px-6 py-4 flex flex-col gap-4">
-            {[
-              { href: "#servicios", label: "Servicios" },
-              { href: "#proceso", label: "Proceso" },
-              { href: "#precios", label: "Precios" },
-              { href: "#faq", label: "FAQ" },
-              { href: "#contacto", label: "Solicitar Info" },
-            ].map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setMobileNavOpen(false)} className="text-sm text-foreground/70 hover:text-foreground py-2 transition-colors">
-                {l.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </nav>
-
       {/* ── HERO ───────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      <section className="relative flex items-center overflow-hidden">
         {/* Grid background */}
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -226,7 +166,7 @@ export function OutsourcingContent() {
         <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-[#0074D9]/8 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/6 w-[400px] h-[400px] bg-[#00C9C8]/5 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-24 lg:py-32 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-24 grid lg:grid-cols-2 gap-16 items-center">
           <div>
             <AnimateIn delay={0.05}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0074D9]/10 border border-[#0074D9]/20 text-[#0074D9] text-xs font-semibold mb-8 tracking-wide uppercase">
@@ -254,20 +194,9 @@ export function OutsourcingContent() {
             </AnimateIn>
 
             <AnimateIn delay={0.3}>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="#contacto"
-                  className="group inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-[#0074D9] text-white font-semibold text-base hover:bg-[#0074D9]/85 hover:shadow-2xl hover:shadow-[#0074D9]/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                >
-                  Quiero ser Partner
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
-                <a
-                  href="#servicios"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-foreground/10 text-foreground/70 font-semibold text-base hover:bg-foreground/5 hover:text-foreground hover:border-foreground/20 transition-all"
-                >
-                  Ver los 3 Servicios
-                </a>
+              <div className="flex flex-wrap items-center gap-3">
+                <PrimaryCTA label="Quiero ser partner" segment="outsourcing_hero" service="Outsourcing / Marca Blanca" />
+                <SecondaryCTA label="Prefiero el formulario" href="#contacto" />
               </div>
             </AnimateIn>
 
@@ -736,6 +665,8 @@ export function OutsourcingContent() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Honeypot anti-bots: oculto para usuarios reales */}
+                  <input type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu nombre</label>
@@ -826,19 +757,6 @@ export function OutsourcingContent() {
         </div>
       </section>
 
-      {/* ── FOOTER ─────────────────────────────────── */}
-      <footer className="border-t border-foreground/5 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/">
-            <img src="/logo-black.svg" alt="Start By Global" className="h-6 dark:invert opacity-40 hover:opacity-70 transition-opacity" />
-          </Link>
-          <div className="flex items-center gap-6 text-xs text-foreground/25">
-            <Link href="/" className="hover:text-muted-foreground transition-colors">Volver al sitio principal</Link>
-            <Link href="/contacto" className="hover:text-muted-foreground transition-colors">Contacto</Link>
-            <span>2026 Start By Global</span>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

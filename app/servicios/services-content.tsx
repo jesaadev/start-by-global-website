@@ -1,240 +1,225 @@
-"use client"
-
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { AnimateIn } from "@/components/animate-in"
-import { Footer } from "@/components/footer"
-import {
-  Globe,
-  Palette,
-  Search,
-  BarChart3,
-  Megaphone,
-  Code,
-  CheckCircle,
-  ArrowRight,
-  Zap,
-  Shield,
-  Clock,
-  Users,
-} from "lucide-react"
 import Link from "next/link"
+import { ArrowRight, BarChart3, Check, Code, Globe, KeyRound, Megaphone, Palette, Search, FileText, Gauge, CalendarCheck } from "lucide-react"
+import { AnimateIn } from "@/components/animate-in"
+import { PageHero } from "@/components/layout/page-hero"
+import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { WhatsAppLink } from "@/components/whatsapp-link"
 
-const services = [
+// Regla de dato real: compromisos y entregables, sin cifras ni credenciales
+// que no podamos demostrar.
+
+const SERVICES = [
   {
     icon: Globe,
     title: "Desarrollo Web",
     slug: "desarrollo-web",
-    description: "Sitios web y aplicaciones de alto rendimiento con tecnologías modernas. E-commerce, landing pages y plataformas a medida.",
-    longDescription: "Creamos experiencias digitales que convierten visitantes en clientes. Desde sitios corporativos hasta plataformas complejas de e-commerce, nuestro equipo domina las tecnologías más avanzadas para entregar proyectos que destacan.",
+    whatsapp: "Desarrollo Web",
+    page: { href: "/diseno-paginas-web", label: "Ver diseño web y precios" },
+    description: "Webs corporativas, tiendas online y landing pages rápidas, pensadas para que el visitante te escriba.",
     features: [
       "Sitios web corporativos y landing pages",
-      "Plataformas e-commerce con pasarelas de pago",
-      "Aplicaciones web progresivas (PWA)",
+      "Tiendas online con pasarela de pago",
+      "Formularios y botón conectados a tu WhatsApp",
       "Integraciones API y sistemas a medida",
-      "Optimización de rendimiento y Core Web Vitals",
+      "Optimización de velocidad y Core Web Vitals",
       "Mantenimiento y soporte continuo",
     ],
-    tech: ["Next.js", "React", "Node.js", "TypeScript", "Tailwind CSS", "PostgreSQL"],
-    color: "primary",
+    tech: ["Next.js", "React", "WordPress", "Shopify", "Tailwind CSS"],
+  },
+  {
+    icon: Megaphone,
+    title: "Publicidad en Google y Meta",
+    slug: "marketing-digital",
+    whatsapp: "Marketing Digital",
+    page: { href: "/publicidad-ads", label: "Ver publicidad y precios" },
+    description: "Campañas que se optimizan por clientes potenciales, no por clics, con medición de punta a punta.",
+    features: [
+      "Google Ads (Búsqueda, Display, Performance Max)",
+      "Meta Ads (Facebook e Instagram)",
+      "TikTok Ads y LinkedIn Ads",
+      "Retargeting de visitantes y conversaciones",
+      "Creatividades y copies orientados a conversión",
+      "Pruebas A/B y optimización semanal",
+    ],
+    tech: ["Google Ads", "Meta Business", "TikTok Ads", "LinkedIn Ads"],
   },
   {
     icon: Search,
     title: "SEO & Posicionamiento",
     slug: "seo-posicionamiento",
-    description: "Estrategias de optimización para motores de busqueda que aumentan tu visibilidad orgánica y generan tráfico cualificado.",
-    longDescription: "Posicionamos tu marca donde tus clientes te buscan. Combinamos estrategias técnicas y de contenido para lograr rankings sostenibles que generan tráfico orgánico de alta calidad.",
+    whatsapp: "SEO & Posicionamiento",
+    description: "Que te encuentren en Google cuando te están buscando: base técnica, contenido y ficha local.",
     features: [
-      "Auditorias SEO técnicas completas",
+      "Auditoría SEO técnica",
       "Optimización on-page y estructura web",
-      "Estrategia de link building ético",
-      "SEO local y multi-regional",
-      "Optimización de contenido y keywords",
-      "Monitoreo y reportes mensuales",
+      "SEO local y ficha de Google Business",
+      "Estrategia de contenido y palabras clave",
+      "Enlazado interno y link building ético",
+      "Seguimiento mensual de posiciones",
     ],
-    tech: ["Google Search Console", "Ahrefs", "SEMrush", "Screaming Frog", "GA4"],
-    color: "chart-2",
-  },
-  {
-    icon: Megaphone,
-    title: "Marketing Digital",
-    slug: "marketing-digital",
-    description: "Campañas de publicidad digital que maximizan tu retorno de inversion en todas las plataformas principales.",
-    longDescription: "Diseñamos y ejecutamos campañas publicitarias que conectan con tu audiencia ideal. Desde Google Ads hasta TikTok, optimizamos cada dolar invertido para maximizar tu ROI.",
-    features: [
-      "Campañas Google Ads (Search, Display, Shopping)",
-      "Meta Ads (Facebook e Instagram)",
-      "TikTok Ads y LinkedIn Ads",
-      "Estrategias de retargeting avanzado",
-      "Optimización de landing pages",
-      "A/B testing y optimización continua",
-    ],
-    tech: ["Google Ads", "Meta Business", "TikTok Ads", "LinkedIn Ads", "Hotjar"],
-    color: "chart-4",
+    tech: ["Search Console", "GA4", "Ahrefs", "Screaming Frog"],
   },
   {
     icon: Palette,
     title: "Branding & Diseño",
     slug: "branding-diseno",
-    description: "Identidad visual que conecta con tu audiencia. Logos, guias de marca y material gráfico para todos tus canales.",
-    longDescription: "Construimos marcas que inspiran confianza y generan conexión emocional. Desde la conceptualizacion hasta la implementación, creamos identidades visuales memorables.",
+    whatsapp: "Branding & Diseño",
+    description: "Una identidad que transmite confianza desde el primer vistazo, coherente en web, anuncios y redes.",
     features: [
-      "Diseño de logotipos e identidad visual",
-      "Guias de marca y sistemas de diseño",
-      "Diseño UI/UX para web y mobile",
-      "Material gráfico para redes sociales",
+      "Logotipo e identidad visual",
+      "Guía de marca y sistema de diseño",
+      "Diseño UI/UX para web y móvil",
+      "Piezas para redes sociales y anuncios",
       "Presentaciones corporativas",
-      "Packaging y material impreso",
     ],
-    tech: ["Figma", "Adobe CC", "Illustrator", "After Effects", "Blender"],
-    color: "chart-3",
+    tech: ["Figma", "Adobe CC", "Illustrator"],
   },
   {
     icon: BarChart3,
     title: "Analítica & Data",
     slug: "analitica-data",
-    description: "Dashboards personalizados y reportes avanzados para tomar decisiones basadas en datos reales.",
-    longDescription: "Transformamos datos en decisiones estratégicas. Implementamos soluciones de analítica que te dan visibilidad completa sobre el rendimiento de tu negocio digital.",
+    whatsapp: "Analítica & Data",
+    description: "Saber de dónde viene cada cliente y cuánto te cuesta, en un panel que se entiende.",
     features: [
-      "Implementación de Google Analytics 4",
-      "Dashboards personalizados en tiempo real",
+      "Google Analytics 4 y Tag Manager",
+      "Píxel de Meta + API de Conversiones",
       "Configuración de conversiones y eventos",
-      "Reportes automatizados mensuales",
-      "Análisis de cohortes y atribucion",
-      "Data visualization y storytelling",
+      "Paneles en Looker Studio",
+      "Atribución por canal y campaña",
     ],
-    tech: ["GA4", "Looker Studio", "BigQuery", "Tag Manager", "Mixpanel"],
-    color: "primary",
+    tech: ["GA4", "Tag Manager", "Looker Studio", "BigQuery"],
   },
   {
     icon: Code,
-    title: "Automatización",
-    slug: "automatización",
-    description: "Flujos automatizados que optimizan procesos, desde email marketing hasta integraciones con CRM.",
-    longDescription: "Eliminamos tareas repetitivas y optimizamos flujos de trabajo. Conectamos tus herramientas y creamos automatizaciones que ahorran tiempo y reducen errores.",
+    title: "Automatización e IA",
+    slug: "automatizacion",
+    whatsapp: "Automatización e IA",
+    page: { href: "/ia-automatizacion", label: "Ver IA & automatización" },
+    description: "Respuestas, seguimiento y tareas repetitivas que se hacen solas, conectadas a tus herramientas.",
     features: [
-      "Automatización de email marketing",
-      "Integración de CRM (HubSpot, Salesforce)",
-      "Workflows de lead nurturing",
+      "Chatbots y asistentes con IA",
+      "Seguimiento automático de leads",
+      "Integración con tu CRM",
       "Conexión de APIs y webhooks",
-      "Chatbots y atención automatizada",
       "Reportes y alertas automáticas",
     ],
-    tech: ["HubSpot", "Zapier", "Make", "n8n", "API REST", "Webhooks"],
-    color: "chart-2",
+    tech: ["Make", "n8n", "Zapier", "HubSpot", "OpenAI"],
   },
 ]
 
-const whyUs = [
-  { icon: Zap, title: "Velocidad", description: "Entregamos proyectos en tiempo record sin sacrificar calidad." },
-  { icon: Shield, title: "Confianza", description: "Accesos, dominio y datos siempre a tu nombre. Sin retención de accesos." },
-  { icon: Clock, title: "Soporte 24/7", description: "Equipo distribuido que asegura cobertura en todas las zonas horarias." },
-  { icon: Users, title: "Equipo Experto", description: "Profesionales certificados en cada área de especialidad." },
+const COMMITMENTS = [
+  { icon: KeyRound, title: "Todo a tu nombre", desc: "Dominio, hosting, accesos y cuentas publicitarias son tuyos desde el primer día." },
+  { icon: FileText, title: "Precio y fecha por escrito", desc: "Qué hacemos, qué no, cuánto cuesta y cuándo se entrega, antes de empezar." },
+  { icon: Gauge, title: "Medición real", desc: "Píxel, API de Conversiones y analítica verificados: cada lead tiene origen." },
+  { icon: CalendarCheck, title: "Semanas, no meses", desc: "Los proyectos de captación estándar se entregan en semanas, con avances visibles." },
 ]
 
 export function ServicesPageContent() {
   return (
-    <DashboardLayout title="Servicios de Desarrollo Web y Marketing Digital" subtitle="Diseño web, SEO, publicidad (Google y Meta Ads), branding, analítica y automatización para empresas">
-      {/* Why choose us cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {whyUs.map((item, i) => {
-          const Icon = item.icon
+    <>
+      <PageHero
+        badge="Servicios"
+        title="Desarrollo web y marketing digital que se convierte en clientes"
+        highlight="en clientes"
+        subtitle="Diseño web, publicidad en Google y Meta, SEO, branding, analítica y automatización. Un solo equipo con un objetivo: que te escriban."
+      >
+        <PrimaryCTA segment="servicios_hero" />
+        <SecondaryCTA />
+      </PageHero>
+
+      {/* Atajos a cada servicio */}
+      <nav aria-label="Servicios" className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4 sm:-mt-8 pb-4">
+        <div className="flex flex-wrap gap-2">
+          {SERVICES.map((s) => (
+            <a key={s.slug} href={`#${s.slug}`}
+              className="rounded-full border border-border/60 bg-card/60 px-4 py-2 text-sm font-medium text-foreground/85 hover:border-primary/40 hover:text-foreground transition-colors">
+              {s.title}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14 flex flex-col gap-5">
+        {SERVICES.map((s, i) => {
+          const Icon = s.icon
           return (
-            <AnimateIn key={item.title} delay={i * 80}>
-              <div className="glass-card rounded-xl p-4 flex flex-col gap-3 text-center h-full">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 mx-auto">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-display font-semibold text-foreground text-sm">{item.title}</h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">{item.description}</p>
-              </div>
-            </AnimateIn>
-          )
-        })}
-      </div>
-
-      {/* Detailed service cards */}
-      <div className="flex flex-col gap-6">
-        {services.map((service, i) => {
-          const Icon = service.icon
-          return (
-            <AnimateIn key={service.slug} delay={i * 60}>
-              <div
-                id={service.slug}
-                className="glass-card rounded-xl overflow-hidden scroll-mt-24"
-              >
-                {/* Color bar */}
-                <div className="h-1" style={{ background: `linear-gradient(90deg, hsl(var(--${service.color})), hsl(var(--${service.color}) / 0.3))` }} />
-
-                <div className="p-6 lg:p-8">
-                  <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
-                    {/* Left: info */}
-                    <div className="flex-1 flex flex-col gap-5">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className="flex items-center justify-center w-12 h-12 rounded-xl"
-                          style={{ backgroundColor: `hsl(var(--${service.color}) / 0.1)` }}
-                        >
-                          <Icon className="w-6 h-6" style={{ color: `hsl(var(--${service.color}))` }} />
-                        </div>
-                        <div>
-                          <h2 className="font-display text-xl font-bold text-foreground">{service.title}</h2>
-                          <p className="text-xs text-muted-foreground">{service.description}</p>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground leading-relaxed">{service.longDescription}</p>
-
-                      {/* Tech stack */}
-                      <div className="flex flex-wrap gap-2">
-                        {service.tech.map((t) => (
-                          <span key={t} className="px-3 py-1 rounded-full bg-secondary/60 text-[11px] text-muted-foreground font-medium">
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right: features */}
-                    <div className="lg:w-[340px] flex flex-col gap-3">
-                      <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Incluye</h3>
-                      {service.features.map((feature) => (
-                        <div key={feature} className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-secondary/30 transition-colors">
-                          <CheckCircle className="w-4 h-4 text-chart-3 mt-0.5 shrink-0" />
-                          <span className="text-sm text-foreground">{feature}</span>
-                        </div>
+            <AnimateIn key={s.slug} delay={i * 40}>
+              <article id={s.slug} className="scroll-mt-24 rounded-3xl border border-border/50 bg-card/60 p-6 sm:p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-8 lg:gap-12">
+                  <div className="flex flex-col gap-5">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <Icon className="h-7 w-7" />
+                    </span>
+                    <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-balance">{s.title}</h2>
+                    <p className="text-lg text-foreground/75 leading-relaxed max-w-xl">{s.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {s.tech.map((t) => (
+                        <span key={t} className="rounded-full bg-secondary/60 px-3 py-1 text-xs font-medium text-muted-foreground">{t}</span>
                       ))}
                     </div>
+                    <div className="mt-auto flex flex-wrap items-center gap-4 pt-2">
+                      <WhatsAppLink
+                        segment={`servicios_${s.slug}`}
+                        defaultService={s.whatsapp}
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white hover:shadow-lg hover:shadow-[#25D366]/25 transition-shadow"
+                      >
+                        Consultar por WhatsApp
+                      </WhatsAppLink>
+                      {s.page && (
+                        <Link href={s.page.href} className="group inline-flex items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary transition-colors">
+                          {s.page.label}
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Incluye</p>
+                    <ul className="flex flex-col gap-3">
+                      {s.features.map((f) => (
+                        <li key={f} className="flex items-start gap-3 text-base text-foreground/85">
+                          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-chart-3/15">
+                            <Check className="h-4 w-4 text-chart-3" />
+                          </span>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              </div>
+              </article>
             </AnimateIn>
           )
         })}
-      </div>
+      </section>
 
-      {/* CTA */}
-      <AnimateIn>
-        <div className="glass-card rounded-xl p-8 lg:p-12 text-center flex flex-col items-center gap-6 glow-accent-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-2/5" />
-          <div className="relative flex flex-col items-center gap-4">
-            <h2 className="font-display text-2xl lg:text-3xl font-bold text-foreground text-balance">
-              Listo para transformar tu presencia digital?
-            </h2>
-            <p className="text-muted-foreground max-w-lg">
-              Agenda una consultoría gratuita y descubre como podemos impulsar tu negocio.
-            </p>
-            <Link
-              href="/contacto"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] active:scale-[0.98] mt-2"
-            >
-              Agendar Consultoría
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+      {/* Compromisos */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-balance max-w-3xl">
+          Trabajes en lo que trabajes con nosotros, esto no cambia
+        </h2>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {COMMITMENTS.map((c) => {
+            const Icon = c.icon
+            return (
+              <div key={c.title} className="rounded-2xl border border-border/50 bg-card/60 p-6">
+                <Icon className="h-7 w-7 text-primary" />
+                <h3 className="font-display text-xl font-bold mt-4">{c.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-2">{c.desc}</p>
+              </div>
+            )
+          })}
         </div>
-      </AnimateIn>
+      </section>
 
-      <Footer />
-    </DashboardLayout>
+      <ClosingCTA
+        title="¿No sabes por dónde empezar?"
+        text="Cuéntanos qué vendes y a quién. Te decimos qué servicio te conviene primero, y cuál todavía no."
+        segment="servicios_final"
+        extra={<SecondaryCTA label="Prefiero un diagnóstico por formulario" className="w-fit" />}
+      />
+    </>
   )
 }

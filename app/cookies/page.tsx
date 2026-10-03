@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { Footer } from "@/components/footer"
+import { LegalPage } from "@/components/layout/legal-page"
 import { CookiePrefsButton } from "@/components/cookie-prefs-button"
 
 export const metadata: Metadata = {
@@ -17,8 +16,8 @@ const COOKIE_TABLE: Array<{ cat: string; cookies: string; purpose: string }> = [
 
 export default function CookiesPage() {
   return (
-    <DashboardLayout title="Política de Cookies" subtitle="Última actualización: 13 de junio de 2026">
-      <article className="glass-card rounded-xl p-6 sm:p-8 max-w-3xl space-y-6">
+    <LegalPage title="Política de Cookies" subtitle="Última actualización: 13 de junio de 2026">
+      <article className="glass-card rounded-2xl p-6 sm:p-8 space-y-6">
         <p className="text-sm text-muted-foreground leading-relaxed">
           <strong className="text-foreground">START BY GLOBAL</strong> utiliza cookies propias y de terceros para
           el funcionamiento del sitio, analizar su uso y medir nuestras campañas. Las cookies de analítica y
@@ -75,7 +74,6 @@ export default function CookiesPage() {
           </p>
         </section>
       </article>
-      <Footer />
-    </DashboardLayout>
+    </LegalPage>
   )
 }

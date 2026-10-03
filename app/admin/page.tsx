@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LANDING_LABELS } from "@/lib/persona-landings"
+import { PAGE_FUNNELS } from "@/lib/page-funnels"
 import { BrowserMockup } from "@/components/mockups/browser-mockup"
 import { PhoneMockup } from "@/components/mockups/phone-mockup"
 import type { SiteSettings } from "@/lib/site-settings"
@@ -1470,14 +1471,14 @@ function LandingsTab({ api }: { api: ReturnType<typeof useAdminAPI> }) {
     return () => { active = false }
   }, [api, days])
 
-  const label = (seg: string) => (seg === "home" ? "Home (página principal)" : LANDING_LABELS[seg]?.persona ?? seg)
-  const slug = (seg: string) => LANDING_LABELS[seg]?.slug
+  const label = (seg: string) => PAGE_FUNNELS[seg]?.name ?? LANDING_LABELS[seg]?.persona ?? seg
+  const slug = (seg: string) => PAGE_FUNNELS[seg]?.slug ?? LANDING_LABELS[seg]?.slug
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <p className="text-xs text-muted-foreground">
-          Embudo de cada landing por persona: visitas → 75% scroll → agenda → descarga. Datos 1st-party (los eventos de píxel viven además en Meta Events Manager).
+          Embudo de cada landing por persona y de las páginas de venta (home, diseño web, publicidad): visitas → 75% scroll → agenda → descarga. Datos 1st-party (los eventos de píxel viven además en Meta Events Manager).
         </p>
         <div className="flex gap-1 p-1 bg-secondary/40 rounded-lg">
           {[7, 30, 90].map((d) => (

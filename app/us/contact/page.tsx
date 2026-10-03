@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
 import { BreadcrumbJsonLd } from "@/components/seo-jsonld"
+import { MarketingLayout } from "@/components/layout/marketing-layout"
 import { UsContactContent } from "./us-contact-content"
 
 export const metadata: Metadata = pageMetadata({
@@ -21,7 +22,9 @@ export default function UsContactPage() {
           { name: "Contact", path: "/us/contact" },
         ]}
       />
-      <UsContactContent />
+      <MarketingLayout ctaSegment="us_contact_sticky" locale="en">
+        <UsContactContent />
+      </MarketingLayout>
     </>
   )
 }
