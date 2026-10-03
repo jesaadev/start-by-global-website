@@ -2,7 +2,7 @@ import { Bot, CalendarCheck, Clock, Mail, MessageCircle } from "lucide-react"
 import { PageHero } from "@/components/layout/page-hero"
 import { PrimaryCTA } from "@/components/cta/primary-cta"
 import { WhatsAppLink } from "@/components/whatsapp-link"
-import { ContactForm, OpenChatButton } from "./contact-form"
+import { ContactForm, OpenChatButton } from "@/components/forms/contact-form"
 
 const CALENDLY_URL = "https://calendly.com/startbyglobal"
 const EMAIL = "info@startbyglobal.com"

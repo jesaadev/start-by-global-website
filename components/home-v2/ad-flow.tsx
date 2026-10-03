@@ -9,18 +9,78 @@ import {
 } from "lucide-react"
 import { PhoneMockup } from "@/components/mockups/phone-mockup"
 import { PrimaryCTA } from "@/components/cta/primary-cta"
+import { LinkCTA } from "@/components/cta/link-cta"
 import { MiniSite } from "@/components/home-v2/mini-site"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 const STEP_MS = 3400
 
-const STEPS: { title: string; desc: string; icon: LucideIcon }[] = [
-  { title: "Ve tu anuncio", desc: "En Instagram, Facebook o Google, con un mensaje hecho para su problema.", icon: Megaphone },
-  { title: "Llega a tu landing", desc: "Una página rápida con una sola acción clara: escribirte.", icon: MousePointerClick },
-  { title: "Te escribe por WhatsApp", desc: "El mensaje te llega con su nombre y lo que necesita.", icon: MessageCircle },
-  { title: "El lead queda medido", desc: "Meta recibe el evento por píxel + API de Conversiones y la campaña aprende a quién mostrarse.", icon: Target },
-]
+const ICONS: LucideIcon[] = [Megaphone, MousePointerClick, MessageCircle, Target]
+
+const TEXT = {
+  es: {
+    eyebrow: "Publicidad que convierte",
+    title: "Así convierte una campaña bien hecha",
+    desc: "No vendemos clics: construimos el camino completo desde el anuncio hasta la conversación, y lo medimos.",
+    steps: [
+      { title: "Ve tu anuncio", desc: "En Instagram, Facebook o Google, con un mensaje hecho para su problema." },
+      { title: "Llega a tu landing", desc: "Una página rápida con una sola acción clara: escribirte." },
+      { title: "Te escribe por WhatsApp", desc: "El mensaje te llega con su nombre y lo que necesita." },
+      { title: "El lead queda medido", desc: "Meta recibe el evento por píxel + API de Conversiones y la campaña aprende a quién mostrarse." },
+    ],
+    link: "Ver publicidad",
+    example: "Ejemplo ilustrativo",
+    ad: { account: "tunegocio", sponsored: "Publicidad", headline: "¿Tu web no te trae clientes?", sub: "Diagnóstico gratis en 30 min", badge: "Agenda hoy", action: "Enviar mensaje" },
+    chat: {
+      name: "Tu negocio",
+      online: "en línea",
+      msgs: [
+        "Hola 👋 vi su anuncio. Quiero más clientes para mi negocio.",
+        "¡Hola! Claro 🙌 Cuéntanos a qué se dedica tu negocio y te enviamos el diagnóstico.",
+        "Tengo una clínica dental 🦷",
+      ],
+    },
+    panel: "Tu panel · ahora",
+    rows: [
+      { title: "Nuevo lead · vía Instagram", sub: "Campaña «Diagnóstico» · clínica dental" },
+      { title: "Evento Lead enviado a Meta", sub: "Píxel + API de Conversiones" },
+      { title: "Origen guardado en tu panel", sub: "Canal, campaña y anuncio" },
+    ],
+  },
+  en: {
+    eyebrow: "Ads that convert",
+    title: "How a well-built campaign converts",
+    desc: "We don't sell clicks: we build the whole path from the ad to the conversation, and we measure it.",
+    steps: [
+      { title: "They see your ad", desc: "On Instagram, Facebook or Google, with a message made for their problem." },
+      { title: "They land on your page", desc: "A fast page with one clear action: contacting you." },
+      { title: "They message you", desc: "The message arrives with their name and what they need." },
+      { title: "The lead is measured", desc: "Meta gets the event via pixel + Conversions API, so the campaign learns who to show up for." },
+    ],
+    link: "See ads management",
+    example: "Illustrative example",
+    ad: { account: "yourbusiness", sponsored: "Sponsored", headline: "Is your website not bringing customers?", sub: "Free 30-min audit", badge: "Book today", action: "Send message" },
+    chat: {
+      name: "Your business",
+      online: "online",
+      msgs: [
+        "Hi 👋 saw your ad. I want more customers for my business.",
+        "Hi! Sure 🙌 Tell us what your business does and we'll send you the audit.",
+        "I run a dental clinic 🦷",
+      ],
+    },
+    panel: "Your dashboard · now",
+    rows: [
+      { title: "New lead · via Instagram", sub: "\u201cAudit\u201d campaign · dental clinic" },
+      { title: "Lead event sent to Meta", sub: "Pixel + Conversions API" },
+      { title: "Source saved in your dashboard", sub: "Channel, campaign and ad" },
+    ],
+  },
+} as const
+
+type Text = (typeof TEXT)[Locale]
 
 /**
  * "Así convierte una campaña": recorrido ILUSTRATIVO (sin métricas) de un
@@ -34,6 +94,8 @@ export function AdFlow({
   ctaLabel = "Quiero campañas así",
   showLink = true,
   id = "anuncios",
+  locale = "es",
+  ctaHref = "#contact",
 }: {
   /** Segmento de tracking del CTA de WhatsApp. */
   segment?: string
@@ -42,7 +104,12 @@ export function AdFlow({
   /** Enlace a /publicidad-ads (desactivar en landings: un solo camino de salida). */
   showLink?: boolean
   id?: string
+  locale?: Locale
+  /** En inglés el CTA es un enlace (al formulario de la página). */
+  ctaHref?: string
 } = {}) {
+  const t = TEXT[locale]
+  const steps = t.steps.map((st, i) => ({ ...st, icon: ICONS[i] }))
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { amount: 0.35 })
   const reduced = useReducedMotion()
@@ -51,7 +118,7 @@ export function AdFlow({
 
   useEffect(() => {
     if (!inView || reduced || !auto) return
-    const t = setInterval(() => setStep((s) => (s + 1) % STEPS.length), STEP_MS)
+    const t = setInterval(() => setStep((s) => (s + 1) % steps.length), STEP_MS)
     return () => clearInterval(t)
   }, [inView, reduced, auto])
 
@@ -65,18 +132,16 @@ export function AdFlow({
       {/* Móvil: título → teléfono → pasos. Desktop: título y pasos a la izquierda, teléfono a la derecha. */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:grid-rows-[auto_1fr] gap-x-20 gap-y-8">
         <div className="lg:col-start-1 lg:row-start-1">
-          <span className="text-xs font-semibold uppercase tracking-widest text-primary">Publicidad que convierte</span>
+          <span className="text-xs font-semibold uppercase tracking-widest text-primary">{t.eyebrow}</span>
           <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] mt-2 text-balance">
-            Así convierte una campaña bien hecha
+            {t.title}
           </h2>
-          <p className="text-base sm:text-lg text-muted-foreground mt-3 max-w-xl">
-            No vendemos clics: construimos el camino completo desde el anuncio hasta la conversación, y lo medimos.
-          </p>
+          <p className="text-base sm:text-lg text-muted-foreground mt-3 max-w-xl">{t.desc}</p>
         </div>
 
         <div className="lg:col-start-1 lg:row-start-2">
           <ol className="flex flex-col gap-2.5">
-            {STEPS.map((s, i) => {
+            {steps.map((s, i) => {
               const Icon = s.icon
               const active = i === step
               return (
@@ -126,10 +191,14 @@ export function AdFlow({
           </ol>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <PrimaryCTA label={ctaLabel} segment={segment} service={service} />
+            {locale === "es" ? (
+              <PrimaryCTA label={ctaLabel} segment={segment} service={service} />
+            ) : (
+              <LinkCTA href={ctaHref} label={ctaLabel} />
+            )}
             {showLink && (
-              <Link href="/publicidad-ads" className="inline-flex items-center gap-1 text-sm font-semibold hover:text-primary transition-colors">
-                Ver publicidad <ArrowUpRight className="h-4 w-4" />
+              <Link href={locale === "es" ? "/publicidad-ads" : "/us/google-ads"} className="inline-flex items-center gap-1 text-sm font-semibold hover:text-primary transition-colors">
+                {t.link} <ArrowUpRight className="h-4 w-4" />
               </Link>
             )}
           </div>
@@ -147,14 +216,14 @@ export function AdFlow({
                 exit={{ opacity: 0, y: reduced ? 0 : -16 }}
                 transition={{ duration: reduced ? 0 : 0.35, ease: "easeOut" }}
               >
-                {step === 0 && <AdScreen reduced={reduced} />}
-                {step === 1 && <LandingScreen reduced={reduced} />}
-                {step === 2 && <ChatScreen reduced={reduced} />}
-                {step === 3 && <LeadScreen reduced={reduced} />}
+                {step === 0 && <AdScreen reduced={reduced} t={t} />}
+                {step === 1 && <LandingScreen reduced={reduced} locale={locale} />}
+                {step === 2 && <ChatScreen reduced={reduced} t={t} />}
+                {step === 3 && <LeadScreen reduced={reduced} t={t} />}
               </motion.div>
             </AnimatePresence>
           </PhoneMockup>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">Ejemplo ilustrativo</p>
+          <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.example}</p>
         </div>
       </div>
     </section>
@@ -163,25 +232,25 @@ export function AdFlow({
 
 /* ── Pantallas ─────────────────────────────────────────────────────────────── */
 
-function AdScreen({ reduced }: { reduced: boolean }) {
+function AdScreen({ reduced, t }: { reduced: boolean; t: Text }) {
   return (
     <div className="absolute inset-0 flex flex-col bg-[#0b0d12] pt-8 text-white">
       <div className="flex items-center gap-2 px-3 py-2">
         <span className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-[#F4A261]" />
         <span className="flex flex-col leading-tight">
-          <span className="text-[11px] font-semibold">tunegocio</span>
-          <span className="text-[9px] text-white/50">Publicidad</span>
+          <span className="text-[11px] font-semibold">{t.ad.account}</span>
+          <span className="text-[9px] text-white/50">{t.ad.sponsored}</span>
         </span>
       </div>
       <div className="relative mx-0 aspect-square overflow-hidden bg-gradient-to-br from-primary via-[#c2410c] to-[#7c2d12] p-4">
-        <p className="font-display text-[22px] font-bold leading-[1.05]">¿Tu web no te trae clientes?</p>
-        <p className="mt-2 text-[11px] text-white/85">Diagnóstico gratis en 30 min</p>
+        <p className="font-display text-[22px] font-bold leading-[1.05]">{t.ad.headline}</p>
+        <p className="mt-2 text-[11px] text-white/85">{t.ad.sub}</p>
         <span className="absolute bottom-3 right-3 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#7c2d12]">
-          Agenda hoy
+          {t.ad.badge}
         </span>
       </div>
       <div className="flex items-center justify-between bg-white/10 px-3 py-2 text-[11px] font-semibold">
-        Enviar mensaje <ChevronRight className="h-3.5 w-3.5" />
+        {t.ad.action} <ChevronRight className="h-3.5 w-3.5" />
       </div>
       <div className="flex items-center gap-3 px-3 py-2.5">
         <motion.span
@@ -198,11 +267,11 @@ function AdScreen({ reduced }: { reduced: boolean }) {
   )
 }
 
-function LandingScreen({ reduced }: { reduced: boolean }) {
+function LandingScreen({ reduced, locale }: { reduced: boolean; locale: Locale }) {
   return (
     <div className="absolute inset-0 pt-7">
       <div className="relative h-full">
-        <MiniSite compact />
+        <MiniSite compact locale={locale} />
         {/* "Toque" sobre el botón de WhatsApp */}
         {!reduced && (
           <motion.span
@@ -217,7 +286,7 @@ function LandingScreen({ reduced }: { reduced: boolean }) {
   )
 }
 
-function ChatScreen({ reduced }: { reduced: boolean }) {
+function ChatScreen({ reduced, t }: { reduced: boolean; t: Text }) {
   const bubble = (delay: number) =>
     reduced
       ? {}
@@ -229,34 +298,32 @@ function ChatScreen({ reduced }: { reduced: boolean }) {
           <MessageCircle className="h-4 w-4" />
         </span>
         <span className="flex flex-col leading-tight">
-          <span className="text-[11px] font-semibold">Tu negocio</span>
-          <span className="text-[9px] text-[#25D366]">en línea</span>
+          <span className="text-[11px] font-semibold">{t.chat.name}</span>
+          <span className="text-[9px] text-[#25D366]">{t.chat.online}</span>
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3 text-[11px] leading-snug">
         <motion.div {...bubble(0.3)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
-          Hola 👋 vi su anuncio. Quiero más clientes para mi negocio.
+          {t.chat.msgs[0]}
         </motion.div>
         <motion.div {...bubble(1.2)} className="max-w-[82%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-2.5 py-1.5">
-          ¡Hola! Claro 🙌 Cuéntanos a qué se dedica tu negocio y te enviamos el diagnóstico.
+          {t.chat.msgs[1]}
         </motion.div>
         <motion.div {...bubble(2.1)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
-          Tengo una clínica dental 🦷
+          {t.chat.msgs[2]}
         </motion.div>
       </div>
     </div>
   )
 }
 
-function LeadScreen({ reduced }: { reduced: boolean }) {
-  const rows = [
-    { title: "Nuevo lead · vía Instagram", sub: "Campaña «Diagnóstico» · clínica dental", accent: "bg-primary/20 text-primary" },
-    { title: "Evento Lead enviado a Meta", sub: "Píxel + API de Conversiones", accent: "bg-[#25D366]/20 text-[#25D366]" },
-    { title: "Origen guardado en tu panel", sub: "Canal, campaña y anuncio", accent: "bg-[#0074D9]/25 text-[#5fb0ff]" },
-  ]
+const ROW_ACCENTS = ["bg-primary/20 text-primary", "bg-[#25D366]/20 text-[#25D366]", "bg-[#0074D9]/25 text-[#5fb0ff]"]
+
+function LeadScreen({ reduced, t }: { reduced: boolean; t: Text }) {
+  const rows = t.rows.map((r, i) => ({ ...r, accent: ROW_ACCENTS[i] }))
   return (
     <div className="absolute inset-0 flex flex-col bg-[#0b0d12] px-3 pt-9 text-white">
-      <p className="text-[10px] uppercase tracking-wider text-white/45">Tu panel · ahora</p>
+      <p className="text-[10px] uppercase tracking-wider text-white/45">{t.panel}</p>
       <div className="mt-2 flex flex-col gap-2">
         {rows.map((r, i) => (
           <motion.div

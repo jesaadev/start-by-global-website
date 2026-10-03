@@ -13,11 +13,26 @@ interface ClosingCTAProps {
   form?: ComponentProps<typeof LeadForm>
   /** Contenido bajo el CTA cuando no hay formulario (p. ej. enlaces secundarios). */
   extra?: ReactNode
+  /** Sustituye al botón de WhatsApp (p. ej. en inglés, donde el modal es en español). */
+  cta?: ReactNode
+  /** Texto sobre el formulario. */
+  formIntro?: string
   id?: string
 }
 
 /** Cierre de página: titular gigante + CTA de WhatsApp (+ formulario opcional). */
-export function ClosingCTA({ title, text, segment, service, ctaLabel, form, extra, id = "contacto" }: ClosingCTAProps) {
+export function ClosingCTA({
+  title,
+  text,
+  segment,
+  service,
+  ctaLabel,
+  form,
+  extra,
+  cta,
+  formIntro = "¿Prefieres que te contactemos?",
+  id = "contacto",
+}: ClosingCTAProps) {
   return (
     <section id={id} className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 scroll-mt-20">
       <div className="relative overflow-hidden rounded-[2rem] border border-primary/25 bg-gradient-to-br from-primary/20 via-primary/[0.06] to-transparent p-7 sm:p-12 lg:p-16">
@@ -26,14 +41,16 @@ export function ClosingCTA({ title, text, segment, service, ctaLabel, form, extr
           <div className="flex flex-col gap-6">
             <h2 className="font-display text-4xl sm:text-6xl font-bold tracking-tight leading-[1.02] text-balance">{title}</h2>
             <p className="text-lg sm:text-xl text-foreground/80 leading-relaxed max-w-lg">{text}</p>
-            <div>
-              <PrimaryCTA segment={segment} service={service} label={ctaLabel} />
-            </div>
+            {cta !== undefined ? <div>{cta}</div> : (
+              <div>
+                <PrimaryCTA segment={segment} service={service} label={ctaLabel} />
+              </div>
+            )}
             {extra}
           </div>
           {form && (
             <div>
-              <p className="text-sm font-semibold text-foreground mb-3">¿Prefieres que te contactemos?</p>
+              <p className="text-sm font-semibold text-foreground mb-3">{formIntro}</p>
               <LeadForm {...form} />
             </div>
           )}

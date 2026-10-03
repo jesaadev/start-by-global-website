@@ -1,11 +1,18 @@
 import { MessageCircle } from "lucide-react"
+import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+
+const TEXT = {
+  es: { badge: "Diagnóstico gratis", title: "Más clientes para tu negocio, directo a tu WhatsApp", cta: "Escríbenos por WhatsApp" },
+  en: { badge: "Free consultation", title: "More customers for your business, straight to your inbox", cta: "Get a free quote" },
+} as const
 
 /**
  * Mini landing ilustrativa en HTML (sin imágenes): se usa dentro de los mockups
  * cuando aún no hay trabajo publicado en el Showcase y en la animación de ads.
  */
-export function MiniSite({ compact = false, className }: { compact?: boolean; className?: string }) {
+export function MiniSite({ compact = false, className, locale = "es" }: { compact?: boolean; className?: string; locale?: Locale }) {
+  const t = TEXT[locale]
   return (
     <div className={cn("absolute inset-0 flex flex-col bg-gradient-to-b from-[#141922] to-[#0d1117] text-white", className)}>
       {/* nav */}
@@ -25,10 +32,10 @@ export function MiniSite({ compact = false, className }: { compact?: boolean; cl
       {/* hero */}
       <div className={cn("flex flex-col gap-2", compact ? "px-3 pt-4" : "px-6 pt-7 max-w-[70%]")}>
         <span className={cn("w-fit rounded-full bg-primary/20 text-primary font-semibold", compact ? "px-1.5 py-0.5 text-[6px]" : "px-2 py-0.5 text-[9px]")}>
-          Diagnóstico gratis
+          {t.badge}
         </span>
         <p className={cn("font-display font-bold leading-tight", compact ? "text-[11px]" : "text-xl")}>
-          Más clientes para tu negocio, directo a tu WhatsApp
+          {t.title}
         </p>
         <span className={cn("rounded-full bg-white/15", compact ? "h-1 w-24" : "h-1.5 w-56")} />
         <span className={cn("rounded-full bg-white/15", compact ? "h-1 w-20" : "h-1.5 w-44")} />
@@ -39,7 +46,7 @@ export function MiniSite({ compact = false, className }: { compact?: boolean; cl
           )}
         >
           <MessageCircle className={compact ? "w-2 h-2" : "w-3 h-3"} />
-          Escríbenos por WhatsApp
+          {t.cta}
         </span>
       </div>
       {/* tarjetas */}

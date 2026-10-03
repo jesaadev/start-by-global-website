@@ -22,7 +22,7 @@ export default function UsContactPage() {
           { name: "Contact", path: "/us/contact" },
         ]}
       />
-      <MarketingLayout ctaSegment="us_contact_sticky" locale="en">
+      <MarketingLayout ctaSegment="us_contact_sticky" locale="en" ctaSecondary={{ href: "#form", label: "Get a free quote" }}>
         <UsContactContent />
       </MarketingLayout>
     </>

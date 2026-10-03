@@ -1,5 +1,4 @@
-// Módulo plano (sin "use client") para poder importarlo tanto desde la página
-// server (FaqJsonLd) como desde el contenido cliente.
+// Preguntas de /us/website-design (sección visible + JSON-LD de FAQ).
 export const US_WEB_FAQS = [
   {
     q: "How much does a website cost?",
