@@ -1,175 +1,100 @@
-"use client"
-
-import { useState } from "react"
-import Link from "next/link"
-import { AnimateIn } from "@/components/animate-in"
-import { ContactSection } from "@/components/contact-section"
-import {
-  ArrowRight, Code2, Gauge, Search, ShoppingCart, LayoutTemplate,
-  Rocket, PenTool, TestTubes, Plus, CheckCircle2,
-} from "lucide-react"
-
+import type { ShowcaseItem } from "@/lib/showcase"
+import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
+import { PageHero } from "@/components/layout/page-hero"
+import { LinkCTA } from "@/components/cta/link-cta"
+import { SecondaryCTA } from "@/components/cta/secondary-cta"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { PersonaVisual } from "@/components/landings/persona-visual"
+import { HomeIncluded } from "@/components/home-v2/included"
+import { ProcessSection } from "@/components/sections/process-section"
+import { PlansSection, type Plan } from "@/components/sections/plans-section"
+import { FaqSection } from "@/components/sections/faq-section"
 import { US_WEB_FAQS } from "./faqs"
 
-const OFFERINGS = [
-  { icon: LayoutTemplate, title: "Landing pages", desc: "Single-goal pages engineered for ad campaigns and lead capture. From $600." },
-  { icon: Code2, title: "Corporate websites", desc: "Fast, credible multi-page sites that make your business the obvious choice. From $1,200." },
-  { icon: ShoppingCart, title: "E-commerce", desc: "Stores that load fast, rank and convert — with payments, shipping and analytics wired in. From $2,500." },
+const CALENDLY_URL = "https://calendly.com/startbyglobal"
+
+const PLANS: Plan[] = [
+  {
+    name: "Landing page",
+    pricePrefix: "From",
+    price: "$600",
+    desc: "A single-goal page engineered for ad campaigns and lead capture.",
+    points: ["One clear call to action", "Conversion-first copy guidance", "Pixel + Conversions API tracking", "Ships in 1–2 weeks"],
+    cta: "Get this quote",
+  },
+  {
+    name: "Corporate website",
+    pricePrefix: "From",
+    price: "$1,200",
+    desc: "A fast, credible multi-page site that makes you the obvious choice.",
+    points: ["Custom multi-page design", "Technical SEO + structured data", "Blog and analytics", "Ships in 3–4 weeks"],
+    featured: true,
+    cta: "Get this quote",
+  },
+  {
+    name: "E-commerce",
+    pricePrefix: "From",
+    price: "$2,500",
+    desc: "A store that loads fast, ranks and converts.",
+    points: ["Payments and shipping wired in", "Catalog management", "Conversion optimization", "Ships in 4–8 weeks"],
+    cta: "Get this quote",
+  },
 ]
 
-const PROCESS = [
-  { icon: Search, title: "Discovery", desc: "We map your goals, audience and competitors before a single pixel is drawn." },
-  { icon: PenTool, title: "Design", desc: "Conversion-first UX and a visual identity that builds instant trust." },
-  { icon: Code2, title: "Build", desc: "Next.js or WordPress, Core Web Vitals in the green, tracking installed." },
-  { icon: Rocket, title: "Launch & grow", desc: "We ship, measure and iterate — your site keeps improving after launch." },
+const STEPS = [
+  { title: "Discovery", desc: "We map your goals, audience and competitors before a single pixel is drawn." },
+  { title: "Design", desc: "Conversion-first UX and a visual identity that builds instant trust. You see it before we build it." },
+  { title: "Build", desc: "Next.js or WordPress, Core Web Vitals in the green, tracking installed." },
+  { title: "Launch & grow", desc: "We ship, measure and iterate, so your site keeps improving after launch." },
 ]
 
-const INCLUDED = [
-  "Mobile-first responsive design",
-  "Core Web Vitals performance targets",
-  "Technical SEO + structured data",
-  "Analytics & conversion tracking (GA4, pixel + CAPI)",
-  "Copywriting guidance in English",
-  "30 days of post-launch support",
-]
-
-export function WebsiteDesignContent() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-
+export function WebsiteDesignContent({ work }: { work: ShowcaseItem[] }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-6">
-      {/* Hero */}
-      <AnimateIn>
-        <section className="glass-card rounded-2xl p-8 sm:p-12 relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-60"
-            style={{ background: "linear-gradient(135deg, hsl(16 90% 50% / 0.12) 0%, transparent 65%)" }}
-          />
-          <div className="relative z-10 max-w-3xl space-y-5">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-xs font-semibold text-primary">
-              <Code2 className="w-3.5 h-3.5" />
-              Website design & development
-            </span>
-            <h1 className="font-display text-4xl sm:text-6xl font-bold text-balance leading-[1.04] tracking-tight">
-              A website that sells — not just a pretty brochure
-            </h1>
-            <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
-              We design and build websites for U.S. businesses with one goal: turning visitors into
-              leads and sales. Senior team, U.S. time zones, fixed USD pricing from $600.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
-              <Link
-                href="/us/contact"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
-              >
-                Get your fixed quote
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#faq"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-card border border-border/50 text-foreground font-medium hover:border-primary/30 transition-all"
-              >
-                Common questions
-              </a>
-            </div>
-          </div>
-        </section>
-      </AnimateIn>
+    <>
+      <PageFunnelTracker landingKey="us_web" />
 
-      {/* Offerings */}
-      <AnimateIn delay={0.1}>
-        <section className="grid sm:grid-cols-3 gap-4">
-          {OFFERINGS.map((o, i) => {
-            const Icon = o.icon
-            return (
-              <AnimateIn key={o.title} delay={i * 80}>
-                <div className="glass-card rounded-xl p-6 flex flex-col gap-3 h-full">
-                  <div className="flex items-center justify-center w-11 h-11 rounded-lg bg-primary/10 border border-primary/20">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h2 className="font-display font-semibold text-foreground">{o.title}</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{o.desc}</p>
-                </div>
-              </AnimateIn>
-            )
-          })}
-        </section>
-      </AnimateIn>
+      <PageHero
+        badge="Website design & development"
+        title="A website that sells, not just a pretty brochure"
+        highlight="that sells"
+        subtitle="We design and build websites for U.S. businesses with one goal: turning visitors into leads and sales. U.S. time zones, fixed USD pricing."
+        note={<><span className="font-semibold text-foreground">From $600.</span> Fixed quote, in writing, before we start.</>}
+        aside={<PersonaVisual visual="web" work={work} locale="en" />}
+      >
+        <LinkCTA href="#contact" label="Get your fixed quote" />
+        <SecondaryCTA label="See pricing" href="#pricing" />
+      </PageHero>
 
-      {/* What's included */}
-      <AnimateIn delay={0.15}>
-        <section className="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-          <div className="flex items-center gap-2">
-            <Gauge className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-xl font-bold text-foreground">Included in every build</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
-            {INCLUDED.map((f) => (
-              <span key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <CheckCircle2 className="w-4 h-4 text-chart-3 shrink-0 mt-0.5" />
-                {f}
-              </span>
-            ))}
-          </div>
-        </section>
-      </AnimateIn>
+      <PlansSection
+        id="pricing"
+        title="Fixed pricing, in USD"
+        subtitle="Starting prices. Your final quote is fixed and in writing before we start: no hourly surprises."
+        plans={PLANS}
+        featuredLabel="Most popular"
+        href="#contact"
+      />
 
-      {/* Process */}
-      <AnimateIn delay={0.2}>
-        <section className="space-y-4">
-          <h2 className="font-display text-2xl font-bold text-foreground">How we work</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {PROCESS.map((p, i) => {
-              const Icon = p.icon
-              return (
-                <AnimateIn key={p.title} delay={i * 80}>
-                  <div className="glass-card rounded-xl p-5 space-y-2.5 h-full">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-display text-xs font-bold text-primary">0{i + 1}</span>
-                      <Icon className="w-4 h-4 text-primary" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground">{p.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
-                  </div>
-                </AnimateIn>
-              )
-            })}
-          </div>
-        </section>
-      </AnimateIn>
+      <HomeIncluded locale="en" />
 
-      {/* FAQ */}
-      <AnimateIn delay={0.25}>
-        <section id="faq" className="space-y-4">
-          <div className="flex items-center gap-2">
-            <TestTubes className="w-5 h-5 text-primary" />
-            <h2 className="font-display text-2xl font-bold text-foreground">Frequently asked questions</h2>
-          </div>
-          <div className="space-y-2">
-            {US_WEB_FAQS.map((f, i) => (
-              <div key={f.q} className="glass-card rounded-xl overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
-                >
-                  <span className="text-sm font-medium text-foreground">{f.q}</span>
-                  <Plus className={`w-4 h-4 text-primary shrink-0 transition-transform ${openFaq === i ? "rotate-45" : ""}`} />
-                </button>
-                {openFaq === i && (
-                  <p className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">{f.a}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      </AnimateIn>
+      <ProcessSection eyebrow="How we work" title="From discovery to launch, no black boxes" steps={STEPS} />
 
-      {/* Contact */}
-      <AnimateIn delay={0.3}>
-        <ContactSection />
-      </AnimateIn>
+      <FaqSection faqs={US_WEB_FAQS} title="Frequently asked questions" jsonLd={false} />
 
-    </div>
+      <ClosingCTA
+        id="contact"
+        title="Get your fixed quote"
+        text="Tell us what you need. We'll reply within 24 hours with a fixed price and a delivery date."
+        segment="us_web_final"
+        cta={<LinkCTA href={CALENDLY_URL} label="Book a 30-min call" external />}
+        formIntro="Or request your quote here:"
+        form={{
+          landingKey: "us_web",
+          landingName: "EE.UU. · Website Design",
+          locale: "en",
+          button: "Get my quote",
+          qualifierLabel: "What do you need? (landing, website, store…)",
+        }}
+      />
+    </>
   )
 }

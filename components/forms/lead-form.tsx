@@ -4,7 +4,35 @@ import { useRef, useState } from "react"
 import Link from "next/link"
 import { Check, Send } from "lucide-react"
 import { fireLandingLead, landingSession } from "@/lib/track-client"
+import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+
+const TEXT = {
+  es: {
+    button: "Quiero mi diagnóstico",
+    name: "Nombre",
+    contact: "WhatsApp o correo",
+    qualifier: "¿Qué necesitas? (web, anuncios, tienda…)",
+    success: "Te contactamos en las próximas 24 horas por la vía que nos dejaste.",
+    received: "¡Recibido!",
+    sending: "Enviando…",
+    error: "No se pudo enviar. Escríbenos a info@startbyglobal.com",
+    privacyPre: "Al enviar aceptas nuestra",
+    privacy: "política de privacidad",
+  },
+  en: {
+    button: "Get my free quote",
+    name: "Name",
+    contact: "Email or phone",
+    qualifier: "What do you need? (website, ads, store…)",
+    success: "We'll get back to you within 24 hours, by the channel you left us.",
+    received: "Got it!",
+    sending: "Sending…",
+    error: "Something went wrong. Email us at info@startbyglobal.com",
+    privacyPre: "By submitting you accept our",
+    privacy: "privacy policy",
+  },
+} as const
 
 interface LeadFormProps {
   /** Clave de analítica del embudo (pestaña "Landings" del admin). */
@@ -17,6 +45,7 @@ interface LeadFormProps {
   qualifierLabel?: string
   successText?: string
   className?: string
+  locale?: Locale
 }
 
 /**
@@ -27,13 +56,15 @@ interface LeadFormProps {
 export function LeadForm({
   landingKey,
   landingName,
-  button = "Quiero mi diagnóstico",
-  nameLabel = "Nombre",
-  contactLabel = "WhatsApp o correo",
-  qualifierLabel = "¿Qué necesitas? (web, anuncios, tienda…)",
-  successText = "Te contactamos en las próximas 24 horas por la vía que nos dejaste.",
+  locale = "es",
+  button = TEXT[locale].button,
+  nameLabel = TEXT[locale].name,
+  contactLabel = TEXT[locale].contact,
+  qualifierLabel = TEXT[locale].qualifier,
+  successText = TEXT[locale].success,
   className,
 }: LeadFormProps) {
+  const t = TEXT[locale]
   const [name, setName] = useState("")
   const [contact, setContact] = useState("")
   const [qualifier, setQualifier] = useState("")
@@ -66,11 +97,12 @@ export function LeadForm({
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "No se pudo enviar.")
+        // Los mensajes del servidor están en español.
+        throw new Error(locale === "es" && data.error ? data.error : t.error)
       }
       setSent(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo enviar. Escríbenos a info@startbyglobal.com")
+      setError(err instanceof Error && err.message ? err.message : t.error)
     } finally {
       setSending(false)
     }
@@ -82,7 +114,7 @@ export function LeadForm({
         <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-chart-3/15">
           <Check className="h-7 w-7 text-chart-3" />
         </span>
-        <p className="font-display text-xl font-bold">¡Recibido!</p>
+        <p className="font-display text-xl font-bold">{t.received}</p>
         <p className="mt-2 text-sm text-muted-foreground">{successText}</p>
       </div>
     )
@@ -104,10 +136,10 @@ export function LeadForm({
         disabled={sending}
         className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-bold text-primary-foreground transition-shadow hover:shadow-lg hover:shadow-primary/25 disabled:opacity-60"
       >
-        {sending ? "Enviando…" : <>{button} <Send className="h-4 w-4" /></>}
+        {sending ? t.sending : <>{button} <Send className="h-4 w-4" /></>}
       </button>
       <p className="text-center text-[11px] text-muted-foreground">
-        Al enviar aceptas nuestra <Link href="/privacidad" className="underline hover:text-foreground">política de privacidad</Link>.
+        {t.privacyPre} <Link href="/privacidad" className="underline hover:text-foreground">{t.privacy}</Link>.
       </p>
     </form>
   )

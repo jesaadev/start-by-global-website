@@ -1,762 +1,284 @@
-"use client"
-
-import { useState } from "react"
+import { Award, Clock, Code2, Layers, LifeBuoy, Megaphone, ShieldCheck } from "lucide-react"
+import type { ShowcaseItem } from "@/lib/showcase"
+import { PageFunnelTracker } from "@/components/analytics/page-funnel-tracker"
 import { AnimateIn } from "@/components/animate-in"
+import { PageHero } from "@/components/layout/page-hero"
 import { PrimaryCTA } from "@/components/cta/primary-cta"
 import { SecondaryCTA } from "@/components/cta/secondary-cta"
-import { fireLead } from "@/lib/track-client"
-import {
-  ArrowRight,
-  CheckCircle2,
-  Lock,
-  Award,
-  Zap,
-  Globe2,
-  ChevronDown,
-  Code2,
-  Layers,
-  Megaphone,
-  Shield,
-  Clock,
-  Star,
-  Send,
-} from "lucide-react"
+import { ClosingCTA } from "@/components/cta/closing-cta"
+import { PersonaVisual } from "@/components/landings/persona-visual"
+import { ComparisonSection } from "@/components/sections/comparison-section"
+import { ProcessSection } from "@/components/sections/process-section"
+import { PlansSection, type Plan } from "@/components/sections/plans-section"
+import { FaqSection } from "@/components/sections/faq-section"
+import SpotlightCard from "@/components/reactbits/SpotlightCard"
+import { WhatsAppLink } from "@/components/whatsapp-link"
 
-const services = [
+// Regla de dato real: compromisos de entrega (NDA, revisiones, Lighthouse 90+)
+// sí; conteos de agencias o informes "reales" que no podamos mostrar, no.
+
+const SERVICE = "Outsourcing / Marca Blanca"
+
+const SERVICES = [
   {
-    id: "wordpress",
-    badge: "Servicio 01",
     icon: Layers,
     title: "WordPress",
-    subtitle: "Sites & Tiendas",
-    description:
-      "Desarrollo full-stack en WordPress para agencias que necesitan entregar sitios corporativos, blogs y WooCommerce con velocidad y calidad garantizada. Tu cliente ve tu marca, nosotros ponemos el código.",
-    stack: ["WordPress 6.x", "WooCommerce", "ACF Pro", "Elementor / Gutenberg", "WPML Multilingue"],
-    deliverables: [
-      "Diseño personalizado pixel-perfect",
-      "Optimización Core Web Vitals 90+",
-      "SEO On-Page configurado",
-      "Seguridad Hardening incluida",
-      "Documentacion para tu equipo",
-    ],
-    turnaround: "7 - 21 días",
+    tag: "Sitios y tiendas",
+    desc: "Sitios corporativos, blogs y WooCommerce entregados rápido y bien. Tu cliente ve tu marca; nosotros ponemos el código.",
+    stack: ["WordPress", "WooCommerce", "ACF Pro", "Elementor / Gutenberg", "WPML"],
+    deliverables: ["Diseño a medida", "Core Web Vitals en verde", "SEO on-page configurado", "Seguridad reforzada", "Documentación para tu equipo"],
+    turnaround: "7 a 21 días",
     color: "#0074D9",
-    bg: "from-[#0074D9]/8 to-transparent",
-    border: "border-[#0074D9]/20 hover:border-[#0074D9]/50",
   },
   {
-    id: "corporate",
-    badge: "Servicio 02",
     icon: Code2,
-    title: "Corporativas",
-    subtitle: "Sin CMS — Astro & React",
-    description:
-      "Para clientes que priorizan velocidad extrema y seguridad maxima. Páginas corporativas estaticas con Astro o React que cargan en milisegundos, sin base de datos ni superficie de ataque.",
-    stack: ["Astro 5.x", "React + Next.js", "Tailwind CSS", "Framer Motion", "Vercel / Cloudflare"],
-    deliverables: [
-      "Performance Score 99/100 garantizado",
-      "0 dependencia de CMS (100% seguro)",
-      "Deploy automatizado en CDN global",
-      "Animaciones fluidas e interactivas",
-      "Accesibilidad WCAG 2.1 AA",
-    ],
-    turnaround: "5 - 14 días",
+    title: "Corporativas sin CMS",
+    tag: "Astro · React · Next.js",
+    desc: "Para clientes que priorizan velocidad y seguridad: sitios estáticos que cargan al instante, sin base de datos que mantener.",
+    stack: ["Astro", "Next.js", "Tailwind CSS", "Framer Motion", "Vercel / Cloudflare"],
+    deliverables: ["Lighthouse 90+ garantizado", "Sin CMS: menos superficie de ataque", "Despliegue automático en CDN", "Animaciones fluidas", "Accesibilidad WCAG 2.1 AA"],
+    turnaround: "5 a 14 días",
     color: "#00C9C8",
-    bg: "from-[#00C9C8]/8 to-transparent",
-    border: "border-[#00C9C8]/20 hover:border-[#00C9C8]/50",
   },
   {
-    id: "landing",
-    badge: "Servicio 03",
     icon: Megaphone,
-    title: "Landing Pages",
-    subtitle: "Embudos de Conversión",
-    description:
-      "Landing pages disenadas para convertir: embudos para campañas de paid media, lanzamientos de productos, webinars y estrategias de lead generation. Cada elemento optimizado para el CPA de tu cliente.",
-    stack: ["Next.js App Router", "A/B Testing Ready", "Meta Pixel + GTM", "CRM Integration", "Heatmap Ready"],
-    deliverables: [
-      "Copy persuasivo orientado a conversión",
-      "Diseño orientado a CRO",
-      "Formularios con automatización",
-      "Integración con cualquier CRM",
-      "Variantes A/B configuradas",
-    ],
-    turnaround: "3 - 10 días",
+    title: "Landing pages",
+    tag: "Embudos de conversión",
+    desc: "Landings para campañas, lanzamientos y captación de leads, pensadas para bajar el costo por lead de tu cliente.",
+    stack: ["Next.js", "Meta Pixel + GTM", "API de Conversiones", "Integración con CRM"],
+    deliverables: ["Copy orientado a conversión", "Diseño orientado a CRO", "Formularios con automatización", "Integración con cualquier CRM", "Variantes A/B listas"],
+    turnaround: "3 a 10 días",
     color: "#7B61FF",
-    bg: "from-[#7B61FF]/8 to-transparent",
-    border: "border-[#7B61FF]/20 hover:border-[#7B61FF]/50",
   },
 ]
 
-const faqs = [
+const STEPS = [
+  { title: "Brief confidencial", desc: "Nos envías los requisitos con el NDA firmado. Ningún dato de tu cliente sale de ese canal." },
+  { title: "Propuesta en 24 h", desc: "Cotización con desglose técnico, cronograma y alcance. La revisas y ajustas." },
+  { title: "Desarrollo en silencio", desc: "Trabajamos en staging bajo tu dominio. Te reportamos con tu marca, por Slack o Notion." },
+  { title: "Entrega lista para publicar", desc: "Repositorio, credenciales y documentación. Tú haces la entrega final: el crédito es 100 % tuyo." },
+]
+
+const PLANS: Plan[] = [
   {
-    q: "Mi cliente puede descubrir que tercericé el proyecto?",
-    a: "Nunca. Firmamos un NDA antes de iniciar y trabajamos exclusivamente bajo tu marca. Facturas, reportes, emails y repositorios llevan tu logo. Somos invisibles.",
+    name: "Puntual",
+    tagline: "Por proyecto",
+    desc: "Para apoyo esporádico o para probar la alianza.",
+    points: ["Sin compromiso de volumen", "Cotización por proyecto", "Pago 50 % al inicio / 50 % a la entrega", "Soporte por email", "1 revisión incluida"],
+    cta: "Empezar con un proyecto",
   },
   {
-    q: "Como funciona el proceso de entrega?",
-    a: "Recibes un brief, lo pasas a nosotros con tus especificaciones. Nosotros diseñamos, desarrollamos y te entregamos todo listo en un repositorio privado o staging bajo tu dominio. Tu haces el delivery final al cliente.",
+    name: "Partner",
+    tagline: "3+ proyectos / mes",
+    desc: "Para agencias con flujo continuo que quieren mejor precio y prioridad.",
+    points: ["15 % de descuento en todos los proyectos", "Prioridad en la agenda", "2 revisiones por proyecto", "Canal de Slack dedicado", "Reportes con tu marca"],
+    featured: true,
+    cta: "Quiero ser partner",
   },
   {
-    q: "Que pasa si el cliente pide revisiones después de entregado?",
-    a: "Cada proyecto incluye 2 rondas de revision sin costo. Revisiones adicionales o cambios de scope se cotizan aparte con tarifa de partner preferencial.",
-  },
-  {
-    q: "Trabajan con agencias fuera de Republica Dominicana?",
-    a: "Si. Tenemos partners activos en Venezuela, España, México, Colombia y EE.UU. Nos comunicamos por Slack, Notion o la herramienta que ya uses.",
-  },
-  {
-    q: "Cual es el volumen mínimo de proyectos?",
-    a: "No hay volumen mínimo para empezar. Sin embargo, los margenes mejoran con el plan Partner (desde 3 proyectos/mes) y Partner Pro (desde 6 proyectos/mes).",
+    name: "Partner Pro",
+    tagline: "6+ proyectos / mes",
+    desc: "Para agencias de alto volumen que necesitan capacidad extendida.",
+    points: ["25 % de descuento en todos los proyectos", "Gestor de cuenta dedicado", "Revisiones ilimitadas", "SLA de entrega garantizado", "Capacitación a tu equipo"],
+    cta: "Hablar de volumen",
   },
 ]
 
-export function OutsourcingContent() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [formData, setFormData] = useState({ name: "", agency: "", email: "", volume: "", message: "" })
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [formError, setFormError] = useState("")
+const GUARANTEES = [
+  { icon: Award, text: "Informes con tu logo para tu cliente" },
+  { icon: Code2, text: "Código limpio, comentado y documentado" },
+  { icon: ShieldCheck, text: "NDA firmado antes de empezar" },
+  { icon: LifeBuoy, text: "Soporte post-entrega durante 30 días" },
+]
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    // Honeypot: leer de forma síncrona antes de cualquier await.
-    const company_website = (new FormData(e.currentTarget).get("company_website") as string) ?? ""
-    setSending(true)
-    setFormError("")
-    try {
-      const tracking = fireLead("contact_form", "outsourcing")
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          company: formData.agency,
-          service: "Outsourcing / Marca Blanca",
-          message: `Volumen estimado: ${formData.volume} proyectos/mes\n\n${formData.message}`,
-          company_website,
-          ...tracking,
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setSent(true)
-      setFormData({ name: "", agency: "", email: "", volume: "", message: "" })
-    } catch {
-      setFormError("Error al enviar. Intenta de nuevo o escribe a info@startbyglobal.com")
-    } finally {
-      setSending(false)
-    }
-  }
+const REPORT = [
+  { label: "Performance", score: 96 },
+  { label: "Accesibilidad", score: 100 },
+  { label: "Buenas prácticas", score: 100 },
+  { label: "SEO", score: 100 },
+]
 
+const FAQS = [
+  { q: "¿Mi cliente puede enterarse de que tercericé el proyecto?", a: "No. Firmamos un NDA antes de empezar y trabajamos solo bajo tu marca: reportes, emails y repositorios llevan tu logo." },
+  { q: "¿Cómo es el proceso de entrega?", a: "Nos pasas el brief con tus especificaciones; diseñamos, desarrollamos y te entregamos todo en un repositorio privado o en staging bajo tu dominio. Tú haces la entrega final al cliente." },
+  { q: "¿Y si el cliente pide cambios después de entregado?", a: "Cada proyecto incluye las revisiones de tu plan sin costo. Cambios adicionales o de alcance se cotizan aparte con tarifa de partner." },
+  { q: "¿Trabajan con agencias fuera de República Dominicana?", a: "Sí. Trabajamos en remoto con agencias de cualquier país y nos comunicamos por Slack, Notion o la herramienta que ya uses." },
+  { q: "¿Hay un volumen mínimo?", a: "No. Puedes empezar con un solo proyecto. Los precios mejoran con los planes Partner (desde 3 proyectos al mes) y Partner Pro (desde 6)." },
+]
+
+function ScoreRing({ score, label }: { score: number; label: string }) {
+  const r = 30
+  const c = 2 * Math.PI * r
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans">
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative h-20 w-20">
+        <svg viewBox="0 0 72 72" className="h-20 w-20 -rotate-90" aria-hidden>
+          <circle cx="36" cy="36" r={r} fill="none" stroke="currentColor" strokeWidth="6" className="text-foreground/10" />
+          <circle cx="36" cy="36" r={r} fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" className="text-chart-3" strokeDasharray={c} strokeDashoffset={c * (1 - score / 100)} />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center font-display text-xl font-bold">{score}</span>
+      </div>
+      <span className="text-xs text-muted-foreground text-center">{label}</span>
+    </div>
+  )
+}
 
-      {/* ── HERO ───────────────────────────────────── */}
-      <section className="relative flex items-center overflow-hidden">
-        {/* Grid background */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: `linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)`,
-            backgroundSize: "64px 64px",
-          }}
-        />
-        {/* Glow blobs */}
-        <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-[#0074D9]/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 left-1/6 w-[400px] h-[400px] bg-[#00C9C8]/5 rounded-full blur-[100px] pointer-events-none" />
+export function OutsourcingContent({ work }: { work: ShowcaseItem[] }) {
+  return (
+    <>
+      <PageFunnelTracker landingKey="outsourcing" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-24 grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <AnimateIn delay={0.05}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0074D9]/10 border border-[#0074D9]/20 text-[#0074D9] text-xs font-semibold mb-8 tracking-wide uppercase">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#0074D9] animate-pulse" />
-                Outsourcing & Marca Blanca — Agencias
-              </div>
-            </AnimateIn>
+      <PageHero
+        badge="Outsourcing y marca blanca para agencias"
+        title="Tu equipo de desarrollo web, invisible para tu cliente."
+        highlight="invisible para tu cliente."
+        glow="#0074D9"
+        subtitle="WordPress, sitios corporativos en Astro o React y landing pages de alta conversión, entregados bajo tu marca. Sin créditos, sin rastro."
+        note={<><span className="font-semibold text-foreground">NDA antes de empezar · Lighthouse 90+ garantizado.</span> Pagas por proyecto entregado.</>}
+        aside={<PersonaVisual visual="agency" work={work} />}
+      >
+        <PrimaryCTA label="Quiero ser partner" segment="outsourcing_hero" service={SERVICE} />
+        <SecondaryCTA label="Prefiero dejar mis datos" href="#contacto" />
+      </PageHero>
 
-            <AnimateIn delay={0.1}>
-              <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-balance mb-6">
-                Tu equipo de
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#00C9C8]">
-                  desarrollo web
-                </span>
-                <br />
-                invisible.
-              </h1>
-            </AnimateIn>
+      <ComparisonSection
+        eyebrow="El problema real"
+        title="Rechazas clientes por falta de capacidad técnica."
+        highlight="por falta de capacidad técnica."
+        before={{
+          label: "Sin partner",
+          items: [
+            "Freelancers sin garantía de calidad ni de plazos",
+            "Nómina fija aunque no entren proyectos",
+            "Proyectos que se retrasan y hay que rehacer",
+            "Cuellos de botella cuando sube la demanda",
+            "Tu reputación en juego en cada entrega",
+          ],
+        }}
+        after={{
+          label: "Con Start By Global",
+          items: [
+            "Un equipo técnico dedicado detrás de tu marca",
+            "Pagas solo por proyecto entregado",
+            "Calidad medida: Lighthouse 90+ o lo rehacemos",
+            "Escalas de 1 a 10 proyectos al mes sin contratar",
+            "Tu marca, tu crédito, nuestro código",
+          ],
+        }}
+      />
 
-            <AnimateIn delay={0.2}>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-lg">
-                Entregamos WordPress, sitios corporativos en Astro/React y Landing Pages de alta conversión bajo tu marca. Sin creditos, sin rastro. Solo resultados.
-              </p>
-            </AnimateIn>
-
-            <AnimateIn delay={0.3}>
-              <div className="flex flex-wrap items-center gap-3">
-                <PrimaryCTA label="Quiero ser partner" segment="outsourcing_hero" service="Outsourcing / Marca Blanca" />
-                <SecondaryCTA label="Prefiero el formulario" href="#contacto" />
-              </div>
-            </AnimateIn>
-
-            <AnimateIn delay={0.4}>
-              <div className="mt-12 flex flex-wrap gap-6">
-                {[
-                  { icon: Lock, label: "NDA firmado antes de iniciar" },
-                  { icon: Shield, label: "Marca Blanca 100%" },
-                  { icon: Zap, label: "Lighthouse 90+ garantizado" },
-                ].map((t) => (
-                  <div key={t.label} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <t.icon className="w-4 h-4 text-[#0E7490] dark:text-[#00C9C8]" />
-                    {t.label}
+      {/* Servicios */}
+      <section id="servicios" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 scroll-mt-20">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-balance max-w-3xl">
+          Tres servicios, un solo partner
+        </h2>
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {SERVICES.map((s, i) => {
+            const Icon = s.icon
+            return (
+              <AnimateIn key={s.title} delay={i * 80} className="h-full">
+                <SpotlightCard spotlightColor="rgba(0, 116, 217, 0.18)" className="h-full !p-7 flex flex-col">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: `${s.color}1f`, color: s.color }}>
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/70 px-3 py-1 text-xs font-semibold text-foreground/80">
+                      <Clock className="h-3.5 w-3.5" /> {s.turnaround}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </AnimateIn>
-          </div>
-
-          {/* Stats card */}
-          <AnimateIn delay={0.25}>
-            <div className="hidden lg:block">
-              <div className="relative p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8 backdrop-blur-sm">
-                <div className="grid grid-cols-2 gap-px bg-foreground/8 rounded-xl overflow-hidden">
-                  {[
-                    { value: "White-label", label: "Entregables bajo tu marca", color: "text-[#0074D9]" },
-                    { value: "100%", label: "Confidencialidad", color: "text-[#0E7490] dark:text-[#00C9C8]" },
-                    { value: "3-21", label: "Días de entrega", color: "text-[#7B61FF]" },
-                    { value: "Lighthouse 90+", label: "Rendimiento garantizado", color: "text-[#0074D9]" },
-                  ].map((s) => (
-                    <div key={s.label} className="bg-background p-6">
-                      <div className={`font-display text-4xl font-bold mb-1 ${s.color}`}>{s.value}</div>
-                      <div className="text-xs text-muted-foreground">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center gap-3 pt-6 border-t border-foreground/5">
-                  <div className="flex -space-x-2">
-                    {["#0074D9", "#00C9C8", "#7B61FF", "#F4A261"].map((c) => (
-                      <div key={c} className="w-8 h-8 rounded-full border-2 border-background" style={{ backgroundColor: c + "33", borderColor: c + "66" }} />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Agencias activas en RD, ES, VE, MX, US</p>
-                </div>
-              </div>
-            </div>
-          </AnimateIn>
-        </div>
-      </section>
-
-      {/* ── PROBLEMA / SOLUCION ────────────────────── */}
-      <section className="py-24 border-t border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="max-w-3xl mb-16">
-              <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">El Problema Real</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight">
-                Rechazas clientes por falta de{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#00C9C8]">
-                  capacidad técnica.
-                </span>
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-5xl">
-            <AnimateIn delay={0.1}>
-              <div className="p-8 rounded-2xl border border-red-500/15 bg-red-500/3">
-                <p className="text-red-400 text-xs font-semibold uppercase tracking-wider mb-6">Sin Partner</p>
-                <ul className="space-y-4">
-                  {[
-                    "Contratas freelancers sin garantía de calidad",
-                    "Nómina fija aunque no haya proyectos",
-                    "Recuerzas proyectos por problemas de entrega",
-                    "Cuellos de botella en picos de demanda",
-                    "Riesgo reputacional en cada proyecto",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
-                        <div className="w-1.5 h-1.5 bg-red-400 rounded-full" />
-                      </div>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimateIn>
-            <AnimateIn delay={0.15}>
-              <div className="p-8 rounded-2xl border border-[#0074D9]/20 bg-gradient-to-br from-[#0074D9]/6 to-transparent">
-                <p className="text-[#0E7490] dark:text-[#00C9C8] text-xs font-semibold uppercase tracking-wider mb-6">Con Start By Global</p>
-                <ul className="space-y-4">
-                  {[
-                    "Equipo técnico certificado en tu back-office",
-                    "Solo pagas por proyecto entregado (costo variable)",
-                    "Calidad garantizada con Lighthouse 90+",
-                    "Escala instantanea: 1 o 10 proyectos al mes",
-                    "Tu marca, tu credito, nuestro código",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-foreground/70">
-                      <CheckCircle2 className="w-5 h-5 text-[#0E7490] dark:text-[#00C9C8] shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </AnimateIn>
-          </div>
-        </div>
-      </section>
-
-      {/* ── LOS 3 SERVICIOS ────────────────────────── */}
-      <section id="servicios" className="py-24 border-t border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16">
-              <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">Portafolio B2B</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                Tres servicios. Un solo partner.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="flex flex-col gap-6">
-            {services.map((svc, i) => {
-              const Icon = svc.icon
-              return (
-                <AnimateIn key={svc.id} delay={0.08 * i}>
-                  <div
-                    className={`group relative p-8 md:p-10 rounded-2xl bg-gradient-to-br ${svc.bg} border ${svc.border} transition-all duration-500`}
-                  >
-                    <div className="grid md:grid-cols-[1fr_auto] gap-8 items-start">
-                      <div>
-                        <div className="flex items-center gap-4 mb-6">
-                          <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: svc.color + "15", border: `1px solid ${svc.color}25` }}
-                          >
-                            <Icon className="w-6 h-6" style={{ color: svc.color }} />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/30">{svc.badge}</p>
-                            <h3 className="font-display text-2xl md:text-3xl font-bold">{svc.title}</h3>
-                          </div>
-                          <span
-                            className="hidden sm:inline-block ml-2 px-3 py-1 rounded-full text-xs font-medium"
-                            style={{ backgroundColor: svc.color + "12", color: svc.color }}
-                          >
-                            {svc.subtitle}
-                          </span>
-                        </div>
-
-                        <p className="text-muted-foreground leading-relaxed mb-8 max-w-2xl">{svc.description}</p>
-
-                        <div className="grid sm:grid-cols-2 gap-8">
-                          <div>
-                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Stack Tecnologico</p>
-                            <div className="flex flex-wrap gap-2">
-                              {svc.stack.map((s) => (
-                                <span key={s} className="px-3 py-1 rounded-md bg-foreground/5 border border-foreground/8 text-xs text-foreground/60 font-mono">
-                                  {s}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div>
-                            <p className="text-xs uppercase tracking-widest text-foreground/30 mb-3">Entregables</p>
-                            <ul className="space-y-2">
-                              {svc.deliverables.map((d) => (
-                                <li key={d} className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <div className="w-1 h-1 rounded-full shrink-0" style={{ backgroundColor: svc.color }} />
-                                  {d}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-start md:items-end gap-4 md:min-w-[180px]">
-                        <div className="text-right">
-                          <div className="flex items-center gap-1.5 text-foreground/30 text-xs mb-1">
-                            <Clock className="w-3.5 h-3.5" />
-                            Tiempo de entrega
-                          </div>
-                          <div className="font-display text-3xl font-bold" style={{ color: svc.color }}>
-                            {svc.turnaround}
-                          </div>
-                        </div>
-                        <a
-                          href="#contacto"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:scale-[1.02]"
-                          style={{ backgroundColor: svc.color + "15", color: svc.color, border: `1px solid ${svc.color}25` }}
-                        >
-                          Cotizar este servicio
-                          <ArrowRight className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </AnimateIn>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PROCESO ────────────────────────────────── */}
-      <section id="proceso" className="py-24 border-t border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16 text-center">
-              <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">Como Funciona</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                De brief a entrega en 4 pasos.
-              </h2>
-            </div>
-          </AnimateIn>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/5 rounded-2xl overflow-hidden">
-            {[
-              { step: "01", title: "Brief Confidencial", desc: "Nos envias los requerimientos del proyecto con NDA firmado. Ningun dato de tu cliente sale de ese canal." },
-              { step: "02", title: "Propuesta en 24h", desc: "Enviamos cotización detallada con desglose técnico, cronograma y alcance. Tu la revisas y ajustas." },
-              { step: "03", title: "Desarrollo en Silencio", desc: "Trabajamos en staging bajo tu dominio o un temporal. Updates por Slack/Notion con tu marca." },
-              { step: "04", title: "Entrega Lista para Deploy", desc: "Recibes repositorio, credenciales y documentacion. Tu haces el handoff final. Credito 100% tuyo." },
-            ].map((step, i) => (
-              <AnimateIn key={step.step} delay={0.08 * i}>
-                <div className="bg-background p-8 flex flex-col gap-4 h-full">
-                  <div className="font-display text-5xl font-bold text-foreground/5">{step.step}</div>
-                  <div>
-                    <h3 className="font-display text-lg font-bold text-foreground mb-2">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-                  </div>
-                </div>
-              </AnimateIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRECIOS / MODELOS ──────────────────────── */}
-      <section id="precios" className="py-24 border-t border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-16 text-center">
-              <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">Modelos de Alianza</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">
-                El margen es tuyo. Siempre.
-              </h2>
-              <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-                Nuestros precios son para ti. Tu pones el markup que quieras a tu cliente. Sin restricciones, sin competencia directa.
-              </p>
-            </div>
-          </AnimateIn>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Puntual",
-                tagline: "Por proyecto",
-                desc: "Ideal para agencias que necesitan apoyo esporadico o que quieren probar la alianza.",
-                perks: ["Sin compromiso de volumen", "Cotización por proyecto", "Pago 50% inicio / 50% entrega", "Soporte via email", "1 revision incluida"],
-                cta: "Empezar ahora",
-                highlight: false,
-                color: "#ffffff",
-              },
-              {
-                name: "Partner",
-                tagline: "3+ proyectos / mes",
-                desc: "Para agencias con flujo continuo que quieren precios preferenciales y prioridad de agenda.",
-                perks: ["Descuento del 15% en todos los proyectos", "Prioridad en agenda de desarrollo", "2 revisiones por proyecto", "Canal Slack dedicado", "Reportes con tu marca"],
-                cta: "Quiero ser Partner",
-                highlight: true,
-                color: "#0074D9",
-              },
-              {
-                name: "Partner Pro",
-                tagline: "6+ proyectos / mes",
-                desc: "Para agencias de alto volumen que necesitan capacidad extendida y SLA garantizado.",
-                perks: ["Descuento del 25% en todos los proyectos", "Cuenta manager dedicada", "Revisiones ilimitadas", "SLA de entrega garantizado", "Capacitacion a tu equipo"],
-                cta: "Hablar con ventas",
-                highlight: false,
-                color: "#00C9C8",
-              },
-            ].map((plan, i) => (
-              <AnimateIn key={plan.name} delay={0.08 * i}>
-                <div
-                  className={`relative flex flex-col p-8 rounded-2xl border transition-all duration-300 h-full ${
-                    plan.highlight
-                      ? "border-[#0074D9]/50 bg-gradient-to-b from-[#0074D9]/10 to-transparent scale-[1.02]"
-                      : "border-foreground/10 bg-foreground/[0.02] hover:border-foreground/20"
-                  }`}
-                >
-                  {plan.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#0074D9] text-white text-xs font-semibold">
-                      Más popular
-                    </div>
-                  )}
-                  <div className="mb-6">
-                    <h3 className="font-display text-2xl font-bold mb-1" style={{ color: plan.color }}>{plan.name}</h3>
-                    <p className="text-xs text-foreground/35 uppercase tracking-widest mb-4">{plan.tagline}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{plan.desc}</p>
-                  </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {plan.perks.map((perk) => (
-                      <li key={perk} className="flex items-center gap-2.5 text-sm text-foreground/60">
-                        <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: plan.color }} />
-                        {perk}
+                  <h3 className="font-display text-2xl font-bold mt-5">{s.title}</h3>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mt-1">{s.tag}</p>
+                  <p className="text-base text-foreground/70 leading-relaxed mt-3">{s.desc}</p>
+                  <ul className="mt-5 flex flex-col gap-2">
+                    {s.deliverables.map((d) => (
+                      <li key={d} className="flex items-start gap-2 text-sm text-foreground/80">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                        {d}
                       </li>
                     ))}
                   </ul>
-                  <a
-                    href="#contacto"
-                    className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all ${
-                      plan.highlight
-                        ? "bg-[#0074D9] text-white hover:bg-[#0074D9]/85 hover:shadow-lg hover:shadow-[#0074D9]/25"
-                        : "border border-foreground/10 text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
-                    }`}
+                  <div className="mt-5 flex flex-wrap gap-1.5">
+                    {s.stack.map((t) => (
+                      <span key={t} className="rounded-md bg-secondary/60 px-2 py-0.5 text-[11px] text-muted-foreground">{t}</span>
+                    ))}
+                  </div>
+                  <WhatsAppLink
+                    segment={`outsourcing_${s.title.toLowerCase().split(" ")[0]}`}
+                    defaultService={SERVICE}
+                    className="mt-auto pt-6 text-left text-sm font-semibold text-foreground hover:text-primary transition-colors"
                   >
-                    {plan.cta}
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
+                    Cotizar este servicio →
+                  </WhatsAppLink>
+                </SpotlightCard>
               </AnimateIn>
-            ))}
-          </div>
+            )
+          })}
         </div>
       </section>
 
-      {/* ── GARANTIA ───────────────────────────────── */}
-      <section className="py-24 border-t border-foreground/5 bg-gradient-to-b from-[#001F3F]/20 to-transparent">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <AnimateIn>
-              <div>
-                <p className="text-[#0E7490] dark:text-[#00C9C8] text-sm font-semibold uppercase tracking-widest mb-4">Nuestra Promesa</p>
-                <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight mb-6">
-                  Si no cumplimos el score,{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0074D9] to-[#00C9C8]">
-                    lo rehacemos gratis.
-                  </span>
-                </h2>
-                <p className="text-muted-foreground leading-relaxed mb-8">
-                  Cada proyecto sale con un informe de Lighthouse y Core Web Vitals adjunto. Si el Performance Score no alcanza 90/100, continuamos hasta lograrlo sin costo adicional.
-                </p>
-                <div className="space-y-4">
-                  {[
-                    { icon: Award, text: "Reportes brandables con tu logo para tu cliente" },
-                    { icon: Code2, text: "Código limpio, comentado y documentado" },
-                    { icon: Globe2, text: "Optimización multiregion: RD, ES, US" },
-                    { icon: Star, text: "Soporte post-entrega durante 30 días" },
-                  ].map((g) => (
-                    <div key={g.text} className="flex items-center gap-4">
-                      <div className="w-9 h-9 rounded-lg bg-[#0074D9]/10 flex items-center justify-center shrink-0">
-                        <g.icon className="w-4.5 h-4.5 text-[#0074D9]" />
-                      </div>
-                      <p className="text-sm text-foreground/60">{g.text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AnimateIn>
+      <ProcessSection eyebrow="Cómo funciona" title="Del brief a la entrega en 4 pasos" steps={STEPS} />
 
-            <AnimateIn delay={0.15}>
-              <div className="relative p-8 rounded-2xl bg-foreground/[0.025] border border-foreground/8">
-                <p className="text-xs text-foreground/30 uppercase tracking-widest mb-6">Lighthouse Report — Ejemplo Real</p>
-                <div className="space-y-5">
-                  {[
-                    { label: "Performance", score: 96, color: "#00C9C8" },
-                    { label: "Accessibility", score: 100, color: "#0074D9" },
-                    { label: "Best Practices", score: 100, color: "#7B61FF" },
-                    { label: "SEO", score: 100, color: "#F4A261" },
-                  ].map((m) => (
-                    <div key={m.label}>
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">{m.label}</span>
-                        <span className="font-semibold" style={{ color: m.color }}>{m.score}</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-foreground/5 overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${m.score}%`, backgroundColor: m.color }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 pt-5 border-t border-foreground/5 flex items-center justify-between">
-                  <span className="text-xs text-foreground/25">Tiempo de carga</span>
-                  <span className="font-display text-2xl font-bold text-[#0E7490] dark:text-[#00C9C8]">{'< 1.1s'}</span>
-                </div>
-              </div>
-            </AnimateIn>
+      <PlansSection
+        title="El margen es tuyo. Siempre."
+        subtitle="Nuestros precios son para ti: tú pones el margen que quieras a tu cliente. Sin restricciones y sin competir contigo."
+        plans={PLANS}
+        whatsapp={{ service: SERVICE, segment: "outsourcing_plan" }}
+      />
+
+      {/* Garantía */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">Nuestra promesa</span>
+            <h2 className="font-display text-3xl sm:text-5xl font-bold tracking-tight leading-[1.05] mt-2 text-balance">
+              Si no llegamos a 90 en Lighthouse, lo rehacemos gratis.
+            </h2>
+            <p className="text-lg text-foreground/75 leading-relaxed mt-4">
+              Cada proyecto sale con su informe de Lighthouse y Core Web Vitals. Si el Performance no alcanza 90/100,
+              seguimos trabajando hasta lograrlo sin costo adicional.
+            </p>
+            <ul className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {GUARANTEES.map((g) => (
+                <li key={g.text} className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/60 p-4 text-sm text-foreground/85">
+                  <g.icon className="h-5 w-5 shrink-0 text-primary" />
+                  {g.text}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-      </section>
-
-      {/* ── FAQ ────────────────────────────────────── */}
-      <section id="faq" className="py-24 border-t border-foreground/5">
-        <div className="max-w-4xl mx-auto px-6">
-          <AnimateIn>
-            <div className="mb-14 text-center">
-              <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">FAQ</p>
-              <h2 className="font-display text-4xl md:text-5xl font-bold text-balance">Preguntas frecuentes.</h2>
+          <div className="rounded-3xl border border-border/50 bg-card/60 p-7 sm:p-9">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-display text-lg font-bold">Informe de entrega</p>
+              <span className="rounded-full bg-[#F4A261]/15 px-2.5 py-1 text-[11px] font-semibold text-[#b45309] dark:text-[#F4A261]">Ejemplo ilustrativo</span>
             </div>
-          </AnimateIn>
-
-          <div className="flex flex-col divide-y divide-foreground/5">
-            {faqs.map((faq, i) => (
-              <AnimateIn key={i} delay={0.05 * i}>
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-start justify-between gap-6 py-6 text-left group"
-                >
-                  <span className="font-semibold text-foreground/80 group-hover:text-foreground transition-colors">{faq.q}</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-foreground/30 shrink-0 mt-0.5 transition-transform duration-300 ${openFaq === i ? "rotate-180 text-[#0074D9]" : ""}`}
-                  />
-                </button>
-                {openFaq === i && (
-                  <p className="text-sm text-muted-foreground leading-relaxed pb-6 -mt-2">{faq.a}</p>
-                )}
-              </AnimateIn>
-            ))}
+            <div className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {REPORT.map((r) => (
+                <ScoreRing key={r.label} score={r.score} label={r.label} />
+              ))}
+            </div>
+            <p className="mt-6 border-t border-border/50 pt-5 text-sm text-muted-foreground">
+              Se adjunta con tu logo para que se lo entregues a tu cliente.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* ── CONTACTO / CTA ─────────────────────────── */}
-      <section id="contacto" className="py-24 border-t border-foreground/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <AnimateIn>
-              <div>
-                <p className="text-[#0074D9] text-sm font-semibold uppercase tracking-widest mb-4">Empecemos</p>
-                <h2 className="font-display text-4xl md:text-5xl font-bold text-balance leading-tight mb-6">
-                  Cuéntanos tu primer proyecto.
-                </h2>
-                <p className="text-muted-foreground leading-relaxed mb-10">
-                  Completar el formulario tarda menos de 2 minutos. Respondemos en menos de 24 horas con una propuesta preliminar y un NDA listo para firmar.
-                </p>
-                <div className="space-y-5">
-                  {[
-                    { label: "Respuesta en", value: "Menos de 24 horas" },
-                    { label: "Primer contrato", value: "NDA incluido" },
-                    { label: "Reunion inicial", value: "Google Meet / Zoom" },
-                    { label: "Email directo", value: "info@startbyglobal.com" },
-                  ].map((d) => (
-                    <div key={d.label} className="flex items-center justify-between py-3 border-b border-foreground/5">
-                      <span className="text-sm text-foreground/35">{d.label}</span>
-                      <span className="text-sm text-foreground/70 font-medium">{d.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </AnimateIn>
+      <FaqSection faqs={FAQS} />
 
-            <AnimateIn delay={0.15}>
-              {sent ? (
-                <div className="flex flex-col items-center justify-center gap-4 h-full py-20 text-center">
-                  <div className="w-16 h-16 rounded-full bg-[#00C9C8]/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-8 h-8 text-[#0E7490] dark:text-[#00C9C8]" />
-                  </div>
-                  <h3 className="font-display text-2xl font-bold">Mensaje recibido.</h3>
-                  <p className="text-muted-foreground max-w-sm">Te respondemos en menos de 24 horas con una propuesta preliminar y el NDA listo.</p>
-                  <button type="button" onClick={() => setSent(false)} className="text-sm text-[#0074D9] hover:underline mt-2">
-                    Enviar otro mensaje
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Honeypot anti-bots: oculto para usuarios reales */}
-                  <input type="text" name="company_website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu nombre</label>
-                      <input
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
-                        placeholder="Juan Garcia"
-                        className="w-full px-4 py-3 rounded-xl bg-foreground/[0.04] border border-foreground/8 text-foreground text-sm placeholder:text-foreground/20 focus:border-[#0074D9]/50 focus:outline-none focus:bg-foreground/[0.06] transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Agencia / empresa</label>
-                      <input
-                        required
-                        value={formData.agency}
-                        onChange={(e) => setFormData((f) => ({ ...f, agency: e.target.value }))}
-                        placeholder="Mi Agencia Digital"
-                        className="w-full px-4 py-3 rounded-xl bg-foreground/[0.04] border border-foreground/8 text-foreground text-sm placeholder:text-foreground/20 focus:border-[#0074D9]/50 focus:outline-none focus:bg-foreground/[0.06] transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Email de contacto</label>
-                    <input
-                      required
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
-                      placeholder="juan@miagencia.com"
-                      className="w-full px-4 py-3 rounded-xl bg-foreground/[0.04] border border-foreground/8 text-foreground text-sm placeholder:text-foreground/20 focus:border-[#0074D9]/50 focus:outline-none focus:bg-foreground/[0.06] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Proyectos estimados al mes</label>
-                    <select
-                      value={formData.volume}
-                      onChange={(e) => setFormData((f) => ({ ...f, volume: e.target.value }))}
-                      className="w-full px-4 py-3 rounded-xl bg-foreground/[0.04] border border-foreground/8 text-foreground text-sm focus:border-[#0074D9]/50 focus:outline-none focus:bg-foreground/[0.06] transition-all"
-                    >
-                      <option value="" className="bg-background">Selecciona un rango</option>
-                      <option value="1-2" className="bg-background">1-2 proyectos</option>
-                      <option value="3-5" className="bg-background">3-5 proyectos</option>
-                      <option value="6-10" className="bg-background">6-10 proyectos</option>
-                      <option value="10+" className="bg-background">Más de 10</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-muted-foreground uppercase tracking-wider mb-2">Cuéntanos tu necesidad</label>
-                    <textarea
-                      required
-                      rows={4}
-                      value={formData.message}
-                      onChange={(e) => setFormData((f) => ({ ...f, message: e.target.value }))}
-                      placeholder="Tengo una agencia de marketing y necesito apoyo con desarrollo web para mis clientes..."
-                      className="w-full px-4 py-3 rounded-xl bg-foreground/[0.04] border border-foreground/8 text-foreground text-sm placeholder:text-foreground/20 focus:border-[#0074D9]/50 focus:outline-none focus:bg-foreground/[0.06] transition-all resize-none"
-                    />
-                  </div>
-
-                  {formError && (
-                    <p className="text-xs text-red-400 bg-red-400/5 border border-red-400/20 px-4 py-3 rounded-lg">{formError}</p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={sending}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#0074D9] text-white font-semibold text-sm hover:bg-[#0074D9]/85 hover:shadow-xl hover:shadow-[#0074D9]/25 transition-all disabled:opacity-50 disabled:pointer-events-none"
-                  >
-                    {sending ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Solicitar información de partner
-                      </>
-                    )}
-                  </button>
-                  <p className="text-center text-xs text-foreground/20">
-                    Al enviar aceptas que te contactemos. Nunca compartimos tu información.
-                  </p>
-                </form>
-              )}
-            </AnimateIn>
-          </div>
-        </div>
-      </section>
-
-    </div>
+      <ClosingCTA
+        title="Cuéntanos tu primer proyecto"
+        text="Te respondemos en menos de 24 horas con una propuesta preliminar y el NDA listo para firmar."
+        segment="outsourcing_final"
+        service={SERVICE}
+        ctaLabel="Hablar por WhatsApp"
+        form={{
+          landingKey: "outsourcing",
+          landingName: "Outsourcing (página de servicio)",
+          button: "Quiero la propuesta",
+          nameLabel: "Nombre y agencia",
+          qualifierLabel: "¿Cuántos proyectos al mes estimas?",
+        }}
+      />
+    </>
   )
 }

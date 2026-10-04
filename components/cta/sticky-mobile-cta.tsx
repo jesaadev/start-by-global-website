@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils"
 /**
  * Barra de CTA fija en móvil: aparece al pasar el hero para que el CTA siempre
  * esté a un toque. Deja libre la esquina derecha para la burbuja del chat.
- * En inglés, un único botón a la página de contacto (el modal de WhatsApp es
- * en español).
+ * En inglés, un único botón al formulario de la página (o a /us/contact): el
+ * modal de WhatsApp es en español.
  */
 export function StickyMobileCTA({
   segment,
@@ -50,7 +50,7 @@ export function StickyMobileCTA({
     >
       {locale === "en" ? (
         <Link
-          href="/us/contact"
+          href={secondaryHref === DIAGNOSTIC_HREF ? "/us/contact" : secondaryHref}
           tabIndex={visible ? 0 : -1}
           className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground font-bold text-sm py-3.5 shadow-lg shadow-black/30"
         >
