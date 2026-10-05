@@ -1,7 +1,8 @@
 // Tracking de blog del lado cliente. Gated por consentimiento analítico.
 
 import { getConsent } from "@/lib/consent"
-import { getStoredAttribution } from "@/lib/attribution"
+import { captureAttribution } from "@/lib/attribution"
+import { isLikelyBot } from "@/lib/bot"
 
 const SRC_ARTICLE_COOKIE = "sbg_src_article"
 
@@ -28,13 +29,14 @@ function payload(slug: string, event_type: string, opts?: { value?: number; targ
     value: opts?.value ?? null,
     target: opts?.target ?? null,
     session_id: sessionId(),
-    attribution: getStoredAttribution(),
+    // Captura en el momento si aún no existe (ver postLandingEvent en track-client).
+    attribution: getConsent().marketing ? captureAttribution() : null,
   })
 }
 
 /** Registra un evento de blog (fetch keepalive). No hace nada sin consentimiento analítico. */
 export function trackBlogEvent(slug: string, event_type: string, opts?: { value?: number; target?: string }) {
-  if (typeof window === "undefined" || !getConsent().analytics) return
+  if (typeof window === "undefined" || !getConsent().analytics || isLikelyBot()) return
   fetch("/api/blog-track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -45,7 +47,7 @@ export function trackBlogEvent(slug: string, event_type: string, opts?: { value?
 
 /** Variante con sendBeacon, fiable al cerrar/ocultar la pestaña. */
 export function beaconBlogEvent(slug: string, event_type: string, opts?: { value?: number; target?: string }) {
-  if (typeof window === "undefined" || !getConsent().analytics) return
+  if (typeof window === "undefined" || !getConsent().analytics || isLikelyBot()) return
   const body = payload(slug, event_type, opts)
   try {
     if (navigator.sendBeacon) {

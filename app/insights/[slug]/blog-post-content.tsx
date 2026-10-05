@@ -7,38 +7,18 @@ import {
   Calendar,
   Clock,
   User,
-  ChevronRight,
   Tag,
   BookOpen,
 } from "lucide-react"
 import type { BlogPostView, RelatedPost } from "@/lib/blog-posts"
 import { ShareButtons } from "@/components/blog/share-buttons"
+import { ArticleCta } from "@/components/blog/article-cta"
 
 const categoryColors: Record<string, string> = {
   "Marketing Digital": "bg-chart-1/10 text-chart-1 border-chart-1/20",
   "Desarrollo Web":    "bg-chart-2/10 text-chart-2 border-chart-2/20",
   "Tendencias Tech":   "bg-chart-4/10 text-chart-4 border-chart-4/20",
 }
-
-// CTA contextual: cada categoría empuja a la money page más afín (por locale).
-const CATEGORY_CTA = {
-  es: {
-    map: {
-      "Marketing Digital": { href: "/publicidad-ads", label: "Solicita una auditoría de Ads gratis" },
-      "Desarrollo Web":    { href: "/diseno-paginas-web", label: "Solicita tu propuesta de web" },
-      "Tendencias Tech":   { href: "/contacto", label: "Agenda una consultoría gratuita" },
-    } as Record<string, { href: string; label: string }>,
-    fallback: { href: "/contacto", label: "Agenda una consultoría gratuita" },
-  },
-  en: {
-    map: {
-      "Marketing Digital": { href: "/us/google-ads", label: "Get a free ads audit" },
-      "Desarrollo Web":    { href: "/us/website-design", label: "Get your website quote" },
-      "Tendencias Tech":   { href: "/us/contact", label: "Book a free consultation" },
-    } as Record<string, { href: string; label: string }>,
-    fallback: { href: "/us/contact", label: "Book a free consultation" },
-  },
-} as const
 
 // Textos del chrome del artículo por locale.
 const ARTICLE_TEXT = {
@@ -51,10 +31,6 @@ const ARTICLE_TEXT = {
     authorBlurb: (category: string) =>
       `Especialista en ${category} en Start By Global. Ayuda a empresas de República Dominicana, España y Latinoamérica a crecer en el entorno digital.`,
     keepReading: "Sigue leyendo",
-    ctaKicker: "Start By Global",
-    ctaTitle: "¿Listo para Aplicar Estas Estrategias?",
-    ctaBody: "Nuestro equipo puede ayudarte a implementar lo que acabas de leer, adaptado a tu negocio y mercado específico.",
-    moreArticles: "Más Artículos",
   },
   en: {
     base: "/us/insights",
@@ -65,10 +41,6 @@ const ARTICLE_TEXT = {
     authorBlurb: (category: string) =>
       `${category} specialist at Start By Global, helping businesses in the U.S. and Latin America grow online.`,
     keepReading: "Keep reading",
-    ctaKicker: "Start By Global",
-    ctaTitle: "Ready to Put This Into Practice?",
-    ctaBody: "Our team can implement what you just read, tailored to your business and market.",
-    moreArticles: "More Articles",
   },
 } as const
 
@@ -83,9 +55,22 @@ interface BlogPostContentProps {
 // Converts the HTML strings in blog-data into JSX with explicit Tailwind
 // classes so typography renders correctly without @tailwindcss/typography.
 // ---------------------------------------------------------------------------
-function ArticleBody({ html, readNextLabel = "Leer también" }: { html: string; readNextLabel?: string }) {
+function ArticleBody({
+  html,
+  readNextLabel = "Leer también",
+  inlineCta,
+}: {
+  html: string
+  readNextLabel?: string
+  /** Bloque de conversión que se inserta a mitad del artículo. */
+  inlineCta?: React.ReactNode
+}) {
   // Split on block-level tags we care about
   const segments: React.ReactNode[] = []
+  // El CTA va antes del 3.er H2 (tras dos secciones de valor); si el artículo
+  // tiene menos secciones, a la mitad del contenido.
+  let h2Count = 0
+  let ctaPlaced = false
 
   // We process the raw HTML string into logical blocks line-by-line.
   // Supported tags: h2, h3, p, ul, ol, blockquote, (li handled inside ul/ol)
@@ -114,6 +99,11 @@ function ArticleBody({ html, readNextLabel = "Leer también" }: { html: string; 
     lastIndex = match.index + fullMatch.length
 
     if (tag === "h2") {
+      h2Count++
+      if (h2Count === 3 && inlineCta && !ctaPlaced) {
+        segments.push(<div key={key++}>{inlineCta}</div>)
+        ctaPlaced = true
+      }
       segments.push(
         <h2
           key={key++}
@@ -193,6 +183,10 @@ function ArticleBody({ html, readNextLabel = "Leer también" }: { html: string; 
     }
   }
 
+  if (inlineCta && !ctaPlaced && segments.length >= 4) {
+    segments.splice(Math.floor(segments.length / 2), 0, <div key={key++}>{inlineCta}</div>)
+  }
+
   return <div className="[&>:first-child]:mt-0">{segments}</div>
 }
 
@@ -242,8 +236,6 @@ function InlineHtml({ html }: { html: string }) {
 export function BlogPostContent({ post, related, locale = "es" }: BlogPostContentProps) {
   const colorClass =
     categoryColors[post.category] ?? "bg-muted text-muted-foreground border-border"
-  const ctas = CATEGORY_CTA[locale]
-  const cta = ctas.map[post.category] ?? ctas.fallback
   const t = ARTICLE_TEXT[locale]
 
   return (
@@ -313,7 +305,11 @@ export function BlogPostContent({ post, related, locale = "es" }: BlogPostConten
 
       {/* Article Body */}
       <article className="glass-card rounded-2xl p-7 sm:p-12">
-        <ArticleBody html={post.content} readNextLabel={t.readNext} />
+        <ArticleBody
+          html={post.content}
+          readNextLabel={t.readNext}
+          inlineCta={<ArticleCta category={post.category} locale={locale} variant="inline" />}
+        />
       </article>
 
       {/* Author */}
@@ -368,42 +364,8 @@ export function BlogPostContent({ post, related, locale = "es" }: BlogPostConten
         </section>
       )}
 
-      {/* CTA */}
-      <div
-        className="rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden border border-primary/20"
-        style={{
-          background:
-            "linear-gradient(135deg, hsl(16 85% 55% / 0.07) 0%, hsl(190 70% 50% / 0.04) 100%)",
-        }}
-      >
-        <div className="relative z-10 space-y-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-            {t.ctaKicker}
-          </p>
-          <h3 className="font-display text-2xl sm:text-3xl font-bold text-balance">
-            {t.ctaTitle}
-          </h3>
-          <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            {t.ctaBody}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
-            <Link
-              href={cta.href}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold hover:shadow-lg hover:shadow-primary/25 transition-all"
-            >
-              {cta.label}
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href={t.base}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-card border border-border/50 text-foreground font-medium hover:border-primary/30 transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.moreArticles}
-            </Link>
-          </div>
-        </div>
-      </div>
+      {/* CTA final */}
+      <ArticleCta category={post.category} locale={locale} variant="final" />
     </div>
   )
 }
