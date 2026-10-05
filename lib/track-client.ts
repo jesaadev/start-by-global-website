@@ -2,7 +2,8 @@
 // Conversions API (server) para que Meta deduplique el pixel del navegador y el
 // evento server-side.
 
-import { getStoredAttribution, getMetaCookies, type Attribution } from "@/lib/attribution"
+import { captureAttribution, getStoredAttribution, getMetaCookies, type Attribution } from "@/lib/attribution"
+import { isLikelyBot } from "@/lib/bot"
 import { getConsent } from "@/lib/consent"
 import { getSourceArticle } from "@/lib/blog-track-client"
 import { localeFromPath } from "@/lib/i18n"
@@ -129,7 +130,7 @@ export function landingSession(): string {
 
 /** Persiste una señal ligera del embudo (view/scroll75/contact) en 1st-party. */
 function postLandingEvent(landing: string, eventType: "view" | "scroll75" | "contact") {
-  if (typeof window === "undefined" || !getConsent().analytics) return
+  if (typeof window === "undefined" || !getConsent().analytics || isLikelyBot()) return
   fetch("/api/landing-event", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -139,7 +140,11 @@ function postLandingEvent(landing: string, eventType: "view" | "scroll75" | "con
       event_type: eventType,
       session_id: landingSession(),
       path: window.location.pathname,
-      attribution: getConsent().marketing ? getStoredAttribution() : null,
+      // captureAttribution y no getStoredAttribution: en la primera vista el
+      // AttributionTracker del layout aún no ha guardado la cookie (sus efectos
+      // corren después de los de la página) y la visita del anuncio quedaba
+      // como "unknown".
+      attribution: getConsent().marketing ? captureAttribution() : null,
     }),
   }).catch(() => {})
 }
