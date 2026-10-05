@@ -19,9 +19,21 @@ function newEventId(): string {
   return `evt-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
+type FbqWindow = { fbq?: (...a: unknown[]) => void; __sbgFbq?: unknown[][] }
+
+/**
+ * Llama a fbq o, si el píxel aún no se inicializó (p. ej. el ViewContent que
+ * dispara una landing al montarse), lo encola: SitePixels vacía la cola justo
+ * después de fbq('init'). Antes estos eventos se perdían en la primera visita.
+ */
+function fbqCall(...args: unknown[]) {
+  const w = window as unknown as FbqWindow
+  if (typeof w.fbq === "function") w.fbq(...args)
+  else (w.__sbgFbq ??= []).push(args)
+}
+
 function fbqTrack(event: string, eventId: string) {
-  const fbq = (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq
-  if (typeof fbq === "function") fbq("track", event, {}, { eventID: eventId })
+  fbqCall("track", event, {}, { eventID: eventId })
 }
 
 /** Lee la variante A/B de navegación (cookie asignada en proxy.ts). */
@@ -111,8 +123,7 @@ export function fireContact(segment?: string): void {
 }
 
 function fbqTrackCustom(event: string) {
-  const fbq = (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq
-  if (typeof fbq === "function") fbq("trackCustom", event, {})
+  fbqCall("trackCustom", event, {})
 }
 
 /** ID de sesión anónimo para el embudo de landings (persiste por pestaña). */

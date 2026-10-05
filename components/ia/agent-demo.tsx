@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { motion, useInView } from "motion/react"
 import { Bot, CalendarCheck, Database, BellRing, Check } from "lucide-react"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useInView } from "@/hooks/use-in-view"
 import { cn } from "@/lib/utils"
 
 // Conversación ILUSTRATIVA (sin métricas): un agente de IA atiende, agenda y
@@ -42,7 +42,7 @@ const HOLD_MS = 3800
  */
 export function AgentDemo() {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { amount: 0.3 })
+  const inView = useInView(ref, 0.3)
   const reduced = useReducedMotion()
   const last = PHASES.length - 1
   const [phase, setPhase] = useState(last)
@@ -62,7 +62,8 @@ export function AgentDemo() {
   }, [phase, inView, reduced, last])
 
   const current = reduced ? PHASES[last] : PHASES[phase]
-  const enter = reduced ? false : { opacity: 0, y: 10, scale: 0.97 }
+  // Entrada de cada burbuja (keyframes en globals.css).
+  const enter = reduced ? undefined : { animation: "sbg-pop-in 280ms ease-out both" }
 
   return (
     <div ref={ref} aria-hidden>
@@ -82,30 +83,27 @@ export function AgentDemo() {
         <div className="flex h-[300px] flex-col gap-2.5 p-4 text-[13px] leading-snug text-white">
           {/* Sin AnimatePresence: al reiniciar el bucle los mensajes se retiran al instante. */}
           {MESSAGES.slice(0, current.msgs).map((m) => (
-            <motion.div
+            <div
               key={m.text}
-              initial={enter}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.28 }}
+              style={enter}
               className={cn(
                 "max-w-[85%] rounded-2xl px-3.5 py-2",
                 m.from === "user" ? "ml-auto rounded-tr-sm bg-[#005c4b]" : "rounded-tl-sm bg-[#1f2c34]"
               )}
             >
               {m.text}
-            </motion.div>
+            </div>
           ))}
           {current.typing && (
-            <motion.div
+            <div
               key="typing"
-              initial={enter}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              style={enter}
               className="flex w-fit gap-1 rounded-2xl rounded-tl-sm bg-[#1f2c34] px-3.5 py-3"
             >
               {[0, 1, 2].map((i) => (
                 <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/60" style={{ animationDelay: `${i * 140}ms` }} />
               ))}
-            </motion.div>
+            </div>
           )}
         </div>
 

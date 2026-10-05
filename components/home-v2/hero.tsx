@@ -5,7 +5,6 @@ import { HeroBackground } from "@/components/backgrounds/hero-background"
 import { PrimaryCTA } from "@/components/cta/primary-cta"
 import { SecondaryCTA } from "@/components/cta/secondary-cta"
 import { RotatingWord } from "@/components/motion/rotating-word"
-import ShinyText from "@/components/reactbits/ShinyText"
 import { DeviceDuo } from "@/components/mockups/device-duo"
 import { BrowserMockup } from "@/components/mockups/browser-mockup"
 import { Tilt } from "@/components/motion/tilt"
@@ -30,12 +29,12 @@ export async function HomeHero() {
         <div className="flex flex-col gap-6">
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse motion-reduce:animate-none" />
-            <ShinyText
-              text="Diseño web y publicidad · RD · ES · LATAM · EE.UU."
-              speed={3}
-              color="hsl(var(--primary))"
-              shineColor="#ffd9c7"
-            />
+            {/* Brillo que recorre el texto: degradado animado en CSS (sin JS). */}
+            <span
+              className="bg-clip-text text-transparent bg-[length:250%_100%] bg-[linear-gradient(110deg,hsl(var(--primary))_40%,#ffd9c7_50%,hsl(var(--primary))_60%)] [animation:sbg-shine_3s_linear_infinite] motion-reduce:[animation:none] motion-reduce:bg-none motion-reduce:text-primary"
+            >
+              Diseño web y publicidad · RD · ES · LATAM · EE.UU.
+            </span>
           </span>
 
           <h1 className="font-display font-bold tracking-tight leading-[1.02] text-[2.6rem] sm:text-6xl xl:text-7xl text-foreground">

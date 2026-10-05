@@ -194,3 +194,15 @@ body {
 .animated-underline:hover::after {
   width: 100%;
 }
+
+/* Animaciones de las demos ilustrativas (AdFlow, AgentDemo) en CSS puro: sin
+   librería de animación en el JavaScript inicial de las landings. Se aplican
+   con style={{ animation }} solo si el usuario no pidió reducir movimiento. */
+@keyframes sbg-fill { from { width: 0%; } to { width: 100%; } }
+@keyframes sbg-screen-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes sbg-pop-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes sbg-slide-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes sbg-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+@keyframes sbg-ripple { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.4); opacity: 0; } }
+@keyframes sbg-word-in { from { transform: translateY(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sbg-shine { from { background-position: 150% 0; } to { background-position: -50% 0; } }

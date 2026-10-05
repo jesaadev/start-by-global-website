@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/layout/marketing-layout"
+import { getSiteBase } from "@/lib/site-settings"
 import { InsightsContent } from "@/app/insights/insights-content"
 import { getAllPublished } from "@/lib/blog-posts"
 import { pageMetadata, hreflangFor } from "@/lib/seo"
@@ -7,7 +8,6 @@ import type { Metadata } from "next"
 // ISR: el listado se regenera cada hora y on-demand al publicar/editar.
 export const revalidate = 3600
 
-const BASE = "https://startbyglobal.com"
 
 export const metadata: Metadata = pageMetadata({
   title: "Insights & Blog",
@@ -25,6 +25,7 @@ export const metadata: Metadata = pageMetadata({
 })
 
 export default async function UsInsightsPage() {
+  const BASE = await getSiteBase()
   const posts = await getAllPublished("en")
 
   const jsonLd = {

@@ -327,10 +327,10 @@ function ChatInactive() {
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
-function ChatWidgetInner() {
+function ChatWidgetInner({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const locale = useLocale()
   const t = CHAT_TEXT[locale]
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(defaultOpen)
   const [minimized, setMinimized] = useState(false)
   const [messages, setMessages] = useState<Message[]>(() => [
     { id: "welcome", role: "model", text: CHAT_TEXT[locale].welcome },
@@ -797,11 +797,11 @@ function ChatWidgetInner() {
 
 // ─── Mounted guard + export ───────────────────────────────────────────────────
 
-export function ChatWidget() {
+export function ChatWidget({ defaultOpen = false }: { defaultOpen?: boolean } = {}) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   if (!mounted) return null
-  return <ChatWidgetInner />
+  return <ChatWidgetInner defaultOpen={defaultOpen} />
 }
 
 // Función global para abrir el chat desde cualquier parte del sitio

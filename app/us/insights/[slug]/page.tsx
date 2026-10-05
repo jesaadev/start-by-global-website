@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/layout/marketing-layout"
+import { getSiteBase } from "@/lib/site-settings"
 import { BlogPostContent } from "@/app/insights/[slug]/blog-post-content"
 import { ArticleTracker } from "@/components/blog/article-tracker"
 import { getPublishedSlugs, getPublishedPostBySlug, getRelatedPublished } from "@/lib/blog-posts"
@@ -7,13 +8,13 @@ import { notFound } from "next/navigation"
 // ISR: igual que el blog en español; revalidación on-demand al publicar/editar.
 export const revalidate = 3600
 
-const BASE = "https://startbyglobal.com"
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
+  const BASE = await getSiteBase()
   const { slug } = await params
   const post = await getPublishedPostBySlug(slug, "en")
   if (!post) return {}
@@ -50,6 +51,7 @@ export async function generateStaticParams() {
 }
 
 export default async function UsBlogPostPage({ params }: Props) {
+  const BASE = await getSiteBase()
   const { slug } = await params
   const post = await getPublishedPostBySlug(slug, "en")
   if (!post) notFound()
