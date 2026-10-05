@@ -10,7 +10,7 @@ import { useLocale } from "@/lib/i18n"
 const ChatWidget = dynamic(() => import("@/components/chat-widget").then((m) => m.ChatWidget), { ssr: false })
 
 /** Margen tras el evento load antes de precargar el chat (no compite con el LCP/INP inicial). */
-const PRELOAD_DELAY_MS = 3000
+const PRELOAD_DELAY_MS = 5000
 
 /**
  * Botón flotante ligero con el mismo aspecto que el del chat. Mientras el chat
