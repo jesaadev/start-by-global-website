@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AnimatePresence, motion, useInView } from "motion/react"
 import {
   Megaphone, MousePointerClick, MessageCircle, Target, Heart, Send, MessageSquare,
   ChevronRight, CheckCircle2, ArrowUpRight, type LucideIcon,
@@ -12,6 +11,7 @@ import { PrimaryCTA } from "@/components/cta/primary-cta"
 import { LinkCTA } from "@/components/cta/link-cta"
 import { MiniSite } from "@/components/home-v2/mini-site"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useInView } from "@/hooks/use-in-view"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -82,6 +82,11 @@ const TEXT = {
 
 type Text = (typeof TEXT)[Locale]
 
+/** Animación CSS (keyframes en globals.css); nada si se pidió reducir movimiento. */
+function anim(reduced: boolean, name: string, ms: number, delayMs = 0, extra = "ease-out both"): React.CSSProperties | undefined {
+  return reduced ? undefined : { animation: `${name} ${ms}ms ${extra}`, animationDelay: `${delayMs}ms` }
+}
+
 /**
  * "Así convierte una campaña": recorrido ILUSTRATIVO (sin métricas) de un
  * anuncio hasta el lead medido, dentro de un teléfono. Avanza solo mientras la
@@ -111,7 +116,7 @@ export function AdFlow({
   const t = TEXT[locale]
   const steps = t.steps.map((st, i) => ({ ...st, icon: ICONS[i] }))
   const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, { amount: 0.35 })
+  const inView = useInView(ref, 0.35)
   const reduced = useReducedMotion()
   const [step, setStep] = useState(0)
   const [auto, setAuto] = useState(true)
@@ -175,13 +180,11 @@ export function AdFlow({
                       </span>
                     </span>
                     {active && auto && !reduced && inView && (
-                      <motion.span
+                      <span
                         key={`bar-${step}`}
                         aria-hidden
                         className="absolute bottom-0 left-0 h-0.5 bg-primary"
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: STEP_MS / 1000, ease: "linear" }}
+                        style={{ animation: `sbg-fill ${STEP_MS}ms linear both` }}
                       />
                     )}
                   </button>
@@ -207,21 +210,13 @@ export function AdFlow({
         {/* Teléfono con la pantalla del paso activo (decorativo) */}
         <div className="mx-auto w-[230px] sm:w-[280px] row-start-2 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-center" aria-hidden>
           <PhoneMockup>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={step}
-                className="absolute inset-0"
-                initial={{ opacity: 0, y: reduced ? 0 : 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: reduced ? 0 : -16 }}
-                transition={{ duration: reduced ? 0 : 0.35, ease: "easeOut" }}
-              >
-                {step === 0 && <AdScreen reduced={reduced} t={t} />}
-                {step === 1 && <LandingScreen reduced={reduced} locale={locale} />}
-                {step === 2 && <ChatScreen reduced={reduced} t={t} />}
-                {step === 3 && <LeadScreen reduced={reduced} t={t} />}
-              </motion.div>
-            </AnimatePresence>
+            {/* key={step}: cada pantalla se monta de nuevo y entra con su animación */}
+            <div key={step} className="absolute inset-0" style={anim(reduced, "sbg-screen-in", 350)}>
+              {step === 0 && <AdScreen reduced={reduced} t={t} />}
+              {step === 1 && <LandingScreen reduced={reduced} locale={locale} />}
+              {step === 2 && <ChatScreen reduced={reduced} t={t} />}
+              {step === 3 && <LeadScreen reduced={reduced} t={t} />}
+            </div>
           </PhoneMockup>
           <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.example}</p>
         </div>
@@ -253,13 +248,9 @@ function AdScreen({ reduced, t }: { reduced: boolean; t: Text }) {
         {t.ad.action} <ChevronRight className="h-3.5 w-3.5" />
       </div>
       <div className="flex items-center gap-3 px-3 py-2.5">
-        <motion.span
-          initial={{ scale: 1 }}
-          animate={reduced ? undefined : { scale: [1, 1.35, 1] }}
-          transition={{ delay: 0.9, duration: 0.45 }}
-        >
+        <span className="inline-flex" style={anim(reduced, "sbg-beat", 450, 900)}>
           <Heart className="h-5 w-5 fill-[#ff3b5c] text-[#ff3b5c]" />
-        </motion.span>
+        </span>
         <MessageSquare className="h-5 w-5 text-white/80" />
         <Send className="h-5 w-5 text-white/80" />
       </div>
@@ -274,11 +265,9 @@ function LandingScreen({ reduced, locale }: { reduced: boolean; locale: Locale }
         <MiniSite compact locale={locale} />
         {/* "Toque" sobre el botón de WhatsApp */}
         {!reduced && (
-          <motion.span
-            className="absolute left-[30%] top-[39%] h-8 w-8 rounded-full border-2 border-white/80"
-            initial={{ scale: 0.3, opacity: 0 }}
-            animate={{ scale: [0.3, 1.4], opacity: [0.9, 0] }}
-            transition={{ delay: 1.1, duration: 0.7, repeat: 1, repeatDelay: 0.3 }}
+          <span
+            className="absolute left-[30%] top-[39%] h-8 w-8 rounded-full border-2 border-white/80 opacity-0"
+            style={{ animation: "sbg-ripple 1000ms ease-out 1100ms 2" }}
           />
         )}
       </div>
@@ -287,10 +276,7 @@ function LandingScreen({ reduced, locale }: { reduced: boolean; locale: Locale }
 }
 
 function ChatScreen({ reduced, t }: { reduced: boolean; t: Text }) {
-  const bubble = (delay: number) =>
-    reduced
-      ? {}
-      : { initial: { opacity: 0, y: 10, scale: 0.96 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { delay, duration: 0.3 } }
+  const bubble = (delayMs: number) => anim(reduced, "sbg-pop-in", 300, delayMs)
   return (
     <div className="absolute inset-0 flex flex-col bg-[#0b141a] pt-7 text-white">
       <div className="flex items-center gap-2 bg-[#1f2c34] px-3 py-2.5">
@@ -303,15 +289,15 @@ function ChatScreen({ reduced, t }: { reduced: boolean; t: Text }) {
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3 text-[11px] leading-snug">
-        <motion.div {...bubble(0.3)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
+        <div style={bubble(300)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
           {t.chat.msgs[0]}
-        </motion.div>
-        <motion.div {...bubble(1.2)} className="max-w-[82%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-2.5 py-1.5">
+        </div>
+        <div style={bubble(1200)} className="max-w-[82%] rounded-xl rounded-tl-sm bg-[#1f2c34] px-2.5 py-1.5">
           {t.chat.msgs[1]}
-        </motion.div>
-        <motion.div {...bubble(2.1)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
+        </div>
+        <div style={bubble(2100)} className="ml-auto max-w-[82%] rounded-xl rounded-tr-sm bg-[#005c4b] px-2.5 py-1.5">
           {t.chat.msgs[2]}
-        </motion.div>
+        </div>
       </div>
     </div>
   )
@@ -326,11 +312,9 @@ function LeadScreen({ reduced, t }: { reduced: boolean; t: Text }) {
       <p className="text-[10px] uppercase tracking-wider text-white/45">{t.panel}</p>
       <div className="mt-2 flex flex-col gap-2">
         {rows.map((r, i) => (
-          <motion.div
+          <div
             key={r.title}
-            initial={reduced ? false : { opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: reduced ? 0 : 0.25 + i * 0.45, type: "spring", damping: 22, stiffness: 260 }}
+            style={anim(reduced, "sbg-slide-in", 420, 250 + i * 450, "cubic-bezier(0.22, 1, 0.36, 1) both")}
             className="flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-2.5"
           >
             <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg", r.accent)}>
@@ -340,7 +324,7 @@ function LeadScreen({ reduced, t }: { reduced: boolean; t: Text }) {
               <span className="block text-[11px] font-semibold">{r.title}</span>
               <span className="block text-[9px] text-white/55">{r.sub}</span>
             </span>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

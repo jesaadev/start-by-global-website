@@ -90,7 +90,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     description:
       "Agencia de marketing digital con presencia en Rep. Dominicana, España, Latinoamérica y EE.UU. Soluciones web innovadoras para impulsar tu negocio.",
     keywords: ["marketing digital", "desarrollo web", "SEO", "Rep. Dominicana", "agencia digital"],
-    canonicalBase: "https://startbyglobal.com",
+    canonicalBase: "https://www.startbyglobal.com",
     defaultOgImage: "/logo-black.svg",
     twitterHandle: "",
     locale: "es_DO",
@@ -151,7 +151,9 @@ export function mergeSettings(partial: unknown): SiteSettings {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const FALLBACK_BASE = "https://startbyglobal.com"
+// El sitio se sirve en www (el dominio raíz redirige ahí): las canónicas
+// deben apuntar a la URL final, no a una que redirige.
+const FALLBACK_BASE = "https://www.startbyglobal.com"
 
 /**
  * Normaliza la URL base canónica editable desde el admin. Si es inválida o le
@@ -165,6 +167,12 @@ export function safeBaseUrl(raw: string): string {
     console.warn(`[SiteSettings] canonicalBase inválida ("${raw}"), usando ${FALLBACK_BASE}`)
     return FALLBACK_BASE
   }
+}
+
+/** URL base canónica del sitio (configurada en el admin), sin barra final. */
+export async function getSiteBase(): Promise<string> {
+  const { seo } = await getSiteSettings()
+  return safeBaseUrl(seo.canonicalBase)
 }
 
 // ─── Reads ────────────────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/layout/marketing-layout"
+import { getSiteBase } from "@/lib/site-settings"
 import { BlogPostContent } from "./blog-post-content"
 import { ArticleTracker } from "@/components/blog/article-tracker"
 import { getPublishedSlugs, getPublishedPostBySlug, getRelatedPublished } from "@/lib/blog-posts"
@@ -8,13 +9,13 @@ import { notFound } from "next/navigation"
 // editar desde el admin se revalidan on-demand (revalidatePath).
 export const revalidate = 3600
 
-const BASE = "https://startbyglobal.com"
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
+  const BASE = await getSiteBase()
   const { slug } = await params
   const post = await getPublishedPostBySlug(slug)
   if (!post) return {}
@@ -50,6 +51,7 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  const BASE = await getSiteBase()
   const { slug } = await params
   const post = await getPublishedPostBySlug(slug)
   if (!post) notFound()

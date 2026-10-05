@@ -1,16 +1,13 @@
 "use client"
 
 import { useRef, type ReactNode } from "react"
-import { motion, useMotionValue, useSpring } from "motion/react"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { cn } from "@/lib/utils"
 
-const SPRING = { damping: 30, stiffness: 100, mass: 2 }
-
 /**
- * Inclinación 3D que sigue al cursor (misma técnica que React Bits·TiltedCard,
- * pero envolviendo cualquier contenido, p. ej. un mockup). Estático en táctil
- * y con prefers-reduced-motion.
+ * Inclinación 3D que sigue al cursor, envolviendo cualquier contenido (p. ej.
+ * un mockup). Sin librería de animación: el transform se escribe directo en el
+ * estilo (sin re-renders) y la transición CSS lo suaviza. Solo con puntero
+ * fino (desktop) y sin "reducir movimiento"; en táctil queda estático.
  */
 export function Tilt({
   children,
@@ -21,27 +18,39 @@ export function Tilt({
   amplitude?: number
   className?: string
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const reduced = useReducedMotion()
-  const rotateX = useSpring(useMotionValue(0), SPRING)
-  const rotateY = useSpring(useMotionValue(0), SPRING)
+  const inner = useRef<HTMLDivElement>(null)
+  const frame = useRef(0)
+
+  const enabled = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduced || !ref.current) return
-    const r = ref.current.getBoundingClientRect()
-    const x = e.clientX - r.left - r.width / 2
-    const y = e.clientY - r.top - r.height / 2
-    rotateX.set((y / (r.height / 2)) * -amplitude)
-    rotateY.set((x / (r.width / 2)) * amplitude)
+    const el = inner.current
+    if (!el || !enabled()) return
+    const r = e.currentTarget.getBoundingClientRect()
+    const rx = ((e.clientY - r.top - r.height / 2) / (r.height / 2)) * -amplitude
+    const ry = ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * amplitude
+    cancelAnimationFrame(frame.current)
+    frame.current = requestAnimationFrame(() => {
+      el.style.transform = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`
+    })
   }
+
   const onLeave = () => {
-    rotateX.set(0)
-    rotateY.set(0)
+    cancelAnimationFrame(frame.current)
+    if (inner.current) inner.current.style.transform = ""
   }
 
   return (
-    <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} className={cn("[perspective:1200px]", className)}>
-      <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}>{children}</motion.div>
+    <div onMouseMove={onMove} onMouseLeave={onLeave} className={cn("[perspective:1200px]", className)}>
+      <div
+        ref={inner}
+        className="[transform-style:preserve-3d] transition-transform [transition-duration:600ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+      >
+        {children}
+      </div>
     </div>
   )
 }

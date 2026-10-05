@@ -2,7 +2,7 @@ import React from "react"
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import { ChatWidget } from '@/components/chat-widget'
+import { ChatLauncher } from '@/components/chat-launcher'
 import { SitePixels } from '@/components/site-pixels'
 import { AttributionTracker } from '@/components/attribution-tracker'
 import { CookieConsent } from '@/components/cookie-consent'
@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     base = new URL(seo.canonicalBase)
   } catch {
-    base = new URL('https://startbyglobal.com')
+    base = new URL('https://www.startbyglobal.com')
   }
 
   // Solo forzamos una imagen OG si el admin fijó una personalizada (no el logo).
@@ -87,7 +87,7 @@ export default async function RootLayout({
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
-          <ChatWidget />
+          <ChatLauncher />
           <JsonLd settings={settings} />
           <SitePixels pixels={settings.pixels} />
           <AttributionTracker />

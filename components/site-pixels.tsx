@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useSearchParams } from "next/navigation"
-import { useEffect, Suspense } from "react"
+import { useEffect, useRef, useState, Suspense } from "react"
 import Script from "next/script"
 import type { PixelSettings } from "@/lib/site-settings"
 import { useConsent } from "@/hooks/use-consent"
@@ -19,9 +19,16 @@ function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) 
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const consent = useConsent()
+  const firstLoad = useRef(true)
 
   useEffect(() => {
     if (!pathname) return
+    // La carga inicial ya la registra cada snippet (fbq PageView, ttq.page):
+    // aquí solo las navegaciones posteriores dentro del sitio.
+    if (firstLoad.current) {
+      firstLoad.current = false
+      return
+    }
     const url = pathname + (searchParams?.toString() ? `?${searchParams}` : "")
 
     if (consent.marketing) {
@@ -40,9 +47,45 @@ function RouteChangeTracker({ ga4Id, gtmId }: { ga4Id: string; gtmId: string }) 
   return null
 }
 
+/** Margen tras el evento load antes de cargar las librerías de medición. */
+const DEFER_MS = 4000
+
+/**
+ * true tras la primera interacción del visitante (tocar, teclear, desplazar) o
+ * DEFER_MS después de la carga, lo que ocurra primero. En móvil, "después de
+ * load" no basta: las librerías seguían ejecutándose antes del primer pintado.
+ */
+function useDeferredLoad(): boolean {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const go = () => setReady(true)
+    const events = ["pointerdown", "keydown", "scroll", "touchstart"] as const
+    events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+    const onLoad = () => {
+      timer = setTimeout(go, DEFER_MS)
+    }
+    if (document.readyState === "complete") onLoad()
+    else window.addEventListener("load", onLoad, { once: true })
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, go))
+      window.removeEventListener("load", onLoad)
+      if (timer) clearTimeout(timer)
+    }
+  }, [])
+  return ready
+}
+
 /**
  * Inyecta todos los pixels/etiquetas de medición configurados desde el admin.
  * Cada bloque se renderiza solo si su ID correspondiente está definido.
+ *
+ * Rendimiento: las colas mínimas (dataLayer, fbq) se crean al hidratar para no
+ * perder eventos, pero las librerías pesadas (gtm.js, gtag.js, fbevents.js,
+ * TikTok, Clarity) se descargan tras la primera interacción o unos segundos
+ * después de la carga (useDeferredLoad): en móvil competían con el primer
+ * pintado del titular. El PageView también se envía server-side por CAPI
+ * (AttributionTracker) y los eventos encolados se envían al cargar fbevents.
  */
 export function SitePixels({ pixels }: { pixels: PixelSettings }) {
   const pathname = usePathname()
@@ -50,6 +93,7 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
   const consent = useConsent()
   const analytics = consent.analytics
   const marketing = consent.marketing
+  const ready = useDeferredLoad()
 
   // No cargar ningún pixel/etiqueta en el panel de administración: evita que
   // los clicks y la navegación del propio equipo se registren como eventos de
@@ -64,11 +108,9 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
           <Script id="gtm" strategy="afterInteractive">
             {`(function(w,l){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});})(window,'dataLayer');`}
           </Script>
-          <Script
-            id="gtm-src"
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}
-          />
+          {ready && (
+            <Script id="gtm-src" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`} />
+          )}
           {/* Respaldo sin JavaScript */}
           <noscript>
             <iframe
@@ -87,11 +129,9 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
           para evitar enviar los datos por duplicado. */}
       {analytics && ga4Id && !gtmId && (
         <>
-          <Script
-            id="ga4-src"
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
-          />
+          {ready && (
+            <Script id="ga4-src" strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />
+          )}
           <Script id="ga4-init" strategy="afterInteractive">
             {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`}
           </Script>
@@ -102,8 +142,9 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
       {marketing && metaPixelId && (
         <>
           <Script id="fb-pixel" strategy="afterInteractive">
-            {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`}
+            {`!function(f){if(f.fbq)return;var n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);fbq('init','${metaPixelId}');fbq('track','PageView');(window.__sbgFbq||[]).splice(0).forEach(function(a){fbq.apply(null,a)});`}
           </Script>
+          {ready && <Script id="fb-pixel-src" strategy="afterInteractive" src="https://connect.facebook.net/en_US/fbevents.js" />}
           <noscript>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -118,14 +159,14 @@ export function SitePixels({ pixels }: { pixels: PixelSettings }) {
       )}
 
       {/* TikTok Pixel (marketing) */}
-      {marketing && tiktokPixelId && (
+      {marketing && tiktokPixelId && ready && (
         <Script id="tiktok-pixel" strategy="afterInteractive">
           {`!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load('${tiktokPixelId}');ttq.page();}(window,document,'ttq');`}
         </Script>
       )}
 
       {/* Microsoft Clarity (analítica) */}
-      {analytics && clarityId && (
+      {analytics && clarityId && ready && (
         <Script id="ms-clarity" strategy="afterInteractive">
           {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarityId}");`}
         </Script>

@@ -1,4 +1,4 @@
-import { getSiteSettings, safeBaseUrl } from "@/lib/site-settings"
+import { getSiteBase } from "@/lib/site-settings"
 
 // Datos estructurados reutilizables para páginas de servicio.
 // La base se toma de la configuración (admin) para mantener paridad entre
@@ -6,10 +6,7 @@ import { getSiteSettings, safeBaseUrl } from "@/lib/site-settings"
 
 const AREA_SERVED = ["DO", "ES", "MX", "US"].map((c) => ({ "@type": "Country", name: c }))
 
-async function getBase() {
-  const { seo } = await getSiteSettings()
-  return safeBaseUrl(seo.canonicalBase)
-}
+const getBase = getSiteBase
 
 function JsonLdScript({ data }: { data: Record<string, unknown> }) {
   return (
