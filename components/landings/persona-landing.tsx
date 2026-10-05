@@ -35,7 +35,7 @@ export async function PersonaLanding({ data }: { data: PersonaLandingData }) {
       {/* NAV reducido: logo + un solo CTA, sin menú */}
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/85 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center" aria-label="Start By Global — inicio">
+          <Link href="/" prefetch={false} className="flex items-center" aria-label="Start By Global — inicio">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-black.svg" alt="Start By Global" className="h-7 dark:invert" />
           </Link>

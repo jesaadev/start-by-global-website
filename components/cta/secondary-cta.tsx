@@ -16,6 +16,9 @@ export function SecondaryCTA({ label = "Diagnóstico gratis", href = DIAGNOSTIC_
   return (
     <Link
       href={href}
+      // Sin precarga: en móvil competía con el primer pintado (y los enlaces
+      // "#contacto" precargaban la propia página).
+      prefetch={false}
       className={cn(
         "group inline-flex items-center justify-center gap-2 px-6 py-4 rounded-[20px] border border-border bg-background/40 text-foreground font-semibold text-sm sm:text-base backdrop-blur-sm transition-colors hover:bg-secondary/70",
         className

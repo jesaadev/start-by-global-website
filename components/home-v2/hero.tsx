@@ -73,7 +73,6 @@ export async function HomeHero() {
                 mobileSrc={featured.mobile_image ?? undefined}
                 alt={featured.title}
                 domain={featured.domain ?? undefined}
-                priority
               />
               <p className="mt-4 text-xs text-muted-foreground text-center lg:text-left">
                 Trabajo real: <span className="text-foreground font-medium">{featured.client_name ?? featured.title}</span> · pasa el cursor para recorrerla

@@ -46,7 +46,6 @@ export function PersonaVisual({ visual, work, locale = "es" }: { visual: Visual;
           mobileSrc={real.mobile_image ?? undefined}
           alt={real.title}
           domain={real.domain ?? undefined}
-          priority
         />
         <p className="mt-4 text-xs text-muted-foreground text-center lg:text-left">
           {t.real} <span className="font-medium text-foreground">{real.client_name ?? real.title}</span>
