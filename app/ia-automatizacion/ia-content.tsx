@@ -206,7 +206,7 @@ export function IaContent() {
       <FaqSection faqs={FAQS} />
 
       <ClosingCTA
-        title="Agenda tu demo gratis"
+        title="Agenda tu demo"
         text="30 minutos para mostrarte qué podemos automatizar en tu empresa, con ejemplos de tu propio día a día. Sin compromiso."
         segment="ia_final"
         service={SERVICE}
